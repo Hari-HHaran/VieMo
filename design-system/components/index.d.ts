@@ -187,6 +187,37 @@ export interface ToastProps {
 }
 export declare function Toast(props: ToastProps): React.ReactElement;
 
+export interface AccentRoles { reel: string; 'on-reel': string; 'reel-ink': string; 'reel-soft': string; /** The fill moved noticeably from the source colour to stay legible. */ adjusted: boolean }
+export interface Accent { source: string; name: string; /** True when the source is black, white or grey: the result is a warm-grey accent. */ noir: boolean; dark: AccentRoles; light: AccentRoles }
+export interface Swatch { hex: string; share: number; name: string; source?: 'logo' | 'poster' }
+/** Tune any colour into the four accent tokens for both themes, holding 3:1 for fills and 4.5:1 for text. Grounds are read from tokens.css. */
+export declare function deriveAccent(color: string, options?: { grounds?: Record<'dark' | 'light', Record<'bg' | 'surface' | 'surface-raised' | 'surface-overlay' | 'ink', string>> }): Accent | null;
+/** Apply an accent to the whole document (null returns to VieMo red). */
+export declare function applyAccent(color: string | null): Accent | null;
+/** CSS re-pointing the accent tokens for `selector` in both themes; 'classic' pins VieMo red. Use it server-side to avoid a flash. */
+export declare function accentCss(color: string | 'classic', selector?: string): string;
+/** Distinct colours in an image (canvas ImageData or raw RGBA), largest first, ignoring transparent pixels and greys. */
+export declare function extractSwatches(image: { data: ArrayLike<number> } | ArrayLike<number>, options?: { max?: number }): { swatches: Swatch[]; neutral: boolean };
+export declare function colorName(color: string): string;
+export declare function contrast(a: string, b: string): number;
+
+export interface AccentScopeProps { color: string | 'classic' | null; as?: string; className?: string; style?: React.CSSProperties; children?: React.ReactNode }
+export declare function AccentScope(props: AccentScopeProps): React.ReactElement;
+
+export interface AccentPickerProps {
+  film: { title: string; posterSrc?: string | null };
+  swatches: Swatch[];
+  /** Nothing colourful in the logo or the poster. */
+  neutral?: boolean;
+  /** Offer "Black and white" (a warm grey) too. */
+  allowNoir?: boolean;
+  /** The chosen source colour, or null for VieMo red. */
+  value: string | null;
+  onChange: (color: string | null) => void;
+  onApply?: () => void; saving?: boolean; className?: string;
+}
+export declare function AccentPicker(props: AccentPickerProps): React.ReactElement;
+
 declare global {
   interface Window {
     VieMo: {
@@ -195,6 +226,8 @@ declare global {
       ProviderBadge: typeof ProviderBadge; CollectionTile: typeof CollectionTile; SwipeCard: typeof SwipeCard;
       FilterChip: typeof FilterChip; BottomNav: typeof BottomNav; Skeleton: typeof Skeleton; EmptyState: typeof EmptyState;
       ErrorState: typeof ErrorState; ConfirmModal: typeof ConfirmModal; Toast: typeof Toast;
+      AccentPicker: typeof AccentPicker; AccentScope: typeof AccentScope; deriveAccent: typeof deriveAccent; applyAccent: typeof applyAccent;
+      accentCss: typeof accentCss; extractSwatches: typeof extractSwatches; colorName: typeof colorName; contrast: typeof contrast;
       iconNames: IconName[]; formatRuntime: (minutes: number) => string | null;
     };
   }

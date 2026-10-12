@@ -260,9 +260,26 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 .vm-toast-action:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
 .vm-toast-close { display: grid; place-items: center; width: var(--tap-min); height: var(--tap-min); border: 0; border-radius: var(--radius-full); background: none; color: var(--ink-muted); cursor: pointer; }
 
+/* AccentPicker */
+.vm-accent-picker { display: grid; gap: var(--space-4); padding: var(--space-4); border-radius: var(--radius-lg); background: var(--surface-raised); border: 1px solid var(--line); }
+.vm-accent-head { display: flex; gap: var(--space-3); align-items: center; }
+.vm-accent-head h3, .vm-accent-head p { margin: 0; }
+.vm-accent-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--space-2); }
+.vm-accent-option { display: grid; justify-items: center; gap: 2px; width: 100%; min-height: var(--tap-min); padding: var(--space-3) var(--space-2); border-radius: var(--radius-md); border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; font-family: var(--font-sans); text-align: center; transition: border-color var(--duration-fast) var(--ease-out); }
+.vm-accent-option:hover { border-color: var(--line-strong); }
+.vm-accent-option.is-on { border-color: var(--reel-ink); background: var(--reel-soft); }
+.vm-accent-option:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.vm-accent-dot { display: grid; place-items: center; width: 36px; height: 36px; margin-bottom: var(--space-1); border-radius: var(--radius-full); background: var(--reel); color: var(--on-reel); }
+.vm-accent-sample { display: grid; gap: var(--space-2); padding: var(--space-4); border-radius: var(--radius-md); background: var(--surface); border: 1px dashed var(--line-strong); }
+.vm-accent-sample > p { margin: 0; }
+.vm-accent-sample-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.vm-accent-link { color: var(--reel-ink); text-decoration: underline; text-underline-offset: 3px; }
+.vm-accent-note { display: inline-flex; align-items: center; gap: 6px; }
+.vm-accent-actions { display: flex; justify-content: flex-end; }
+
 /* Motion off: keep state changes, drop travel. */
 @media (prefers-reduced-motion: reduce) {
   .vm-skel::after, .vm-modal[open] .vm-modal-panel, .vm-toast { animation: none; }
-  .vm-swipe-card, .vm-btn, .vm-chip, .vm-swipe-bar span { transition: none; }
+  .vm-swipe-card, .vm-btn, .vm-chip, .vm-swipe-bar span, .vm-accent-option { transition: none; }
   .vm-spin { animation-duration: 2400ms; }
 }

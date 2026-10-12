@@ -16,6 +16,7 @@ Film, review, collection, person and Movie Night screens open on top of the tab 
 
 - **Film**: backdrop, Poster `lg`, title in `type-display-lg`, facts line, Rating pair (VieMo and TMDB, labelled), primary action Add to watchlist, then Log or rate, Where to watch (ProviderBadge group), friends who watched, reviews, collections it appears in.
 - **Movie Night**: lobby (participants, readiness, code in `type-code-lg`, invite) → viewing context (mood, genres with exclusions, runtime, services; three steps at most) → voting (SwipeCard stack with progress) → results (top pick with agreement score, why, alternatives, Confirm) → saved to history.
+- **Appearance** (Profile → Settings, and the last, skippable onboarding step after favourite films): theme (System, Dark, Light), Reduce motion, Autoplay previews, and AccentPicker for the favourite film's colour.
 - **Collection**: cover mosaic, title in `type-display-md`, creator, visibility, Save / Copy / Follow creator, ordered FilmCards with notes, Reorder mode with drag handles and move-up/move-down buttons.
 
 ## Rules

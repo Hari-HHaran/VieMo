@@ -1,6 +1,6 @@
 # VieMo: product foundation and build plan
 
-Working title in the brief: ReelCircle. Status of everything below is labelled **Complete**, **Partial**, **Planned** or **Blocked**.
+Name: VieMo (the brief's working title, ReelCircle, is retired). Status of everything below is labelled **Complete**, **Partial**, **Planned** or **Blocked**.
 
 ## Core user problem
 
@@ -26,8 +26,8 @@ Home (friends' activity) · Discover (search, trends, moods, collections) · Mat
 
 ## Essential data structures (Supabase / Postgres)
 
-- `profiles`, `user_preferences` (genres, services, region default `SG`, language, consent flags), `follows`, `blocks`
-- `films` (TMDB id as primary key, cached metadata with `fetched_at`), `watch_providers_cache` (film, region, provider, kind, `fetched_at`)
+- `profiles`, `user_preferences` (genres, services, region default `SG`, language, theme, consent flags, `accent_hex`, `accent_film_id`, `accent_source` logo/poster/classic/noir), `follows`, `blocks`
+- `films` (TMDB id as primary key, cached metadata with `fetched_at`), `film_palettes` (film, source logo/poster, swatches, `fetched_at`), `watch_providers_cache` (film, region, provider, kind, `fetched_at`)
 - `diary_entries` (watched_on, rating 0.5–5 in 0.5 steps, review, spoiler, visibility), `review_likes`, `review_comments`
 - `watchlist_items`, `collections` (visibility, cover), `collection_items` (position, note), `collection_members` (role: editor/viewer), `collection_saves`
 - `match_sessions` (code, host, status), `match_participants` (ready, last_seen), `match_preferences` (hard constraints vs soft preferences), `match_candidates`, `match_votes` (unique per participant + candidate), `match_results` (scores, weights version), `match_selections`
@@ -41,8 +41,8 @@ Next.js (App Router) + TypeScript, Tailwind mapped to the design tokens, Supabas
 
 ## Implementation sequence
 
-1. **Design system**: **Complete.** Tokens, type, 19 components with live previews, brand book, navigation and accessibility rules (`design-system/`).
-2. **Phase 1 foundation**: app shell and navigation, auth, TMDB search and film pages, diary/ratings/reviews, watchlist, profiles, follows, activity feed, basic collections. **Planned.**
+1. **Design system**: **Complete.** Tokens, type, 20 components with live previews, brand book, navigation and accessibility rules (`design-system/`), including personal accent colours (AccentPicker, `deriveAccent`, `applyAccent`, `extractSwatches`).
+2. **Phase 1 foundation**: app shell and navigation, auth, TMDB search and film pages, diary/ratings/reviews, watchlist, profiles, follows, activity feed, basic collections, and the Appearance settings with the favourite-film accent (server route reads the TMDB logo, falls back to the poster, caches swatches per film). **Planned.**
 3. **Phase 2 Movie Night**: sessions, realtime lobby, preferences, voting, deterministic scoring with documented weights, results, history, cross-account tests. **Planned.**
 4. **Phase 3 discovery**: Clips trailer feed, mood discovery, trending, regional availability. **Planned.**
 5. **Phase 4**: AI explanations, ranking improvements, collaborative collections, moderation, performance and accessibility audits. **Planned.**
@@ -58,6 +58,7 @@ Next.js (App Router) + TypeScript, Tailwind mapped to the design tokens, Supabas
 
 ## Decisions for the founder
 
-- Product name: VieMo (repo) or ReelCircle (brief)?
+- Product name: **VieMo** (decided).
+- Personal accent from the favourite film's logo: **in** (decided). It changes only the accent tokens; ratings, statuses and text colours stay fixed.
 - Keep the Light theme alongside the default Dark?
 - A logo or wordmark (none exists; the name is set in Instrument Serif for now).

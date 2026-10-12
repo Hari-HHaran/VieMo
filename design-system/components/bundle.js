@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"VieMo","components":[{"name":"Button"},{"name":"Icon"},{"name":"Avatar"},{"name":"Poster"},{"name":"FilmCard"},{"name":"Rating"},{"name":"ReviewCard"},{"name":"ActivityItem"},{"name":"ProfilePreview"},{"name":"ProviderBadge"},{"name":"CollectionTile"},{"name":"SwipeCard"},{"name":"FilterChip"},{"name":"BottomNav"},{"name":"Skeleton"},{"name":"EmptyState"},{"name":"ErrorState"},{"name":"ConfirmModal"},{"name":"Toast"}]} */
+/* @ds-bundle: {"format":4,"namespace":"VieMo","components":[{"name":"Button"},{"name":"Icon"},{"name":"Avatar"},{"name":"Poster"},{"name":"FilmCard"},{"name":"Rating"},{"name":"ReviewCard"},{"name":"ActivityItem"},{"name":"ProfilePreview"},{"name":"ProviderBadge"},{"name":"CollectionTile"},{"name":"SwipeCard"},{"name":"FilterChip"},{"name":"BottomNav"},{"name":"Skeleton"},{"name":"EmptyState"},{"name":"ErrorState"},{"name":"ConfirmModal"},{"name":"Toast"},{"name":"AccentPicker"}]} */
 /* VieMo components for React 18 (window.React, window.ReactDOM). Icons: Lucide 0.460.0, ISC licence. */
 (function () {
   "use strict";
@@ -537,11 +537,280 @@
       props.onDismiss ? h('button', { type: 'button', className: 'vm-toast-close', onClick: props.onDismiss }, h(Icon, { name: 'x', size: 18 }), sr('Dismiss')) : null);
   }
 
+  /* ---------- Personal accent: colour maths (OKLab / OKLCH, WCAG 2 contrast) ---------- */
+  function toLin(c) { c /= 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function fromLin(c) { var v = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055; return Math.round(Math.max(0, Math.min(1, v)) * 255); }
+  function parseColor(str) {
+    var s = String(str || '').trim(), m;
+    if ((m = /^#([0-9a-f]{3,8})$/i.exec(s))) {
+      var x = m[1];
+      if (x.length === 3 || x.length === 4) x = x.split('').map(function (c) { return c + c; }).join('');
+      return [parseInt(x.slice(0, 2), 16), parseInt(x.slice(2, 4), 16), parseInt(x.slice(4, 6), 16)];
+    }
+    if ((m = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(s))) return [+m[1], +m[2], +m[3]];
+    if (typeof document !== 'undefined' && s) {
+      var ctx = document.createElement('canvas').getContext('2d');
+      if (ctx) { ctx.fillStyle = '#000'; ctx.fillStyle = s; ctx.fillRect(0, 0, 1, 1); var d = ctx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2]]; }
+    }
+    return null;
+  }
+  function hex(rgb) { return '#' + rgb.map(function (v) { return ('0' + Math.round(v).toString(16)).slice(-2); }).join(''); }
+  function luminance(rgb) { return 0.2126 * toLin(rgb[0]) + 0.7152 * toLin(rgb[1]) + 0.0722 * toLin(rgb[2]); }
+  function contrast(a, b) {
+    var la = luminance(typeof a === 'string' ? parseColor(a) : a), lb = luminance(typeof b === 'string' ? parseColor(b) : b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+  function rgbToOklab(rgb) {
+    var r = toLin(rgb[0]), g = toLin(rgb[1]), b = toLin(rgb[2]);
+    var l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+    var m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+    var s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+    return [0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s];
+  }
+  function oklabToLinear(L, a, b) {
+    var l = Math.pow(L + 0.3963377774 * a + 0.2158037573 * b, 3), m = Math.pow(L - 0.1055613458 * a - 0.0638541728 * b, 3), s = Math.pow(L - 0.0894841775 * a - 1.2914855480 * b, 3);
+    return [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s];
+  }
+  function toOklch(rgb) { var o = rgbToOklab(rgb); var h = Math.atan2(o[2], o[1]) * 180 / Math.PI; return { L: o[0], C: Math.sqrt(o[1] * o[1] + o[2] * o[2]), h: h < 0 ? h + 360 : h }; }
+  /* OKLCH to sRGB, lowering chroma until the colour fits the sRGB gamut. */
+  function fromOklch(L, C, h) {
+    var rad = h * Math.PI / 180, lo = 0, hi = C, lin;
+    function inGamut(c) { lin = oklabToLinear(L, c * Math.cos(rad), c * Math.sin(rad)); return lin.every(function (v) { return v >= -0.0005 && v <= 1.0005; }); }
+    if (!inGamut(C)) { for (var i = 0; i < 18; i++) { var mid = (lo + hi) / 2; if (inGamut(mid)) lo = mid; else hi = mid; } inGamut(lo); }
+    return lin.map(fromLin);
+  }
+  function distance(a, b) { var x = rgbToOklab(a), y = rgbToOklab(b); return Math.sqrt(Math.pow(x[0] - y[0], 2) + Math.pow(x[1] - y[1], 2) + Math.pow(x[2] - y[2], 2)); }
+
+  var HUE_NAMES = [[15, 'Pink'], [45, 'Red'], [70, 'Orange'], [100, 'Gold'], [125, 'Yellow'], [165, 'Green'], [200, 'Teal'], [235, 'Cyan'], [275, 'Blue'], [315, 'Violet'], [345, 'Magenta'], [361, 'Pink']];
+  var NEUTRAL_CHROMA = 0.035;
+  function colorName(color) {
+    var rgb = typeof color === 'string' ? parseColor(color) : color;
+    if (!rgb) return 'Colour';
+    var c = toOklch(rgb);
+    if (c.C < NEUTRAL_CHROMA) return 'Black and white';
+    for (var i = 0; i < HUE_NAMES.length; i++) if (c.h < HUE_NAMES[i][0]) return HUE_NAMES[i][1];
+    return 'Pink';
+  }
+
+  /* The grounds an accent must read on, read from tokens.css so the tokens stay the one source.
+     The fallbacks are the published token values, for use outside a page (tests, server). */
+  var GROUND_NAMES = ['bg', 'surface', 'surface-raised', 'surface-overlay', 'ink'];
+  var GROUND_FALLBACK = {
+    dark: { bg: '#0d0b0b', surface: '#151213', 'surface-raised': '#1d191a', 'surface-overlay': '#262122', ink: '#f3ece2' },
+    light: { bg: '#f5efe6', surface: '#faf6f0', 'surface-raised': '#ffffff', 'surface-overlay': '#ffffff', ink: '#1d1718' }
+  };
+  function readGrounds(theme) {
+    var out = Object.assign({}, GROUND_FALLBACK[theme]);
+    if (typeof document === 'undefined' || !document.body) return out;
+    var probe = document.createElement('span');
+    probe.setAttribute('data-theme', theme);
+    probe.style.display = 'none';
+    document.body.appendChild(probe);
+    var cs = getComputedStyle(probe);
+    GROUND_NAMES.forEach(function (n) { var v = cs.getPropertyValue('--' + n).trim(); if (v && parseColor(v)) out[n] = v; });
+    document.body.removeChild(probe);
+    return out;
+  }
+
+  /* Walk lightness from a start value in one direction until test() passes. */
+  function solve(h, C, L0, dir, test) {
+    for (var L = L0; L >= 0.04 && L <= 0.99; L += dir * 0.01) {
+      var rgb = fromOklch(L, C, h);
+      if (test(rgb)) return rgb;
+    }
+    return fromOklch(dir > 0 ? 0.99 : 0.04, 0, h);
+  }
+
+  function deriveAccent(color, options) {
+    var src = typeof color === 'string' ? parseColor(color) : color;
+    if (!src) return null;
+    var o = options || {};
+    var c = toOklch(src);
+    var noir = c.C < NEUTRAL_CHROMA;
+    var G = o.grounds || { dark: readGrounds('dark'), light: readGrounds('light') };
+    var themes = {};
+    ['dark', 'light'].forEach(function (theme) {
+      var g = G[theme], dark = theme === 'dark';
+      var grounds = [g.bg, g.surface, g['surface-raised'], g['surface-overlay']].map(parseColor);
+      var fillGrounds = grounds.slice(0, 3);
+      /* Text on a fill is either the dark theme's off-white ink or a near-black. */
+      var textLight = parseColor(G.dark.ink), textDark = parseColor(dark ? g.bg : g.ink);
+      /* Black-and-white sources become a warm grey that matches ink. */
+      var C = noir ? 0.008 : c.C, hue = noir ? 60 : c.h;
+      var onFill = null;
+      var fill = solve(hue, Math.min(C, dark ? 0.2 : 0.18),
+        noir ? (dark ? 0.9 : 0.3) : Math.max(dark ? 0.5 : 0.32, Math.min(dark ? 0.8 : 0.52, c.L)), dark ? 1 : -1,
+        function (rgb) {
+          if (!fillGrounds.every(function (gr) { return contrast(rgb, gr) >= 3; })) return false;
+          var cl = contrast(textLight, rgb), cd = contrast(textDark, rgb);
+          if (cl >= 4.5 && (cl >= cd || cd < 4.5)) { onFill = textLight; return true; }
+          if (cd >= 4.5) { onFill = textDark; return true; }
+          return false;
+        });
+      if (!onFill) onFill = contrast(textLight, fill) >= contrast(textDark, fill) ? textLight : textDark;
+      var soft = fromOklch(dark ? (noir ? 0.3 : 0.27) : (noir ? 0.92 : 0.94), Math.min(C, dark ? 0.06 : 0.035), hue);
+      var inkGrounds = grounds.concat([soft]);
+      var ink = solve(hue, Math.min(C, 0.16), noir ? (dark ? 0.86 : 0.3) : (dark ? Math.max(0.74, c.L) : rgbToOklab(fill)[0]), dark ? 1 : -1,
+        function (rgb) { return inkGrounds.every(function (gr) { return contrast(rgb, gr) >= 4.5; }); });
+      themes[theme] = {
+        reel: hex(fill), 'on-reel': hex(onFill), 'reel-ink': hex(ink), 'reel-soft': hex(soft),
+        adjusted: distance(src, fill) > 0.06
+      };
+    });
+    return { source: hex(src), name: colorName(src), noir: noir, dark: themes.dark, light: themes.light };
+  }
+
+  var ACCENT_VARS = ['reel', 'on-reel', 'reel-ink', 'reel-soft'];
+  function declarations(t) { return ACCENT_VARS.map(function (k) { return '--' + k + ': ' + t[k] + ';'; }).join(' '); }
+  /* The token values of VieMo red, read from tokens.css (an element carrying data-theme gets the token values, not inherited overrides). */
+  function classicAccent() {
+    var out = {};
+    ['dark', 'light'].forEach(function (theme) {
+      var t = {};
+      if (typeof document !== 'undefined' && document.body) {
+        var probe = document.createElement('span');
+        probe.setAttribute('data-theme', theme); probe.style.display = 'none';
+        document.body.appendChild(probe);
+        var cs = getComputedStyle(probe);
+        ACCENT_VARS.forEach(function (k) { t[k] = cs.getPropertyValue('--' + k).trim(); });
+        document.body.removeChild(probe);
+      }
+      out[theme] = t;
+    });
+    return out;
+  }
+  /* CSS that re-points the four accent tokens for one selector, per theme. 'classic' pins VieMo red. */
+  function accentCss(color, selector) {
+    var a = color === 'classic' ? classicAccent() : deriveAccent(color);
+    if (!a) return '';
+    var sel = selector || ':root';
+    return sel + ', [data-theme="dark"] ' + sel + ', ' + sel + '[data-theme="dark"] { ' + declarations(a.dark) + ' }\n' +
+      '[data-theme="light"] ' + sel + ', ' + sel + '[data-theme="light"] { ' + declarations(a.light) + ' }';
+  }
+  /* Apply a person's accent to the whole app, or pass null to return to VieMo red. */
+  function applyAccent(color) {
+    var root = document.documentElement, el = document.getElementById('vm-accent');
+    if (!color) { if (el) el.remove(); root.removeAttribute('data-vm-accent'); return null; }
+    var css = accentCss(color, 'html[data-vm-accent]');
+    if (!el) { el = document.createElement('style'); el.id = 'vm-accent'; document.head.appendChild(el); }
+    el.textContent = css;
+    root.setAttribute('data-vm-accent', '');
+    return deriveAccent(color);
+  }
+
+  /* Up to `max` distinct colours in an image, largest first, ignoring transparent pixels and greys.
+     Works on canvas ImageData in the browser and on raw RGBA buffers (e.g. sharp) on the server. */
+  function extractSwatches(image, options) {
+    var o = options || {}, max = o.max || 5;
+    var data = image.data || image, n = data.length / 4;
+    var step = Math.max(1, Math.floor(n / 40000));
+    var bins = {}, opaque = 0, chromatic = 0;
+    for (var i = 0; i < n; i += step) {
+      var p = i * 4;
+      if (data[p + 3] < 128) continue;
+      opaque++;
+      var key = (data[p] >> 4) << 8 | (data[p + 1] >> 4) << 4 | (data[p + 2] >> 4);
+      var b = bins[key] || (bins[key] = [0, 0, 0, 0]);
+      b[0] += data[p]; b[1] += data[p + 1]; b[2] += data[p + 2]; b[3]++;
+    }
+    var list = [];
+    for (var k in bins) {
+      var bb = bins[k], rgb = [bb[0] / bb[3], bb[1] / bb[3], bb[2] / bb[3]], lch = toOklch(rgb);
+      if (lch.C < 0.05 || lch.L < 0.12 || lch.L > 0.97) continue;
+      chromatic += bb[3];
+      list.push({ lab: rgbToOklab(rgb), count: bb[3] });
+    }
+    list.sort(function (x, y) { return y.count - x.count; });
+    var clusters = [];
+    list.forEach(function (it) {
+      for (var j = 0; j < clusters.length; j++) {
+        var cl = clusters[j], d = Math.sqrt(Math.pow(cl.lab[0] - it.lab[0], 2) + Math.pow(cl.lab[1] - it.lab[1], 2) + Math.pow(cl.lab[2] - it.lab[2], 2));
+        if (d < 0.1) {
+          var w = cl.count + it.count;
+          cl.lab = cl.lab.map(function (v, z) { return (v * cl.count + it.lab[z] * it.count) / w; });
+          cl.count = w;
+          return;
+        }
+      }
+      clusters.push({ lab: it.lab.slice(), count: it.count });
+    });
+    var swatches = clusters
+      .filter(function (cl) { return opaque && cl.count / opaque >= 0.01; })
+      .sort(function (x, y) { return y.count - x.count; })
+      .slice(0, max)
+      .map(function (cl) {
+        var rgb = oklabToLinear(cl.lab[0], cl.lab[1], cl.lab[2]).map(fromLin);
+        return { hex: hex(rgb), share: Math.round(cl.count / opaque * 1000) / 1000, name: colorName(rgb) };
+      });
+    return { swatches: swatches, neutral: !opaque || chromatic / opaque < 0.04 };
+  }
+
+  /* ---------- AccentScope ---------- */
+  function AccentScope(props) {
+    var id = 'vm-acc-' + useId().replace(/[^a-zA-Z0-9_-]/g, '');
+    var css = props.color ? accentCss(props.color, '.' + id) : '';
+    return h(props.as || 'div', { className: cx(id, props.className), style: props.style },
+      css ? h('style', null, css) : null, props.children);
+  }
+
+  /* ---------- AccentPicker ---------- */
+  function AccentPicker(props) {
+    var f = props.film || {};
+    var swatches = props.swatches || [];
+    var options = [{ hex: null, name: 'VieMo red', note: 'Classic' }].concat(swatches.map(function (s) {
+      return { hex: s.hex, name: s.name || colorName(s.hex), note: s.source === 'poster' ? 'From the poster' : 'From the logo' };
+    }));
+    if (props.allowNoir && !swatches.some(function (s) { return toOklch(parseColor(s.hex)).C < NEUTRAL_CHROMA; })) options.push({ hex: '#f3ece2', name: 'Black and white', note: 'Noir' });
+    var current = props.value || null;
+    if (current && !options.some(function (op) { return op.hex === current; })) options.push({ hex: current, name: colorName(current), note: 'Current' });
+    var refs = useRef([]);
+    var idx = Math.max(0, options.findIndex(function (op) { return (op.hex || null) === current; }));
+    var groupId = useId();
+    function choose(i) { var op = options[(i + options.length) % options.length]; props.onChange && props.onChange(op.hex); var el = refs.current[(i + options.length) % options.length]; if (el) el.focus(); }
+    function onKey(e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { choose(idx + 1); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { choose(idx - 1); e.preventDefault(); }
+    }
+    var accent = current ? deriveAccent(current) : null;
+    var source = swatches.length ? (swatches[0].source === 'poster' ? 'its poster' : 'its logo') : null;
+    return h('section', { className: cx('vm-accent-picker', props.className), 'aria-labelledby': groupId },
+      h('header', { className: 'vm-accent-head' },
+        h(Poster, { src: f.posterSrc, title: f.title, size: 'sm' }),
+        h('div', null,
+          h('h3', { id: groupId, className: 'type-heading-md' }, 'Accent colour'),
+          h('p', { className: 'type-caption vm-muted' }, f.title ? (source ? 'Colours from ' + source + ': ' : 'No colours found in ') + f.title : 'Pick a favourite film to take its colours'),
+          props.neutral ? h('p', { className: 'type-caption vm-muted' }, 'Its logo and poster are black and white.') : null)),
+      h('div', { className: 'vm-accent-options', role: 'radiogroup', 'aria-labelledby': groupId, onKeyDown: onKey },
+        options.map(function (op, i) {
+          var checked = i === idx;
+          return h(AccentScope, { key: op.name + i, color: op.hex || 'classic', className: 'vm-accent-option-wrap' },
+            h('button', {
+              type: 'button', role: 'radio', 'aria-checked': checked, tabIndex: checked ? 0 : -1,
+              ref: function (el) { refs.current[i] = el; },
+              className: cx('vm-accent-option', checked && 'is-on'), onClick: function () { choose(i); }
+            },
+              h('span', { className: 'vm-accent-dot', 'aria-hidden': true }, checked ? h(Icon, { name: 'check', size: 20, strokeWidth: 2.5 }) : null),
+              h('span', { className: 'type-label' }, op.name),
+              h('span', { className: 'type-caption vm-muted' }, op.note)));
+        })),
+      h(AccentScope, { color: current || 'classic', className: 'vm-accent-sample' },
+        h('p', { className: 'type-eyebrow vm-muted' }, 'Preview'),
+        h('div', { className: 'vm-accent-sample-row' },
+          h(Button, { variant: 'primary', icon: 'users', tabIndex: -1 }, 'Start Movie Night'),
+          h('span', { className: 'vm-chip type-label is-on', 'aria-hidden': true }, h(Icon, { name: 'check', size: 16, strokeWidth: 2.25 }), 'Thrilling'),
+          h('span', { className: 'vm-accent-link type-label' }, 'Read more')),
+        accent && (accent.dark.adjusted || accent.light.adjusted) ? h('p', { className: 'type-caption vm-muted vm-accent-note' }, h(Icon, { name: 'info', size: 14 }), 'Tuned for each theme so text stays readable.') : null),
+      props.onApply ? h('div', { className: 'vm-accent-actions' }, h(Button, { variant: 'primary', onClick: props.onApply, busy: props.saving }, props.saving ? 'Saving' : 'Use this colour')) : null);
+  }
+
   var api = {
     Button: Button, Icon: Icon, Avatar: Avatar, Poster: Poster, FilmCard: FilmCard, ReviewCard: ReviewCard,
     ActivityItem: ActivityItem, ProfilePreview: ProfilePreview, ProviderBadge: ProviderBadge, CollectionTile: CollectionTile,
     SwipeCard: SwipeCard, Rating: Rating, FilterChip: FilterChip, BottomNav: BottomNav, Skeleton: Skeleton,
     EmptyState: EmptyState, ErrorState: ErrorState, ConfirmModal: ConfirmModal, Toast: Toast,
+    AccentPicker: AccentPicker, AccentScope: AccentScope,
+    deriveAccent: deriveAccent, applyAccent: applyAccent, accentCss: accentCss, extractSwatches: extractSwatches,
+    colorName: colorName, contrast: contrast,
     iconNames: Object.keys(ICONS), formatRuntime: formatRuntime
   };
   window.VieMo = Object.assign(window.VieMo || {}, api);

@@ -1,0 +1,45 @@
+<!-- @dsCard group="Personalisation" height=540 subtitle="Specimen logos drawn on a canvas, then read by VieMo.extractSwatches" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AccentPicker — preview</title>
+<style>body{padding:16px} .pv-films{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px} .pv-wrap{max-width:460px}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+/* Specimen title treatments: text painted in made-up colours on a transparent canvas, the same shape as a TMDB logo PNG. */
+var films = [
+  { title: 'The Lantern Keeper', year: 2019, ink: ['#2a8f8a', '#d9a441'] },
+  { title: 'Salt & Static', year: 2022, ink: ['#e0457b', '#3a6fd8'] },
+  { title: 'Paper Moons', year: 2015, ink: ['#f7f7f7'] }
+];
+function logoPixels(f) {
+  var c = document.createElement('canvas'); c.width = 300; c.height = 90;
+  var x = c.getContext('2d');
+  x.font = 'bold 40px serif'; x.fillStyle = f.ink[0]; x.fillText(f.title.split(' ')[0], 8, 46);
+  x.fillStyle = f.ink[1] || f.ink[0]; x.fillRect(8, 62, 220, 14);
+  return x.getImageData(0, 0, c.width, c.height);
+}
+function Demo() {
+  var s = useState(0), pick = s[0], setPick = s[1];
+  var v = useState(null), value = v[0], setValue = v[1];
+  var m = useState(''), msg = m[0], setMsg = m[1];
+  var f = films[pick];
+  var result = V.extractSwatches(logoPixels(f), { max: 4 });
+  var swatches = result.swatches.map(function (sw) { return Object.assign({ source: 'logo' }, sw); });
+  return h('div', { className: 'pv-wrap' },
+    h('div', { className: 'pv-films', role: 'group', 'aria-label': 'Specimen favourite film' }, films.map(function (x, i) {
+      return h(V.FilterChip, { key: x.title, label: x.title, state: i === pick ? 'on' : 'off', onChange: function () { setPick(i); setValue(null); } });
+    })),
+    h(V.AccentPicker, {
+      film: { title: f.title, year: f.year }, swatches: swatches, neutral: result.neutral, allowNoir: true,
+      value: value, onChange: setValue,
+      onApply: function () { V.applyAccent(value); setMsg(value ? 'Applied to this whole page with VieMo.applyAccent.' : 'Back to VieMo red.'); }
+    }),
+    h('p', { className: 'type-caption vm-muted', role: 'status' }, msg));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

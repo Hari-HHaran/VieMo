@@ -5,6 +5,7 @@ VieMo targets WCAG 2.2 AA. These rules are built into the tokens and components;
 ## Contrast
 
 - Every text token holds 4.5:1 or better on the grounds its usage note names, in both themes; `line-strong`, `reel` fills, icons and the focus ring hold 3:1 or better against `bg`, `surface` and `surface-raised`.
+- Personal accents keep the same floors: `deriveAccent` was checked against 4,096 source colours in both themes with no failures (fills 3:1 on `bg`, `surface`, `surface-raised`; labels 4.5:1 on the fill; `reel-ink` 4.5:1 on every surface and `reel-soft`).
 - Do not put `ink-faint` on `surface-overlay`, or any text on a poster image.
 - Never let colour carry meaning alone: votes have icons and words, chips change icon and border, the active tab has a bar and heavier stroke, ratings print their number, provider kinds are words.
 
