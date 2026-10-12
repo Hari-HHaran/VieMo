@@ -1,0 +1,22 @@
+<!-- @dsCard group="Social" height=808 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ReviewCard — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+var long = 'Quiet, patient and far funnier than the trailer lets on. The lighthouse scenes are shot almost entirely in available light, and the sound design does most of the storytelling: you hear the storm long before you see it. It sags a little in the middle hour, but the last twenty minutes earn every slow beat that came before.';
+function Demo() {
+  var l = useState(false), liked = l[0], setLiked = l[1];
+  return h('div', { className: 'pv-col', style: { maxWidth: '420px' } },
+    h(V.ReviewCard, { author: { name: 'Arjun Rao', href: '#u' }, film: { title: 'The Lantern Keeper', year: 2019, href: '#f' }, rating: 4.5, watchedOn: '3 Oct', watchedOnISO: '2026-10-03', text: long, likeCount: liked ? 4 : 3, liked: liked, onToggleLike: function () { setLiked(!liked); }, commentCount: 2, onComment: function () {}, href: '#review' }),
+    h(V.ReviewCard, { author: { name: 'Maya Tan', href: '#u' }, film: { title: 'Nine Floors Down', year: 2017, href: '#f' }, rating: 3, watchedOn: '28 Sep', watchedOnISO: '2026-09-28', text: 'The elevator was never broken. It was waiting for her.', spoiler: true, likeCount: 1, onToggleLike: function () {}, commentCount: 0, onComment: function () {} }),
+    h(V.ReviewCard, { isOwn: true, visibility: 'followers', author: { name: 'Mei Lin' }, film: { title: 'Salt & Static', year: 2022 }, rating: 3.5, watchedOn: 'yesterday', text: 'Exactly the 90 minutes I needed after work.', likeCount: 0, onToggleLike: function () {}, onEdit: function () {}, onDelete: function () {} }));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

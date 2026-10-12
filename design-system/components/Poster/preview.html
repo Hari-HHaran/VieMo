@@ -1,0 +1,21 @@
+<!-- @dsCard group="Foundations" height=288 subtitle="Typographic fallback shown; a TMDB poster replaces it when one exists" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Poster — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+var films = [['The Lantern Keeper', 2019], ['Salt & Static', 2022], ['Nine Floors Down', 2017], ['A Quiet Monsoon', 2021]];
+function Demo() {
+  return h('div', { className: 'pv-row', style: { alignItems: 'flex-end' } },
+    h(V.Poster, { title: films[0][0], year: films[0][1], size: 'lg' }),
+    films.slice(1).map(function (f) { return h(V.Poster, { key: f[0], title: f[0], year: f[1], size: 'md' }); }),
+    h(V.Poster, { title: 'Paper Moons', size: 'sm' }));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

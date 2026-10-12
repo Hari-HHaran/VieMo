@@ -1,0 +1,19 @@
+<!-- @dsCard group="Foundations" height=552 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Icon — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}.pv-icons{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:4px}.pv-icons li{display:grid;justify-items:center;gap:6px;padding:10px 4px;border-radius:var(--radius-md);color:var(--ink)}.pv-icons span{color:var(--ink-muted);text-align:center;overflow-wrap:anywhere}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  return h('ul', { className: 'pv-icons' }, V.iconNames.map(function (n) {
+    return h('li', { key: n }, h(V.Icon, { name: n, size: 24 }), h('span', { className: 'type-caption' }, n));
+  }));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

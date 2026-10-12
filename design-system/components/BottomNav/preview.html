@@ -1,0 +1,27 @@
+<!-- @dsCard group="Navigation" height=380 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>BottomNav — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}body{padding:0}.pv-split{display:flex;gap:24px;align-items:stretch;height:380px}.pv-rail{height:100%}.pv-phone{flex:1;max-width:390px;display:flex;flex-direction:column;justify-content:flex-end;border-left:1px solid var(--line);border-right:1px solid var(--line)}.pv-phone p{margin:auto 16px}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  var c = useState('match'), cur = c[0], setCur = c[1];
+  var items = [
+    { id: 'home', label: 'Home', icon: 'house', href: '#' },
+    { id: 'discover', label: 'Discover', icon: 'compass', href: '#' },
+    { id: 'match', label: 'Match', icon: 'users', href: '#', badge: 'Movie Night in progress' },
+    { id: 'clips', label: 'Clips', icon: 'clapperboard', href: '#' },
+    { id: 'profile', label: 'Profile', icon: 'user', href: '#' }
+  ];
+  return h('div', { className: 'pv-split' },
+    h('div', { className: 'pv-rail' }, h(V.BottomNav, { layout: 'rail', brand: 'VieMo', items: items, current: cur, onNavigate: setCur, label: 'Primary (desktop)' })),
+    h('div', { className: 'pv-phone' }, h('p', { className: 'type-caption vm-muted' }, 'Mobile, 390 px'), h(V.BottomNav, { items: items, current: cur, onNavigate: setCur })));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

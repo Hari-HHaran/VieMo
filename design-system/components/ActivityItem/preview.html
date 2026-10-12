@@ -1,0 +1,21 @@
+<!-- @dsCard group="Social" height=772 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ActivityItem — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  var l = useState(false), liked = l[0], setLiked = l[1];
+  return h('div', { style: { maxWidth: '440px' } },
+    h(V.ActivityItem, { actor: { name: 'Arjun Rao', href: '#u' }, verb: 'reviewed', film: { title: 'The Lantern Keeper', year: 2019, runtime: 112, href: '#f' }, rating: 4.5, excerpt: 'Quiet, patient and far funnier than the trailer lets on. The sound design does most of the storytelling: you hear the storm long before you see it.', timestamp: '2 h', datetime: '2026-10-12T10:00:00+08:00', liked: liked, likeCount: liked ? 4 : 3, onToggleLike: function () { setLiked(!liked); }, commentCount: 2, onComment: function () {} }),
+    h(V.ActivityItem, { actor: { name: 'Mei Lin', href: '#u' }, verb: 'watchlisted', film: { title: 'A Quiet Monsoon', year: 2021, runtime: 128, href: '#f' }, timestamp: '5 h', datetime: '2026-10-12T07:00:00+08:00', likeCount: 0, onToggleLike: function () {} }),
+    h(V.ActivityItem, { actor: { name: 'Maya Tan', href: '#u' }, verb: 'collection', collection: { title: 'Friday picks for five', count: 9, href: '#c', posters: [{ title: 'Salt & Static' }, { title: 'Nine Floors Down' }, { title: 'Paper Moons' }, { title: 'The Lantern Keeper' }] }, timestamp: 'yesterday', datetime: '2026-10-11T21:00:00+08:00', likeCount: 2, onToggleLike: function () {}, commentCount: 1, onComment: function () {} }));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

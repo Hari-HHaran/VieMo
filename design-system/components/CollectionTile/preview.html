@@ -1,0 +1,20 @@
+<!-- @dsCard group="Film" height=340 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CollectionTile — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}.pv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,172px));gap:12px}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  var s = useState(true), saved = s[0], setSaved = s[1];
+  return h('div', { className: 'pv-grid' },
+    h(V.CollectionTile, { title: 'Comfort films for rainy days', href: '#c', creator: { handle: 'meilin' }, filmCount: 12, moodTags: ['Comforting', 'Funny'], posters: [{ title: 'Paper Moons' }, { title: 'Salt & Static' }, { title: 'A Quiet Monsoon' }, { title: 'Glasshouse Summer' }], saved: saved, onToggleSave: function () { setSaved(!saved); } }),
+    h(V.CollectionTile, { title: 'Plot twists that play fair', href: '#c', creator: { handle: 'arjun.films' }, filmCount: 3, collaborative: true, visibility: 'unlisted', posters: [{ title: 'Nine Floors Down' }, { title: 'The Lantern Keeper' }, { title: 'Salt & Static' }], onToggleSave: function () {} }));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

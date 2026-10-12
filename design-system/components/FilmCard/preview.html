@@ -1,0 +1,22 @@
+<!-- @dsCard group="Film" height=360 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>FilmCard — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  var s = useState({ lantern: true }), saved = s[0], setSaved = s[1];
+  function toggle(k) { return function () { var n = Object.assign({}, saved); n[k] = !n[k]; setSaved(n); }; }
+  return h('div', { className: 'pv-row' },
+    h(V.FilmCard, { size: 'lg', title: 'The Lantern Keeper', year: 2019, runtime: 112, genres: ['Drama'], href: '#film', saved: saved.lantern, onToggleSave: toggle('lantern'), rating: { value: 7.4, source: 'tmdb' } }),
+    h(V.FilmCard, { title: 'Salt & Static', year: 2022, runtime: 94, genres: ['Comedy'], href: '#film', saved: saved.salt, onToggleSave: toggle('salt'), rating: { value: 4, source: 'friend' } }),
+    h(V.FilmCard, { title: 'A Quiet Monsoon: The Long Way Back to Kampong Lorong', year: 2021, runtime: 128, genres: ['Romance'], href: '#film', saved: saved.mon, onToggleSave: toggle('mon') }));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

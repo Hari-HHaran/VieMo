@@ -1,0 +1,20 @@
+<!-- @dsCard group="Feedback" height=380 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ConfirmModal — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  var o = useState(true), open = o[0], setOpen = o[1];
+  return h('div', null,
+    h(V.Button, { variant: 'danger', icon: 'trash-2', onClick: function () { setOpen(true); } }, 'Delete review'),
+    h(V.ConfirmModal, { open: open, destructive: true, title: 'Delete your review?', body: 'Your rating and review of The Lantern Keeper will be removed for everyone. The 3 likes and 2 comments on it go too. This can’t be undone.', confirmLabel: 'Delete review', cancelLabel: 'Keep it', onCancel: function () { setOpen(false); }, onConfirm: function () { setOpen(false); } }));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

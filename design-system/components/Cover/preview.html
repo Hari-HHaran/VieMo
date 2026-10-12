@@ -1,0 +1,65 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>VieMo</title>
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { padding: 0; background: var(--bg); color: var(--ink); font-family: var(--font-sans); overflow: hidden; }
+  .cover { position: relative; width: 960px; height: 288px; overflow: hidden; }
+  .art { position: absolute; top: 0; left: 480px; width: 480px; height: 288px; overflow: hidden; }
+  .art svg { display: block; width: 480px; height: 288px; }
+  .reel { fill: var(--reel); }
+  .amber { fill: var(--amber); }
+  .ink { fill: var(--ink); }
+  .stone { fill: var(--line-strong); }
+  .ground { fill: var(--bg); }
+  .strip { rx: var(--radius-md); }
+  .blk { rx: var(--radius-lg); }
+  .perf { rx: var(--radius-sm); }
+  .words { position: absolute; left: var(--space-8); bottom: var(--space-8); max-width: 440px; }
+  .name { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 120px; line-height: .92; letter-spacing: -0.01em; color: var(--ink); }
+  .tag { margin: var(--space-2) 0 0 4px; font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+</style>
+</head>
+<body>
+<div class="cover">
+<div class="art" aria-hidden="true">
+<svg viewBox="0 0 480 288" width="480" height="288">
+<!--
+  blocks      reel 144x272 film strip bled off the top (the brand's one hue, largest) · ink 160x144 (the off-white type of the dark theme) · amber disc r56 with a ground spindle (the stars and the top pick) · line-strong 144x96 bled off the right as relief - about 30 percent of 960x288
+  arrangement one tall reel slab with satellites, bottoms on one line space-8 above the edge, space-4 gutters
+  pattern     sprocket perforations, from the brand book's "lobby of a good independent cinema" and "posters doing the talking": 16 radius-sm holes cut from the strip in bg, two columns at a space-8 pitch
+  scales      strip and blocks in space-4 multiples; pitch space-8; corners radius-md (strip), radius-lg (blocks), radius-sm (perforations)
+-->
+<rect class="reel strip" x="24" y="-16" width="144" height="272" rx="10"/>
+<rect class="ground perf" x="36" y="0" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="36" y="32" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="36" y="64" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="36" y="96" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="36" y="128" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="36" y="160" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="36" y="192" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="36" y="224" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="144" y="0" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="144" y="32" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="144" y="64" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="144" y="96" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="144" y="128" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="144" y="160" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="144" y="192" width="12" height="16" rx="6"/>
+<rect class="ground perf" x="144" y="224" width="12" height="16" rx="6"/>
+<rect class="ink blk" x="184" y="112" width="160" height="144" rx="16"/>
+<rect class="stone blk" x="360" y="160" width="144" height="96" rx="16"/>
+<circle class="amber" cx="304" cy="72" r="56"/>
+<circle class="ground" cx="304" cy="72" r="10"/>
+</svg>
+</div>
+<div class="words">
+<h1 class="name">VieMo</h1>
+<p class="tag">Discover films through the people you trust.</p>
+</div>
+</div>
+</body>
+</html>

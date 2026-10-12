@@ -1,0 +1,29 @@
+<!-- @dsCard group="Actions" height=148 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Button — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  var b = useState(false), busy = b[0], setBusy = b[1];
+  return h('div', { className: 'pv-col' },
+    h('div', { className: 'pv-row' },
+      h(V.Button, { variant: 'primary', icon: 'bookmark-plus' }, 'Add to watchlist'),
+      h(V.Button, { icon: 'list-plus' }, 'Add to collection'),
+      h(V.Button, { variant: 'ghost' }, 'Not now'),
+      h(V.Button, { variant: 'danger', icon: 'trash-2' }, 'Delete review')),
+    h('div', { className: 'pv-row' },
+      h(V.Button, { variant: 'primary', size: 'lg', icon: 'users' }, 'Start Movie Night'),
+      h(V.Button, { variant: 'primary', busy: busy, onClick: function () { setBusy(true); setTimeout(function () { setBusy(false); }, 1600); } }, busy ? 'Publishing' : 'Publish review'),
+      h(V.Button, { size: 'sm', icon: 'pencil' }, 'Edit'),
+      h(V.Button, { iconOnly: true, icon: 'share-2', label: 'Share' }),
+      h(V.Button, { disabled: true }, 'Confirm pick')));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

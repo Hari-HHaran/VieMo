@@ -1,0 +1,18 @@
+<!-- @dsCard group="Feedback" height=420 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ErrorState — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  var r = useState(false), busy = r[0], setBusy = r[1];
+  return h(V.ErrorState, { icon: 'wifi-off', title: 'Film details didn’t load', body: 'TMDB isn’t responding right now. Your watchlist and reviews are safe.', cachedNote: 'Showing details saved 2 days ago', retrying: busy, onRetry: function () { setBusy(true); setTimeout(function () { setBusy(false); }, 1500); }, detail: 'Error 503 from api.themoviedb.org' });
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

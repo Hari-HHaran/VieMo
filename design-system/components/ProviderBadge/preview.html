@@ -1,0 +1,24 @@
+<!-- @dsCard group="Film" height=140 subtitle="Specimen data; logos come from TMDB at runtime" -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ProviderBadge — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  return h('section', { 'aria-labelledby': 'where' },
+    h('h3', { id: 'where', className: 'type-heading-md', style: { margin: '0 0 4px' } }, 'Where to watch in Singapore'),
+    h('p', { className: 'type-caption vm-faint', style: { margin: '0 0 12px' } }, 'Availability from JustWatch via TMDB · checked 3 h ago'),
+    h('div', { className: 'pv-row' },
+      h(V.ProviderBadge, { name: 'Netflix', kind: 'stream', href: '#justwatch', linkType: 'source' }),
+      h(V.ProviderBadge, { name: 'Apple TV', kind: 'rent', href: '#justwatch', linkType: 'source' }),
+      h(V.ProviderBadge, { name: 'Apple TV', kind: 'buy' }),
+      h(V.ProviderBadge, { name: 'Cinemas', kind: 'cinema' })));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

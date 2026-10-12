@@ -1,0 +1,21 @@
+<!-- @dsCard group="Feedback" height=218 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Toast — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  var s = useState(true), show = s[0], setShow = s[1];
+  return h('div', { className: 'pv-col', style: { maxWidth: '420px' } },
+    show ? h(V.Toast, { tone: 'positive', message: 'Saved to your watchlist', action: { label: 'Undo', onClick: function () { setShow(false); } }, onDismiss: function () { setShow(false); } }) : h(V.Button, { size: 'sm', onClick: function () { setShow(true); } }, 'Show again'),
+    h(V.Toast, { tone: 'negative', message: 'Couldn’t save. Check your connection.', action: { label: 'Retry', onClick: function () {} } }),
+    h(V.Toast, { icon: 'link', message: 'Invite link copied' }));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

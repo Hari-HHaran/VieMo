@@ -1,0 +1,17 @@
+<!-- @dsCard group="Feedback" height=372 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>EmptyState — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  return h(V.EmptyState, { icon: 'users', title: 'Your feed is quiet', body: 'Nobody you follow has logged a film yet. Follow a few people and their ratings, reviews and collections will show up here.', action: { label: 'Find friends', icon: 'user-plus', onClick: function () {} }, secondaryAction: { label: 'Browse trending', onClick: function () {} } });
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

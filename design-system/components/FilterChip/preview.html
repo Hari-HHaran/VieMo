@@ -1,0 +1,28 @@
+<!-- @dsCard group="Actions" height=170 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>FilterChip — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  var m = useState({ Thrilling: 'on', Funny: 'on' }), moods = m[0], setMoods = m[1];
+  var g = useState({ Comedy: 'on', Horror: 'excluded' }), genres = g[0], setGenres = g[1];
+  function set(map, setter, k) { return function (v) { var n = Object.assign({}, map); n[k] = v; setter(n); }; }
+  return h('div', { className: 'pv-col' },
+    h('div', null, h('p', { className: 'pv-label type-label' }, 'Mood'),
+      h('div', { className: 'pv-row', style: { gap: '8px' } }, ['Funny', 'Comforting', 'Thrilling', 'Emotional', 'Scary', 'Open to anything'].map(function (k) {
+        return h(V.FilterChip, { key: k, label: k, state: moods[k] || 'off', onChange: set(moods, setMoods, k) });
+      }))),
+    h('div', null, h('p', { className: 'pv-label type-label' }, 'Genres · tap twice to exclude'),
+      h('div', { className: 'pv-row', style: { gap: '8px' } }, ['Comedy', 'Horror', 'Mystery', 'Romance', 'Sci-fi'].map(function (k) {
+        return h(V.FilterChip, { key: k, label: k, triState: true, state: genres[k] || 'off', onChange: set(genres, setGenres, k) });
+      }))));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>

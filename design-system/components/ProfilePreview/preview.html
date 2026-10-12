@@ -1,0 +1,21 @@
+<!-- @dsCard group="Social" height=410 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ProfilePreview — preview</title>
+<style>body{padding:16px} .pv-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start} .pv-col{display:grid;gap:12px} .pv-label{margin:0 0 8px;color:var(--ink-muted)}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var V = window.VieMo, h = React.createElement, useState = React.useState;
+function Demo() {
+  var a = useState(false), fa = a[0], setFa = a[1];
+  var m = useState(true), fm = m[0], setFm = m[1];
+  return h('div', { className: 'pv-col', style: { maxWidth: '400px' } },
+    h(V.ProfilePreview, { name: 'Arjun Rao', handle: 'arjun.films', href: '#u', bio: 'Sci-fi first, horror on Fridays. Building lists of plot twists that actually play fair.', stats: { watched: 342, followers: 58, following: 41 }, tasteTags: ['Sci-fi', 'Psychological thriller', 'Korean cinema'], following: fa, onToggleFollow: function () { setFa(!fa); } }),
+    h(V.ProfilePreview, { layout: 'row', name: 'Mei Lin', handle: 'meilin', href: '#u', followsYou: true, following: fm, onToggleFollow: function () { setFm(!fm); } }));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(Demo));
+</script>
+</body>
+</html>
