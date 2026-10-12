@@ -1,0 +1,820 @@
+  var React = window.React;
+  var h = React.createElement;
+  var useState = React.useState, useRef = React.useRef, useEffect = React.useEffect, useId = React.useId;
+
+  function cx() {
+    var out = [];
+    for (var i = 0; i < arguments.length; i++) if (arguments[i]) out.push(arguments[i]);
+    return out.join(' ');
+  }
+  function camel(k) { return k.replace(/-([a-z])/g, function (_, c) { return c.toUpperCase(); }); }
+  function sr(text) { return h('span', { className: 'vm-sr' }, text); }
+  function reducedMotion() {
+    return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+  function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+
+  /* ---------- Formatting ---------- */
+  function formatRuntime(min) {
+    if (min == null) return null;
+    var hrs = Math.floor(min / 60), m = min % 60;
+    return hrs ? hrs + ' h' + (m ? ' ' + m + ' min' : '') : m + ' min';
+  }
+  function metaLine(parts) { return parts.filter(function (p) { return p != null && p !== ''; }).join(' · '); }
+
+  /* ---------- Icon ---------- */
+  function Icon(props) {
+    var paths = ICONS[props.name];
+    if (!paths) return null;
+    var size = props.size || 20;
+    var a11y = props.label ? { role: 'img', 'aria-label': props.label } : { 'aria-hidden': true, focusable: 'false' };
+    return h('svg', Object.assign({
+      className: cx('vm-icon', props.className), width: size, height: size, viewBox: '0 0 24 24',
+      fill: props.filled ? 'currentColor' : 'none', stroke: 'currentColor',
+      strokeWidth: props.strokeWidth || 1.75, strokeLinecap: 'round', strokeLinejoin: 'round'
+    }, a11y), paths.map(function (p, i) {
+      var attrs = { key: i };
+      for (var k in p[1]) attrs[camel(k)] = p[1][k];
+      return h(p[0], attrs);
+    }));
+  }
+
+  /* ---------- Button ---------- */
+  function Button(props) {
+    var variant = props.variant || 'secondary', size = props.size || 'md';
+    var rest = Object.assign({}, props);
+    ['variant', 'size', 'icon', 'iconAfter', 'iconOnly', 'busy', 'href', 'className', 'children', 'label'].forEach(function (k) { delete rest[k]; });
+    var content = [
+      props.busy ? h(Icon, { key: 'b', name: 'loader-circle', className: 'vm-spin', size: size === 'lg' ? 22 : 18 }) : (props.icon ? h(Icon, { key: 'i', name: props.icon, size: size === 'lg' ? 22 : 18 }) : null),
+      props.iconOnly ? sr(props.label) : (props.children != null ? h('span', { key: 'l', className: 'vm-btn-label' }, props.children) : null),
+      props.iconAfter && !props.iconOnly ? h(Icon, { key: 'a', name: props.iconAfter, size: 18 }) : null
+    ];
+    var className = cx('vm-btn', 'vm-btn-' + variant, 'vm-btn-' + size, props.iconOnly && 'vm-btn-icon', 'type-label', props.className);
+    if (props.href) return h('a', Object.assign({}, rest, { className: className, href: props.href }), content);
+    return h('button', Object.assign({ type: 'button' }, rest, { className: className, 'aria-busy': props.busy || undefined, disabled: props.disabled || props.busy }), content);
+  }
+
+  /* ---------- Avatar ---------- */
+  function initials(name) {
+    var parts = String(name || '?').trim().split(/\s+/);
+    return ((parts[0] || '?')[0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+  }
+  function Avatar(props) {
+    var size = props.size || 'sm';
+    var st = useState(false), failed = st[0], setFailed = st[1];
+    var alt = props.decorative === false ? props.name : '';
+    return h('span', { className: cx('vm-avatar', 'vm-avatar-' + size, props.className), 'aria-hidden': props.decorative === false ? undefined : true },
+      props.src && !failed
+        ? h('img', { src: props.src, alt: alt, loading: 'lazy', decoding: 'async', onError: function () { setFailed(true); } })
+        : h('span', { className: 'vm-avatar-initials' }, initials(props.name)));
+  }
+
+  /* ---------- Poster ---------- */
+  var POSTER_TONES = ['wine', 'slate', 'sepia', 'smoke'];
+  function hash(s) { var x = 0; s = String(s || ''); for (var i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) >>> 0; return x; }
+  function Poster(props) {
+    var size = props.size || 'md';
+    var st = useState(false), failed = st[0], setFailed = st[1];
+    var style = typeof size === 'number' ? { width: size + 'px' } : undefined;
+    var sizeClass = typeof size === 'number' ? (size < 64 ? 'vm-poster-sm' : 'vm-poster-custom') : 'vm-poster-' + size;
+    var alt = props.alt != null ? props.alt : '';
+    if (props.src && !failed) {
+      return h('span', { className: cx('vm-poster', sizeClass, props.className), style: style },
+        h('img', { src: props.src, srcSet: props.srcSet, sizes: props.sizes, alt: alt, loading: props.eager ? 'eager' : 'lazy', decoding: 'async', onError: function () { setFailed(true); } }));
+    }
+    var tone = POSTER_TONES[hash(props.title) % POSTER_TONES.length];
+    var small = size === 'sm' || (typeof size === 'number' && size < 64);
+    return h('span', { className: cx('vm-poster', 'vm-poster-fallback', 'vm-tone-' + tone, sizeClass, props.className), style: style, role: alt ? 'img' : undefined, 'aria-label': alt || undefined, 'aria-hidden': alt ? undefined : true },
+      small
+        ? h('span', { className: 'vm-poster-initial' }, String(props.title || '?').trim()[0])
+        : h('span', { className: 'vm-poster-cap' },
+            h('span', { className: 'vm-poster-title' }, props.title),
+            h('span', { className: 'vm-poster-rule' }),
+            props.year ? h('span', { className: 'vm-poster-year' }, props.year) : null));
+  }
+
+  /* ---------- Rating ---------- */
+  function Star(props) {
+    var fill = props.fill;
+    return h('span', { className: 'vm-star', style: props.size ? { width: props.size + 'px', height: props.size + 'px' } : undefined },
+      h(Icon, { name: 'star', size: props.size || 16, className: 'vm-star-empty' }),
+      fill > 0 ? h('span', { className: 'vm-star-fill', style: { width: (fill * 100) + '%' } }, h(Icon, { name: 'star', size: props.size || 16, filled: true })) : null);
+  }
+  function Stars(props) {
+    var out = [];
+    for (var i = 1; i <= 5; i++) out.push(h(Star, { key: i, size: props.size, fill: Math.max(0, Math.min(1, props.value - (i - 1))) }));
+    return h('span', { className: 'vm-stars', 'aria-hidden': true }, out);
+  }
+  var SOURCE_LABEL = { tmdb: 'TMDB', community: 'VieMo', yours: 'You', friend: null };
+  function Rating(props) {
+    if (props.onChange) return h(RatingInput, props);
+    var source = props.source || 'friend';
+    var max = props.max || (source === 'tmdb' ? 10 : 5);
+    if (props.value == null || (source === 'community' && !props.count)) {
+      return h('span', { className: 'vm-rating vm-rating-empty type-caption' }, source === 'community' ? 'No VieMo ratings yet' : 'Not rated');
+    }
+    var label = SOURCE_LABEL[source];
+    var value = max === 10 ? Number(props.value).toFixed(1) : String(props.value);
+    var spoken = (source === 'tmdb' ? 'TMDB rating ' : source === 'community' ? 'VieMo members rate it ' : source === 'yours' ? 'You rated it ' : 'Rated ') + value + ' out of ' + max + (props.count ? ', from ' + plural(props.count, 'rating', 'ratings') : '');
+    return h('span', { className: cx('vm-rating', 'vm-rating-' + source, props.compact && 'vm-rating-compact', props.className), role: 'img', 'aria-label': spoken },
+      max === 5 && !props.compact ? h(Stars, { value: props.value, size: props.size || 16 }) : h(Icon, { name: 'star', filled: max === 5, size: 14, className: 'vm-rating-glyph' }),
+      h('span', { className: 'vm-rating-value type-data' }, value, max === 10 ? h('span', { className: 'vm-rating-max' }, '/10') : null),
+      label ? h('span', { className: 'vm-source type-eyebrow' }, label) : null,
+      props.count ? h('span', { className: 'vm-rating-count type-caption' }, plural(props.count, 'rating', 'ratings')) : null);
+  }
+  function RatingInput(props) {
+    var value = props.value || 0;
+    var ref = useRef(null);
+    function set(v) { v = Math.max(0.5, Math.min(5, Math.round(v * 2) / 2)); if (v !== value) props.onChange(v); }
+    function onKey(e) {
+      var k = e.key;
+      if (k === 'ArrowRight' || k === 'ArrowUp') { set((value || 0) + 0.5); e.preventDefault(); }
+      else if (k === 'ArrowLeft' || k === 'ArrowDown') { set((value || 1) - 0.5); e.preventDefault(); }
+      else if (k === 'Home') { set(0.5); e.preventDefault(); }
+      else if (k === 'End') { set(5); e.preventDefault(); }
+      else if (/^[1-5]$/.test(k)) { set(Number(k)); e.preventDefault(); }
+      else if ((k === 'Delete' || k === 'Backspace') && props.onClear) { props.onClear(); e.preventDefault(); }
+    }
+    function onPointer(e) {
+      var r = ref.current.getBoundingClientRect();
+      var x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+      set(Math.ceil((x / r.width) * 10) / 2);
+    }
+    var label = props.label || 'Your rating';
+    return h('div', { className: cx('vm-rating-input', props.className) },
+      h('div', {
+        ref: ref, className: 'vm-rating-track', role: 'slider', tabIndex: props.disabled ? -1 : 0,
+        'aria-label': label, 'aria-valuemin': 0.5, 'aria-valuemax': 5, 'aria-valuenow': value || undefined,
+        'aria-valuetext': value ? value + ' out of 5 stars' : 'Not rated', 'aria-disabled': props.disabled || undefined,
+        onKeyDown: props.disabled ? undefined : onKey, onClick: props.disabled ? undefined : onPointer
+      }, h(Stars, { value: value, size: 30 })),
+      h('span', { className: 'vm-rating-readout type-data', 'aria-hidden': true }, value ? value.toFixed(1) : '–'),
+      props.onClear && value ? h(Button, { variant: 'ghost', size: 'sm', onClick: props.onClear }, 'Clear') : null);
+  }
+
+  /* ---------- FilmCard ---------- */
+  function FilmCard(props) {
+    var size = props.size || 'md';
+    var titleId = useId();
+    var meta = metaLine([props.year, formatRuntime(props.runtime), props.genres && props.genres[0]]);
+    var link = props.href
+      ? h('a', { className: 'vm-stretch', href: props.href, id: titleId }, h('span', { className: 'vm-clamp-2' }, props.title))
+      : h('button', { type: 'button', className: 'vm-stretch', onClick: props.onOpen, id: titleId }, h('span', { className: 'vm-clamp-2' }, props.title));
+    return h('article', { className: cx('vm-film-card', 'vm-film-card-' + size, props.className), 'aria-labelledby': titleId },
+      h(Poster, { src: props.posterSrc, srcSet: props.posterSrcSet, sizes: props.posterSizes, title: props.title, year: props.year, size: size }),
+      props.onToggleSave ? h('button', {
+        type: 'button', className: cx('vm-film-save', props.saved && 'is-on'), 'aria-pressed': !!props.saved,
+        onClick: props.onToggleSave
+      }, h(Icon, { name: props.saved ? 'bookmark-check' : 'bookmark-plus', size: 20 }), sr((props.saved ? 'Saved: ' : 'Save to watchlist: ') + props.title)) : null,
+      h('h3', { className: 'vm-film-title type-heading-md' }, link),
+      meta ? h('p', { className: 'vm-film-meta type-caption' }, meta) : null,
+      props.rating ? h(Rating, Object.assign({ compact: true }, props.rating)) : null,
+      props.note ? h('p', { className: 'vm-film-note type-caption' }, props.note) : null);
+  }
+
+  /* ---------- Spoiler + clamp text ---------- */
+  function ReviewBody(props) {
+    var rv = useState(false), revealed = rv[0], setRevealed = rv[1];
+    var ex = useState(false), expanded = ex[0], setExpanded = ex[1];
+    var bodyId = useId();
+    if (props.spoiler && !revealed) {
+      return h('div', { className: 'vm-spoiler' },
+        h(Icon, { name: 'eye-off', size: 18 }),
+        h('div', { className: 'vm-spoiler-text' },
+          h('span', { className: 'type-eyebrow' }, 'Contains spoilers'),
+          h('span', { className: 'type-caption' }, 'Hidden until you choose to read it.')),
+        h(Button, { size: 'sm', variant: 'secondary', onClick: function () { setRevealed(true); } }, 'Show review'));
+    }
+    var long = (props.text || '').length > (props.clampAt || 220);
+    return h('div', { className: 'vm-review-body' },
+      h('p', { id: bodyId, className: cx(props.large ? 'type-body-lg' : 'type-body', long && !expanded && 'vm-clamp') }, props.text),
+      long ? h('button', { type: 'button', className: 'vm-textlink type-label', 'aria-expanded': expanded, 'aria-controls': bodyId, onClick: function () { setExpanded(!expanded); } }, expanded ? 'Show less' : 'Read more') : null);
+  }
+
+  /* ---------- Social actions row ---------- */
+  function SocialActions(props) {
+    return h('div', { className: 'vm-social' },
+      props.onToggleLike ? h('button', { type: 'button', className: cx('vm-social-btn', props.liked && 'is-on'), 'aria-pressed': !!props.liked, onClick: props.onToggleLike },
+        h(Icon, { name: 'heart', size: 18, filled: !!props.liked }),
+        h('span', { className: 'type-data' }, props.likeCount || 0), sr(props.liked ? 'Liked' : 'Like')) : null,
+      props.onComment ? h('button', { type: 'button', className: 'vm-social-btn', onClick: props.onComment },
+        h(Icon, { name: 'message-circle', size: 18 }),
+        h('span', { className: 'type-data' }, props.commentCount || 0), sr(plural(props.commentCount || 0, 'comment', 'comments'))) : null,
+      props.extra || null);
+  }
+
+  var VISIBILITY = {
+    'public': { icon: 'globe', label: 'Public' },
+    followers: { icon: 'users', label: 'Followers only' },
+    unlisted: { icon: 'link', label: 'Unlisted' },
+    'private': { icon: 'lock', label: 'Private' }
+  };
+  function VisibilityTag(props) {
+    var v = VISIBILITY[props.value];
+    if (!v) return null;
+    return h('span', { className: 'vm-visibility type-caption' }, h(Icon, { name: v.icon, size: 14 }), v.label);
+  }
+
+  /* ---------- ReviewCard ---------- */
+  function ReviewCard(props) {
+    var a = props.author || {}, f = props.film || {};
+    return h('article', { className: cx('vm-review-card', props.className) },
+      h('header', { className: 'vm-review-head' },
+        h(Poster, { src: f.posterSrc, title: f.title, size: 'sm' }),
+        h('div', { className: 'vm-review-id' },
+          h('h3', { className: 'type-heading-md' }, f.href ? h('a', { href: f.href }, f.title) : f.title, f.year ? h('span', { className: 'vm-year type-caption' }, ' ' + f.year) : null),
+          h('p', { className: 'vm-review-by type-caption' },
+            h(Avatar, { src: a.avatarSrc, name: a.name, size: 'xs' }),
+            a.href ? h('a', { href: a.href }, a.name) : h('span', null, a.name),
+            props.watchedOn ? h('span', null, ' · watched ', h('time', { dateTime: props.watchedOnISO }, props.watchedOn)) : null),
+          props.rating != null ? h(Rating, { value: props.rating, source: props.isOwn ? 'yours' : 'friend', size: 14 }) : null)),
+      props.text ? h(ReviewBody, { text: props.text, spoiler: props.spoiler, large: props.large }) : null,
+      h('footer', { className: 'vm-review-foot' },
+        h(SocialActions, props),
+        props.visibility && props.isOwn ? h(VisibilityTag, { value: props.visibility }) : null,
+        props.isOwn && props.onEdit ? h(Button, { variant: 'ghost', size: 'sm', icon: 'pencil', iconOnly: true, label: 'Edit review', onClick: props.onEdit }) : null,
+        props.isOwn && props.onDelete ? h(Button, { variant: 'ghost', size: 'sm', icon: 'trash-2', iconOnly: true, label: 'Delete review', onClick: props.onDelete }) : null,
+        props.href ? h('a', { className: 'vm-textlink type-label', href: props.href }, 'Full review') : null));
+  }
+
+  /* ---------- ActivityItem ---------- */
+  var VERBS = { watched: 'watched', rated: 'rated', reviewed: 'reviewed', watchlisted: 'wants to watch', collection: 'published a collection' };
+  function ActivityItem(props) {
+    var a = props.actor || {}, f = props.film, c = props.collection;
+    var headId = useId();
+    var objectLink = c
+      ? (c.href ? h('a', { href: c.href }, c.title) : h('span', null, c.title))
+      : (f ? (f.href ? h('a', { href: f.href }, f.title) : h('span', null, f.title)) : null);
+    return h('article', { className: cx('vm-activity', props.className), 'aria-labelledby': headId },
+      a.href ? h('a', { className: 'vm-activity-avatar', href: a.href, tabIndex: -1, 'aria-hidden': true }, h(Avatar, { src: a.avatarSrc, name: a.name, size: 'sm' })) : h(Avatar, { src: a.avatarSrc, name: a.name, size: 'sm' }),
+      h('div', { className: 'vm-activity-main' },
+        h('p', { id: headId, className: 'vm-activity-line type-body' },
+          a.href ? h('a', { className: 'vm-strong', href: a.href }, a.name) : h('span', { className: 'vm-strong' }, a.name),
+          ' ' + (VERBS[props.verb] || props.verb) + ' ', objectLink,
+          h('span', { className: 'vm-activity-time type-caption' }, ' · ', h('time', { dateTime: props.datetime }, props.timestamp))),
+        f || c ? h('div', { className: 'vm-activity-body' },
+          f ? h(Poster, { src: f.posterSrc, title: f.title, size: 'sm' }) : h(CollectionMosaic, { posters: (c && c.posters) || [], size: 56 }),
+          h('div', { className: 'vm-activity-detail' },
+            f ? h('p', { className: 'type-caption vm-muted' }, metaLine([f.year, formatRuntime(f.runtime)])) : h('p', { className: 'type-caption vm-muted' }, plural(c.count || 0, 'film', 'films')),
+            props.rating != null ? h(Rating, { value: props.rating, source: 'friend', size: 14 }) : null,
+            props.excerpt ? h(ReviewBody, { text: props.excerpt, spoiler: props.spoiler, clampAt: 140 }) : null)) : null,
+        h(SocialActions, props)));
+  }
+
+  /* ---------- ProfilePreview ---------- */
+  function ProfilePreview(props) {
+    var s = props.stats || {};
+    var stats = [
+      s.watched != null ? [s.watched, 'films'] : null,
+      s.followers != null ? [s.followers, s.followers === 1 ? 'follower' : 'followers'] : null,
+      s.following != null ? [s.following, 'following'] : null
+    ].filter(Boolean);
+    return h('article', { className: cx('vm-profile', props.layout === 'row' && 'vm-profile-row', props.className) },
+      h(Avatar, { src: props.avatarSrc, name: props.name, size: props.layout === 'row' ? 'md' : 'lg' }),
+      h('div', { className: 'vm-profile-id' },
+        h('h3', { className: 'type-heading-md' }, props.href ? h('a', { href: props.href }, props.name) : props.name),
+        h('p', { className: 'type-caption vm-muted' }, '@' + props.handle, props.followsYou ? h('span', { className: 'vm-tag type-caption' }, 'Follows you') : null),
+        props.bio && props.layout !== 'row' ? h('p', { className: 'type-body vm-profile-bio' }, props.bio) : null,
+        stats.length && props.layout !== 'row' ? h('dl', { className: 'vm-profile-stats' }, stats.map(function (x, i) {
+          return h('div', { key: i }, h('dt', { className: 'type-caption vm-muted' }, x[1]), h('dd', { className: 'type-heading-md' }, x[0]));
+        })) : null,
+        props.tasteTags && props.tasteTags.length && props.layout !== 'row' ? h('ul', { className: 'vm-taste', 'aria-label': 'Taste' }, props.tasteTags.map(function (t) { return h('li', { key: t, className: 'type-caption' }, t); })) : null),
+      props.isSelf || !props.onToggleFollow ? null : h(Button, {
+        variant: props.following ? 'secondary' : 'primary', size: 'sm', icon: props.following ? 'user-check' : 'user-plus',
+        'aria-pressed': !!props.following, onClick: props.onToggleFollow, className: 'vm-profile-follow'
+      }, props.following ? 'Following' : 'Follow'));
+  }
+
+  /* ---------- ProviderBadge ---------- */
+  var KINDS = { stream: 'Subscription', free: 'Free', ads: 'Free with ads', rent: 'Rent', buy: 'Buy', cinema: 'In cinemas' };
+  function ProviderBadge(props) {
+    var kind = KINDS[props.kind] || props.kind;
+    var st = useState(false), failed = st[0], setFailed = st[1];
+    var logo = props.logoSrc && !failed
+      ? h('img', { className: 'vm-provider-logo', src: props.logoSrc, alt: '', width: 28, height: 28, loading: 'lazy', onError: function () { setFailed(true); } })
+      : h('span', { className: 'vm-provider-logo vm-provider-mono', 'aria-hidden': true }, String(props.name || '?')[0]);
+    var inner = [logo,
+      h('span', { key: 't', className: 'vm-provider-text' },
+        h('span', { className: 'type-label' }, props.name),
+        h('span', { className: 'type-caption vm-muted' }, metaLine([kind, props.price]))),
+      props.href ? h(Icon, { key: 'e', name: 'external-link', size: 16, className: 'vm-provider-ext' }) : null];
+    if (!props.href) return h('span', { className: cx('vm-provider', props.className) }, inner);
+    var spoken = props.name + ', ' + kind + (props.price ? ', ' + props.price : '') + (props.linkType === 'direct' ? '. Opens ' + props.name : '. Opens the availability source') + ' in a new tab';
+    return h('a', { className: cx('vm-provider', 'vm-provider-link', props.className), href: props.href, target: '_blank', rel: 'noopener noreferrer', 'aria-label': spoken }, inner);
+  }
+
+  /* ---------- CollectionTile ---------- */
+  function CollectionMosaic(props) {
+    var posters = (props.posters || []).slice(0, 4);
+    var cells = [];
+    for (var i = 0; i < 4; i++) {
+      var p = posters[i];
+      cells.push(p ? h(Poster, { key: i, src: p.posterSrc, title: p.title, size: 'sm', className: 'vm-mosaic-cell' }) : h('span', { key: i, className: 'vm-mosaic-cell vm-mosaic-empty' }));
+    }
+    return h('span', { className: 'vm-mosaic', style: props.size ? { width: props.size + 'px' } : undefined, 'aria-hidden': true }, cells);
+  }
+  function CollectionTile(props) {
+    var titleId = useId();
+    var cr = props.creator || {};
+    return h('article', { className: cx('vm-collection', props.className), 'aria-labelledby': titleId },
+      props.coverSrc ? h('span', { className: 'vm-collection-cover' }, h('img', { src: props.coverSrc, alt: '', loading: 'lazy' })) : h(CollectionMosaic, { posters: props.posters }),
+      h('div', { className: 'vm-collection-text' },
+        h('h3', { className: 'type-heading-md vm-collection-title' },
+          props.href ? h('a', { className: 'vm-stretch', id: titleId, href: props.href }, props.title) : h('button', { type: 'button', className: 'vm-stretch', id: titleId, onClick: props.onOpen }, props.title)),
+        h('p', { className: 'type-caption vm-muted' }, metaLine([cr.handle ? '@' + cr.handle : cr.name, plural(props.filmCount || 0, 'film', 'films')])),
+        props.collaborative ? h('p', { className: 'type-caption vm-collection-flag' }, h(Icon, { name: 'users', size: 14 }), 'Collaborative') : null,
+        props.visibility && props.visibility !== 'public' ? h(VisibilityTag, { value: props.visibility }) : null,
+        props.moodTags && props.moodTags.length ? h('ul', { className: 'vm-taste', 'aria-label': 'Moods' }, props.moodTags.slice(0, 3).map(function (t) { return h('li', { key: t, className: 'type-caption' }, t); })) : null),
+      props.onToggleSave ? h('button', { type: 'button', className: cx('vm-collection-save', props.saved && 'is-on'), 'aria-pressed': !!props.saved, onClick: props.onToggleSave },
+        h(Icon, { name: props.saved ? 'bookmark-check' : 'bookmark', size: 20 }), sr((props.saved ? 'Saved to your library: ' : 'Save to your library: ') + props.title)) : null);
+  }
+
+  /* ---------- SwipeCard ---------- */
+  var VOTE_WORDS = { yes: 'Interested', no: 'Not interested', skip: 'Unsure' };
+  function SwipeCard(props) {
+    var f = props.film || {};
+    var drag = useState(0), dx = drag[0], setDx = drag[1];
+    var lv = useState(null), leaving = lv[0], setLeaving = lv[1];
+    var start = useRef(null), cardRef = useRef(null);
+    var titleId = useId();
+    var THRESH = 96;
+    function vote(v) {
+      if (props.disabled || leaving) return;
+      if (reducedMotion()) { props.onVote && props.onVote(v); return; }
+      setLeaving(v);
+      setTimeout(function () { setLeaving(null); setDx(0); props.onVote && props.onVote(v); }, 320);
+    }
+    function down(e) { if (props.disabled || e.button > 0) return; if (e.target.closest && e.target.closest('button,a')) return; start.current = e.clientX; cardRef.current.setPointerCapture(e.pointerId); }
+    function move(e) { if (start.current == null) return; setDx(e.clientX - start.current); }
+    function up() { if (start.current == null) return; start.current = null; if (dx > THRESH) vote('yes'); else if (dx < -THRESH) vote('no'); else setDx(0); }
+    function key(e) {
+      if (e.target !== cardRef.current) return;
+      if (e.key === 'ArrowRight') { vote('yes'); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft') { vote('no'); e.preventDefault(); }
+      else if (e.key === 'ArrowDown') { vote('skip'); e.preventDefault(); }
+    }
+    var x = leaving === 'yes' ? 480 : leaving === 'no' ? -480 : leaving === 'skip' ? 0 : dx;
+    var y = leaving === 'skip' ? 240 : 0;
+    var hint = leaving || (dx > 24 ? 'yes' : dx < -24 ? 'no' : null);
+    var style = { transform: 'translate(' + x + 'px,' + y + 'px) rotate(' + (x / 24) + 'deg)', opacity: leaving ? 0 : 1, transition: start.current != null ? 'none' : undefined };
+    var meta = metaLine([f.year, formatRuntime(f.runtime), (f.genres || []).slice(0, 2).join(', ')]);
+    return h('div', { className: cx('vm-swipe', props.className) },
+      props.progress ? h('p', { className: 'vm-swipe-progress type-data' },
+        h('span', null, 'Film ' + props.progress.current + ' of ' + props.progress.total),
+        h('span', { className: 'vm-swipe-bar', role: 'progressbar', 'aria-label': 'Films rated', 'aria-valuemin': 0, 'aria-valuemax': props.progress.total, 'aria-valuenow': props.progress.current - 1 },
+          h('span', { style: { width: ((props.progress.current - 1) / props.progress.total * 100) + '%' } }))) : null,
+      h('article', {
+        ref: cardRef, className: cx('vm-swipe-card', hint && 'is-' + hint), style: style, tabIndex: 0,
+        'aria-labelledby': titleId, 'aria-describedby': titleId + '-hint', 'aria-roledescription': 'film card',
+        onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: up, onKeyDown: key
+      },
+        h('div', { className: 'vm-swipe-poster' },
+          h(Poster, { src: f.posterSrc, title: f.title, year: f.year, size: 'fill', eager: true }),
+          hint ? h('span', { className: 'vm-swipe-stamp vm-stamp-' + hint, 'aria-hidden': true }, h(Icon, { name: hint === 'yes' ? 'heart' : hint === 'no' ? 'x' : 'circle-help', size: 18, strokeWidth: 2.25 }), VOTE_WORDS[hint]) : null),
+        h('div', { className: 'vm-swipe-info' },
+          h('h3', { id: titleId, className: 'type-display-md' }, f.title),
+          h('p', { className: 'type-caption vm-muted' }, meta),
+          f.rating ? h(Rating, f.rating) : null,
+          f.synopsis ? h('p', { className: 'type-body vm-swipe-synopsis' }, f.synopsis) : null,
+          f.providers && f.providers.length ? h('p', { className: 'type-caption vm-swipe-where' }, h(Icon, { name: 'tv', size: 14 }), 'On ' + f.providers.map(function (p) { return p.name; }).join(', ')) : (f.providers ? h('p', { className: 'type-caption vm-muted vm-swipe-where' }, h(Icon, { name: 'tv', size: 14 }), 'Not on your group’s services') : null)),
+        h('span', { id: titleId + '-hint', className: 'vm-sr' }, 'Right arrow: interested. Left arrow: not interested. Down arrow: unsure.')),
+      h('div', { className: 'vm-swipe-actions' },
+        h(Button, { variant: 'secondary', size: 'lg', icon: 'x', className: 'vm-vote-no', onClick: function () { vote('no'); }, disabled: props.disabled }, 'Not interested'),
+        h(Button, { variant: 'ghost', size: 'md', icon: 'circle-help', className: 'vm-vote-skip', onClick: function () { vote('skip'); }, disabled: props.disabled }, 'Unsure'),
+        h(Button, { variant: 'primary', size: 'lg', icon: 'heart', className: 'vm-vote-yes', onClick: function () { vote('yes'); }, disabled: props.disabled }, 'Interested')),
+      props.onDetails || props.onTrailer ? h('div', { className: 'vm-swipe-more' },
+        props.onTrailer ? h(Button, { variant: 'ghost', size: 'sm', icon: 'play', onClick: props.onTrailer }, 'Trailer') : null,
+        props.onDetails ? h(Button, { variant: 'ghost', size: 'sm', icon: 'info', onClick: props.onDetails }, 'Details') : null) : null);
+  }
+
+  /* ---------- FilterChip ---------- */
+  function FilterChip(props) {
+    var state = props.state || (props.selected ? 'on' : 'off');
+    function next() {
+      if (!props.onChange) return;
+      if (props.triState) props.onChange(state === 'off' ? 'on' : state === 'on' ? 'excluded' : 'off');
+      else props.onChange(state === 'on' ? 'off' : 'on');
+    }
+    var icon = state === 'on' ? 'check' : state === 'excluded' ? 'minus' : props.icon;
+    var a11y = props.triState
+      ? { 'aria-label': props.label + (state === 'on' ? ', included' : state === 'excluded' ? ', excluded' : ', not set') }
+      : { 'aria-pressed': state === 'on' };
+    return h('button', Object.assign({ type: 'button', className: cx('vm-chip', 'type-label', 'is-' + state, props.className), onClick: next, disabled: props.disabled }, a11y),
+      icon ? h(Icon, { name: icon, size: 16, strokeWidth: state === 'off' ? 1.75 : 2.25 }) : null,
+      h('span', { className: 'vm-chip-label' }, props.label),
+      props.count != null ? h('span', { className: 'vm-chip-count type-data' }, props.count) : null);
+  }
+
+  /* ---------- BottomNav ---------- */
+  var DEFAULT_NAV = [
+    { id: 'home', label: 'Home', icon: 'house', href: '/' },
+    { id: 'discover', label: 'Discover', icon: 'compass', href: '/discover' },
+    { id: 'match', label: 'Match', icon: 'users', href: '/match' },
+    { id: 'clips', label: 'Clips', icon: 'clapperboard', href: '/clips' },
+    { id: 'profile', label: 'Profile', icon: 'user', href: '/profile' }
+  ];
+  function BottomNav(props) {
+    var items = props.items || DEFAULT_NAV;
+    var rail = props.layout === 'rail';
+    return h('nav', { className: cx('vm-nav', rail ? 'vm-nav-rail' : 'vm-nav-bar', props.fixed && 'vm-nav-fixed', props.className), 'aria-label': props.label || 'Primary' },
+      rail && props.brand ? h('div', { className: 'vm-nav-brand type-display-md' }, props.brand) : null,
+      h('ul', null, items.map(function (it) {
+        var current = it.id === props.current;
+        return h('li', { key: it.id },
+          h('a', {
+            href: it.href, className: cx('vm-nav-item', current && 'is-current'), 'aria-current': current ? 'page' : undefined,
+            onClick: props.onNavigate ? function (e) { e.preventDefault(); props.onNavigate(it.id); } : undefined
+          },
+            h('span', { className: 'vm-nav-icon' }, h(Icon, { name: it.icon, size: 24, strokeWidth: current ? 2.25 : 1.75 }),
+              it.badge ? h('span', { className: 'vm-nav-dot' }) : null),
+            h('span', { className: 'type-nav-label' }, it.label),
+            it.badge ? sr(', ' + it.badge) : null));
+      })));
+  }
+
+  /* ---------- Skeleton ---------- */
+  function Skeleton(props) {
+    var v = props.variant || 'text';
+    var lines = props.lines || 2;
+    var body;
+    function line(w, k) { return h('span', { key: k, className: 'vm-skel vm-skel-line', style: { width: w } }); }
+    if (v === 'text') { body = []; for (var i = 0; i < lines; i++) body.push(line(i === lines - 1 && lines > 1 ? '62%' : '100%', i)); }
+    else if (v === 'poster') body = h('span', { className: 'vm-skel vm-skel-poster' });
+    else if (v === 'avatar') body = h('span', { className: 'vm-skel vm-skel-avatar' });
+    else if (v === 'film-card') body = [h('span', { key: 'p', className: 'vm-skel vm-skel-poster' }), line('86%', 'a'), line('54%', 'b')];
+    else if (v === 'activity') body = h('span', { className: 'vm-skel-activity' },
+      h('span', { className: 'vm-skel vm-skel-avatar' }),
+      h('span', { className: 'vm-skel-stack' }, line('78%', 'a'), h('span', { className: 'vm-skel-row' }, h('span', { className: 'vm-skel vm-skel-thumb' }), h('span', { className: 'vm-skel-stack' }, line('40%', 'b'), line('92%', 'c'), line('66%', 'd')))));
+    return h('div', { className: cx('vm-skeleton', 'vm-skeleton-' + v, props.className), role: props.label ? 'status' : undefined, style: props.width ? { width: props.width } : undefined },
+      h('span', { 'aria-hidden': true, className: 'vm-skel-inner' }, body),
+      props.label ? sr(props.label) : null);
+  }
+
+  /* ---------- EmptyState / ErrorState ---------- */
+  function actionButton(a, variant) {
+    if (!a) return null;
+    return h(Button, { variant: variant, href: a.href, onClick: a.onClick, icon: a.icon }, a.label);
+  }
+  function EmptyState(props) {
+    var id = useId();
+    return h('section', { className: cx('vm-state', props.compact && 'vm-state-compact', props.className), 'aria-labelledby': id },
+      h('span', { className: 'vm-state-icon', 'aria-hidden': true }, h(Icon, { name: props.icon || 'film', size: 28 })),
+      h('h2', { id: id, className: props.compact ? 'type-heading-md' : 'type-display-md' }, props.title),
+      props.body ? h('p', { className: 'type-body vm-muted' }, props.body) : null,
+      props.action || props.secondaryAction ? h('div', { className: 'vm-state-actions' }, actionButton(props.action, 'primary'), actionButton(props.secondaryAction, 'ghost')) : null);
+  }
+  function ErrorState(props) {
+    return h('section', { className: cx('vm-state', 'vm-state-error', props.compact && 'vm-state-compact', props.className), role: 'alert' },
+      h('span', { className: 'vm-state-icon', 'aria-hidden': true }, h(Icon, { name: props.icon || 'triangle-alert', size: 28 })),
+      h('h2', { className: props.compact ? 'type-heading-md' : 'type-display-md' }, props.title || 'Something went wrong'),
+      props.body ? h('p', { className: 'type-body vm-muted' }, props.body) : null,
+      props.cachedNote ? h('p', { className: 'type-caption vm-state-cached' }, h(Icon, { name: 'clock', size: 14 }), props.cachedNote) : null,
+      props.onRetry || props.secondaryAction ? h('div', { className: 'vm-state-actions' },
+        props.onRetry ? h(Button, { variant: 'primary', icon: 'rotate-cw', busy: props.retrying, onClick: props.onRetry }, props.retrying ? 'Trying again' : 'Try again') : null,
+        actionButton(props.secondaryAction, 'ghost')) : null,
+      props.detail ? h('p', { className: 'type-caption vm-faint' }, props.detail) : null);
+  }
+
+  /* ---------- ConfirmModal ---------- */
+  function ConfirmModal(props) {
+    var ref = useRef(null);
+    var titleId = useId(), bodyId = useId();
+    useEffect(function () {
+      var d = ref.current;
+      if (!d) return;
+      if (props.open && !d.open) { if (d.showModal) d.showModal(); else d.setAttribute('open', ''); }
+      if (!props.open && d.open) d.close();
+    }, [props.open]);
+    var latest = useRef(null);
+    function cancel(e) { if (e) e.preventDefault(); if (!props.busy && props.onCancel) props.onCancel(); }
+    latest.current = cancel;
+    useEffect(function () {
+      var d = ref.current;
+      function onEsc(e) { latest.current(e); }
+      d.addEventListener('cancel', onEsc);
+      return function () { d.removeEventListener('cancel', onEsc); };
+    }, []);
+    return h('dialog', {
+      ref: ref, className: cx('vm-modal', props.destructive && 'vm-modal-danger', props.className),
+      'aria-labelledby': titleId, 'aria-describedby': props.body ? bodyId : undefined,
+      onClick: function (e) { if (e.target === ref.current) cancel(); }
+    },
+      h('div', { className: 'vm-modal-panel' },
+        props.destructive ? h('span', { className: 'vm-modal-icon', 'aria-hidden': true }, h(Icon, { name: props.icon || 'trash-2', size: 22 })) : null,
+        h('h2', { id: titleId, className: 'type-heading-lg' }, props.title),
+        props.body ? h('p', { id: bodyId, className: 'type-body vm-muted' }, props.body) : null,
+        props.children,
+        h('div', { className: 'vm-modal-actions' },
+          h(Button, { variant: 'secondary', onClick: cancel, autoFocus: true, disabled: props.busy }, props.cancelLabel || 'Cancel'),
+          h(Button, { variant: props.destructive ? 'danger' : 'primary', onClick: props.onConfirm, busy: props.busy }, props.confirmLabel || 'Confirm'))));
+  }
+
+  /* ---------- Toast ---------- */
+  function Toast(props) {
+    var tone = props.tone || 'neutral';
+    var hovered = useRef(false);
+    useEffect(function () {
+      if (!props.duration || !props.onDismiss) return;
+      var left = Math.max(props.duration, props.action ? 6000 : 0), t0 = Date.now(), id;
+      function tick() { if (hovered.current) { t0 = Date.now(); } else if (Date.now() - t0 >= left) { props.onDismiss(); return; } id = setTimeout(tick, 250); }
+      id = setTimeout(tick, 250);
+      return function () { clearTimeout(id); };
+    }, [props.duration, props.message]);
+    var icon = tone === 'positive' ? 'check' : tone === 'negative' ? 'triangle-alert' : props.icon;
+    return h('div', {
+      className: cx('vm-toast', 'vm-toast-' + tone, props.floating && 'vm-toast-floating', props.className), role: tone === 'negative' ? 'alert' : 'status',
+      onMouseEnter: function () { hovered.current = true; }, onMouseLeave: function () { hovered.current = false; },
+      onFocus: function () { hovered.current = true; }, onBlur: function () { hovered.current = false; }
+    },
+      icon ? h(Icon, { name: icon, size: 18, strokeWidth: 2.25, className: 'vm-toast-icon' }) : null,
+      h('span', { className: 'type-body vm-toast-msg' }, props.message),
+      props.action ? h('button', { type: 'button', className: 'vm-toast-action type-label', onClick: props.action.onClick }, props.action.label) : null,
+      props.onDismiss ? h('button', { type: 'button', className: 'vm-toast-close', onClick: props.onDismiss }, h(Icon, { name: 'x', size: 18 }), sr('Dismiss')) : null);
+  }
+
+  /* ---------- Personal accent: colour maths (OKLab / OKLCH, WCAG 2 contrast) ---------- */
+  function toLin(c) { c /= 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function fromLin(c) { var v = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055; return Math.round(Math.max(0, Math.min(1, v)) * 255); }
+  function parseColor(str) {
+    var s = String(str || '').trim(), m;
+    if ((m = /^#([0-9a-f]{3,8})$/i.exec(s))) {
+      var x = m[1];
+      if (x.length === 3 || x.length === 4) x = x.split('').map(function (c) { return c + c; }).join('');
+      return [parseInt(x.slice(0, 2), 16), parseInt(x.slice(2, 4), 16), parseInt(x.slice(4, 6), 16)];
+    }
+    if ((m = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(s))) return [+m[1], +m[2], +m[3]];
+    if (typeof document !== 'undefined' && s) {
+      var ctx = document.createElement('canvas').getContext('2d');
+      if (ctx) { ctx.fillStyle = '#000'; ctx.fillStyle = s; ctx.fillRect(0, 0, 1, 1); var d = ctx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2]]; }
+    }
+    return null;
+  }
+  function hex(rgb) { return '#' + rgb.map(function (v) { return ('0' + Math.round(v).toString(16)).slice(-2); }).join(''); }
+  function luminance(rgb) { return 0.2126 * toLin(rgb[0]) + 0.7152 * toLin(rgb[1]) + 0.0722 * toLin(rgb[2]); }
+  function contrast(a, b) {
+    var la = luminance(typeof a === 'string' ? parseColor(a) : a), lb = luminance(typeof b === 'string' ? parseColor(b) : b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+  function rgbToOklab(rgb) {
+    var r = toLin(rgb[0]), g = toLin(rgb[1]), b = toLin(rgb[2]);
+    var l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+    var m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+    var s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+    return [0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s];
+  }
+  function oklabToLinear(L, a, b) {
+    var l = Math.pow(L + 0.3963377774 * a + 0.2158037573 * b, 3), m = Math.pow(L - 0.1055613458 * a - 0.0638541728 * b, 3), s = Math.pow(L - 0.0894841775 * a - 1.2914855480 * b, 3);
+    return [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s];
+  }
+  function toOklch(rgb) { var o = rgbToOklab(rgb); var h = Math.atan2(o[2], o[1]) * 180 / Math.PI; return { L: o[0], C: Math.sqrt(o[1] * o[1] + o[2] * o[2]), h: h < 0 ? h + 360 : h }; }
+  /* OKLCH to sRGB, lowering chroma until the colour fits the sRGB gamut. */
+  function fromOklch(L, C, h) {
+    var rad = h * Math.PI / 180, lo = 0, hi = C, lin;
+    function inGamut(c) { lin = oklabToLinear(L, c * Math.cos(rad), c * Math.sin(rad)); return lin.every(function (v) { return v >= -0.0005 && v <= 1.0005; }); }
+    if (!inGamut(C)) { for (var i = 0; i < 18; i++) { var mid = (lo + hi) / 2; if (inGamut(mid)) lo = mid; else hi = mid; } inGamut(lo); }
+    return lin.map(fromLin);
+  }
+  function distance(a, b) { var x = rgbToOklab(a), y = rgbToOklab(b); return Math.sqrt(Math.pow(x[0] - y[0], 2) + Math.pow(x[1] - y[1], 2) + Math.pow(x[2] - y[2], 2)); }
+
+  var HUE_NAMES = [[15, 'Pink'], [45, 'Red'], [70, 'Orange'], [100, 'Gold'], [125, 'Yellow'], [165, 'Green'], [200, 'Teal'], [235, 'Cyan'], [275, 'Blue'], [315, 'Violet'], [345, 'Magenta'], [361, 'Pink']];
+  var NEUTRAL_CHROMA = 0.035;
+  function colorName(color) {
+    var rgb = typeof color === 'string' ? parseColor(color) : color;
+    if (!rgb) return 'Colour';
+    var c = toOklch(rgb);
+    if (c.C < NEUTRAL_CHROMA) return 'Black and white';
+    for (var i = 0; i < HUE_NAMES.length; i++) if (c.h < HUE_NAMES[i][0]) return HUE_NAMES[i][1];
+    return 'Pink';
+  }
+
+  /* The grounds an accent must read on, read from tokens.css so the tokens stay the one source.
+     The fallbacks are the published token values, for use outside a page (tests, server). */
+  var GROUND_NAMES = ['bg', 'surface', 'surface-raised', 'surface-overlay', 'ink'];
+  var GROUND_FALLBACK = {
+    dark: { bg: '#0d0b0b', surface: '#151213', 'surface-raised': '#1d191a', 'surface-overlay': '#262122', ink: '#f3ece2' },
+    light: { bg: '#f5efe6', surface: '#faf6f0', 'surface-raised': '#ffffff', 'surface-overlay': '#ffffff', ink: '#1d1718' }
+  };
+  function readGrounds(theme) {
+    var out = Object.assign({}, GROUND_FALLBACK[theme]);
+    if (typeof document === 'undefined' || !document.body) return out;
+    var probe = document.createElement('span');
+    probe.setAttribute('data-theme', theme);
+    probe.style.display = 'none';
+    document.body.appendChild(probe);
+    var cs = getComputedStyle(probe);
+    GROUND_NAMES.forEach(function (n) { var v = cs.getPropertyValue('--' + n).trim(); if (v && parseColor(v)) out[n] = v; });
+    document.body.removeChild(probe);
+    return out;
+  }
+
+  /* Walk lightness from a start value in one direction until test() passes. */
+  function solve(h, C, L0, dir, test) {
+    for (var L = L0; L >= 0.04 && L <= 0.99; L += dir * 0.01) {
+      var rgb = fromOklch(L, C, h);
+      if (test(rgb)) return rgb;
+    }
+    return fromOklch(dir > 0 ? 0.99 : 0.04, 0, h);
+  }
+
+  function deriveAccent(color, options) {
+    var src = typeof color === 'string' ? parseColor(color) : color;
+    if (!src) return null;
+    var o = options || {};
+    var c = toOklch(src);
+    var noir = c.C < NEUTRAL_CHROMA;
+    var G = o.grounds || { dark: readGrounds('dark'), light: readGrounds('light') };
+    var themes = {};
+    ['dark', 'light'].forEach(function (theme) {
+      var g = G[theme], dark = theme === 'dark';
+      var grounds = [g.bg, g.surface, g['surface-raised'], g['surface-overlay']].map(parseColor);
+      var fillGrounds = grounds.slice(0, 3);
+      /* Text on a fill is either the dark theme's off-white ink or a near-black. */
+      var textLight = parseColor(G.dark.ink), textDark = parseColor(dark ? g.bg : g.ink);
+      /* Black-and-white sources become a warm grey that matches ink. */
+      var C = noir ? 0.008 : c.C, hue = noir ? 60 : c.h;
+      var onFill = null;
+      var fill = solve(hue, Math.min(C, dark ? 0.2 : 0.18),
+        noir ? (dark ? 0.9 : 0.3) : Math.max(dark ? 0.5 : 0.32, Math.min(dark ? 0.8 : 0.52, c.L)), dark ? 1 : -1,
+        function (rgb) {
+          if (!fillGrounds.every(function (gr) { return contrast(rgb, gr) >= 3; })) return false;
+          var cl = contrast(textLight, rgb), cd = contrast(textDark, rgb);
+          if (cl >= 4.5 && (cl >= cd || cd < 4.5)) { onFill = textLight; return true; }
+          if (cd >= 4.5) { onFill = textDark; return true; }
+          return false;
+        });
+      if (!onFill) onFill = contrast(textLight, fill) >= contrast(textDark, fill) ? textLight : textDark;
+      var soft = fromOklch(dark ? (noir ? 0.3 : 0.27) : (noir ? 0.92 : 0.94), Math.min(C, dark ? 0.06 : 0.035), hue);
+      var inkGrounds = grounds.concat([soft]);
+      var ink = solve(hue, Math.min(C, 0.16), noir ? (dark ? 0.86 : 0.3) : (dark ? Math.max(0.74, c.L) : rgbToOklab(fill)[0]), dark ? 1 : -1,
+        function (rgb) { return inkGrounds.every(function (gr) { return contrast(rgb, gr) >= 4.5; }); });
+      themes[theme] = {
+        reel: hex(fill), 'on-reel': hex(onFill), 'reel-ink': hex(ink), 'reel-soft': hex(soft),
+        adjusted: distance(src, fill) > 0.06
+      };
+    });
+    return { source: hex(src), name: colorName(src), noir: noir, dark: themes.dark, light: themes.light };
+  }
+
+  var ACCENT_VARS = ['reel', 'on-reel', 'reel-ink', 'reel-soft'];
+  function declarations(t) { return ACCENT_VARS.map(function (k) { return '--' + k + ': ' + t[k] + ';'; }).join(' '); }
+  /* The token values of VieMo red, read from tokens.css (an element carrying data-theme gets the token values, not inherited overrides). */
+  function classicAccent() {
+    var out = {};
+    ['dark', 'light'].forEach(function (theme) {
+      var t = {};
+      if (typeof document !== 'undefined' && document.body) {
+        var probe = document.createElement('span');
+        probe.setAttribute('data-theme', theme); probe.style.display = 'none';
+        document.body.appendChild(probe);
+        var cs = getComputedStyle(probe);
+        ACCENT_VARS.forEach(function (k) { t[k] = cs.getPropertyValue('--' + k).trim(); });
+        document.body.removeChild(probe);
+      }
+      out[theme] = t;
+    });
+    return out;
+  }
+  /* CSS that re-points the four accent tokens for one selector, per theme. 'classic' pins VieMo red. */
+  function accentCss(color, selector) {
+    var a = color === 'classic' ? classicAccent() : deriveAccent(color);
+    if (!a) return '';
+    var sel = selector || ':root';
+    return sel + ', [data-theme="dark"] ' + sel + ', ' + sel + '[data-theme="dark"] { ' + declarations(a.dark) + ' }\n' +
+      '[data-theme="light"] ' + sel + ', ' + sel + '[data-theme="light"] { ' + declarations(a.light) + ' }';
+  }
+  /* Apply a person's accent to the whole app, or pass null to return to VieMo red. */
+  function applyAccent(color) {
+    var root = document.documentElement, el = document.getElementById('vm-accent');
+    if (!color) { if (el) el.remove(); root.removeAttribute('data-vm-accent'); return null; }
+    var css = accentCss(color, 'html[data-vm-accent]');
+    if (!el) { el = document.createElement('style'); el.id = 'vm-accent'; document.head.appendChild(el); }
+    el.textContent = css;
+    root.setAttribute('data-vm-accent', '');
+    return deriveAccent(color);
+  }
+
+  /* Up to `max` distinct colours in an image, largest first, ignoring transparent pixels and greys.
+     Works on canvas ImageData in the browser and on raw RGBA buffers (e.g. sharp) on the server. */
+  function extractSwatches(image, options) {
+    var o = options || {}, max = o.max || 5;
+    var data = image.data || image, n = data.length / 4;
+    var step = Math.max(1, Math.floor(n / 40000));
+    var bins = {}, opaque = 0, chromatic = 0;
+    for (var i = 0; i < n; i += step) {
+      var p = i * 4;
+      if (data[p + 3] < 128) continue;
+      opaque++;
+      var key = (data[p] >> 4) << 8 | (data[p + 1] >> 4) << 4 | (data[p + 2] >> 4);
+      var b = bins[key] || (bins[key] = [0, 0, 0, 0]);
+      b[0] += data[p]; b[1] += data[p + 1]; b[2] += data[p + 2]; b[3]++;
+    }
+    var list = [];
+    for (var k in bins) {
+      var bb = bins[k], rgb = [bb[0] / bb[3], bb[1] / bb[3], bb[2] / bb[3]], lch = toOklch(rgb);
+      if (lch.C < 0.05 || lch.L < 0.12 || lch.L > 0.97) continue;
+      chromatic += bb[3];
+      list.push({ lab: rgbToOklab(rgb), count: bb[3] });
+    }
+    list.sort(function (x, y) { return y.count - x.count; });
+    var clusters = [];
+    list.forEach(function (it) {
+      for (var j = 0; j < clusters.length; j++) {
+        var cl = clusters[j], d = Math.sqrt(Math.pow(cl.lab[0] - it.lab[0], 2) + Math.pow(cl.lab[1] - it.lab[1], 2) + Math.pow(cl.lab[2] - it.lab[2], 2));
+        if (d < 0.1) {
+          var w = cl.count + it.count;
+          cl.lab = cl.lab.map(function (v, z) { return (v * cl.count + it.lab[z] * it.count) / w; });
+          cl.count = w;
+          return;
+        }
+      }
+      clusters.push({ lab: it.lab.slice(), count: it.count });
+    });
+    var swatches = clusters
+      .filter(function (cl) { return opaque && cl.count / opaque >= 0.01; })
+      .sort(function (x, y) { return y.count - x.count; })
+      .slice(0, max)
+      .map(function (cl) {
+        var rgb = oklabToLinear(cl.lab[0], cl.lab[1], cl.lab[2]).map(fromLin);
+        return { hex: hex(rgb), share: Math.round(cl.count / opaque * 1000) / 1000, name: colorName(rgb) };
+      });
+    return { swatches: swatches, neutral: !opaque || chromatic / opaque < 0.04 };
+  }
+
+  /* ---------- AccentScope ---------- */
+  /* True after the first client render. Accent CSS reads tokens from the live document, so it is only
+     written once mounted; server and first client render then match during hydration. */
+  function useMounted() {
+    var st = useState(false);
+    useEffect(function () { st[1](true); }, []);
+    return st[0];
+  }
+  function AccentScope(props) {
+    var id = 'vm-acc-' + useId().replace(/[^a-zA-Z0-9_-]/g, '');
+    var mounted = useMounted();
+    var css = mounted && props.color ? accentCss(props.color, '.' + id) : '';
+    return h(props.as || 'div', { className: cx(id, props.className), style: props.style },
+      css ? h('style', null, css) : null, props.children);
+  }
+
+  /* ---------- AccentPicker ---------- */
+  function AccentPicker(props) {
+    var f = props.film || {};
+    var swatches = props.swatches || [];
+    var options = [{ hex: null, name: 'VieMo red', note: 'Classic' }].concat(swatches.map(function (s) {
+      return { hex: s.hex, name: s.name || colorName(s.hex), note: s.source === 'poster' ? 'From the poster' : 'From the logo' };
+    }));
+    if (props.allowNoir && !swatches.some(function (s) { return toOklch(parseColor(s.hex)).C < NEUTRAL_CHROMA; })) options.push({ hex: '#f3ece2', name: 'Black and white', note: 'Noir' });
+    var current = props.value || null;
+    if (current && !options.some(function (op) { return op.hex === current; })) options.push({ hex: current, name: colorName(current), note: 'Current' });
+    var refs = useRef([]);
+    var idx = Math.max(0, options.findIndex(function (op) { return (op.hex || null) === current; }));
+    var groupId = useId();
+    function choose(i) { var op = options[(i + options.length) % options.length]; props.onChange && props.onChange(op.hex); var el = refs.current[(i + options.length) % options.length]; if (el) el.focus(); }
+    function onKey(e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { choose(idx + 1); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { choose(idx - 1); e.preventDefault(); }
+    }
+    var mounted = useMounted();
+    var accent = mounted && current ? deriveAccent(current) : null;
+    var source = swatches.length ? (swatches[0].source === 'poster' ? 'its poster' : 'its logo') : null;
+    return h('section', { className: cx('vm-accent-picker', props.className), 'aria-labelledby': groupId },
+      h('header', { className: 'vm-accent-head' },
+        h(Poster, { src: f.posterSrc, title: f.title, size: 'sm' }),
+        h('div', null,
+          h('h3', { id: groupId, className: 'type-heading-md' }, 'Accent colour'),
+          h('p', { className: 'type-caption vm-muted' }, f.title ? (source ? 'Colours from ' + source + ': ' : 'No colours found in ') + f.title : 'Pick a favourite film to take its colours'),
+          props.neutral ? h('p', { className: 'type-caption vm-muted' }, 'Its logo and poster are black and white.') : null)),
+      h('div', { className: 'vm-accent-options', role: 'radiogroup', 'aria-labelledby': groupId, onKeyDown: onKey },
+        options.map(function (op, i) {
+          var checked = i === idx;
+          return h(AccentScope, { key: op.name + i, color: op.hex || 'classic', className: 'vm-accent-option-wrap' },
+            h('button', {
+              type: 'button', role: 'radio', 'aria-checked': checked, tabIndex: checked ? 0 : -1,
+              ref: function (el) { refs.current[i] = el; },
+              className: cx('vm-accent-option', checked && 'is-on'), onClick: function () { choose(i); }
+            },
+              h('span', { className: 'vm-accent-dot', 'aria-hidden': true }, checked ? h(Icon, { name: 'check', size: 20, strokeWidth: 2.5 }) : null),
+              h('span', { className: 'type-label' }, op.name),
+              h('span', { className: 'type-caption vm-muted' }, op.note)));
+        })),
+      h(AccentScope, { color: current || 'classic', className: 'vm-accent-sample' },
+        h('p', { className: 'type-eyebrow vm-muted' }, 'Preview'),
+        h('div', { className: 'vm-accent-sample-row' },
+          h(Button, { variant: 'primary', icon: 'users', tabIndex: -1 }, 'Start Movie Night'),
+          h('span', { className: 'vm-chip type-label is-on', 'aria-hidden': true }, h(Icon, { name: 'check', size: 16, strokeWidth: 2.25 }), 'Thrilling'),
+          h('span', { className: 'vm-accent-link type-label' }, 'Read more')),
+        accent && (accent.dark.adjusted || accent.light.adjusted) ? h('p', { className: 'type-caption vm-muted vm-accent-note' }, h(Icon, { name: 'info', size: 14 }), 'Tuned for each theme so text stays readable.') : null),
+      props.onApply ? h('div', { className: 'vm-accent-actions' }, h(Button, { variant: 'primary', onClick: props.onApply, busy: props.saving }, props.saving ? 'Saving' : 'Use this colour')) : null);
+  }
+
+  var api = {
+    Button: Button, Icon: Icon, Avatar: Avatar, Poster: Poster, FilmCard: FilmCard, ReviewCard: ReviewCard,
+    ActivityItem: ActivityItem, ProfilePreview: ProfilePreview, ProviderBadge: ProviderBadge, CollectionTile: CollectionTile,
+    SwipeCard: SwipeCard, Rating: Rating, FilterChip: FilterChip, BottomNav: BottomNav, Skeleton: Skeleton,
+    EmptyState: EmptyState, ErrorState: ErrorState, ConfirmModal: ConfirmModal, Toast: Toast,
+    AccentPicker: AccentPicker, AccentScope: AccentScope,
+    deriveAccent: deriveAccent, applyAccent: applyAccent, accentCss: accentCss, extractSwatches: extractSwatches,
+    colorName: colorName, contrast: contrast,
+    iconNames: Object.keys(ICONS), formatRuntime: formatRuntime
+  };
+  window.VieMo = Object.assign(window.VieMo || {}, api);

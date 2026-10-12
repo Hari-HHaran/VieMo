@@ -35,6 +35,8 @@ export interface PosterProps {
   title: string; year?: number | string;
   /** TMDB image URL, e.g. https://image.tmdb.org/t/p/w342{poster_path}. Missing or broken shows the typographic fallback. */
   src?: string | null;
+  /** Optional srcset/sizes, e.g. TMDB w185 1x and w342 2x. */
+  srcSet?: string; sizes?: string;
   size?: 'sm' | 'md' | 'lg' | 'fill' | number;
   /** Empty by default (the title is printed nearby). Pass "<title> poster" when it stands alone. */
   alt?: string; eager?: boolean; className?: string;
@@ -56,7 +58,7 @@ export interface RatingProps {
 export declare function Rating(props: RatingProps): React.ReactElement;
 
 export interface FilmCardProps {
-  title: string; year?: number; runtime?: number; genres?: string[]; posterSrc?: string | null;
+  title: string; year?: number; runtime?: number; genres?: string[]; posterSrc?: string | null; posterSrcSet?: string; posterSizes?: string;
   href?: string; onOpen?: () => void;
   size?: 'md' | 'lg';
   saved?: boolean; onToggleSave?: () => void;
