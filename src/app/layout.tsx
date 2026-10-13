@@ -3,6 +3,7 @@ import '@ds/components/bundle.css';
 import './app.css';
 import type { Metadata, Viewport } from 'next';
 import AppShell from '@/components/AppShell';
+import { dataSource } from '@/lib/tmdb';
 
 export const metadata: Metadata = {
   title: { default: 'VieMo', template: '%s · VieMo' },
@@ -23,6 +24,14 @@ export const viewport: Viewport = {
 /* Runs before first paint: applies the saved theme, motion setting and personal accent so nothing flashes. */
 const boot = `(function(){try{var e=document.documentElement;var p=JSON.parse(localStorage.getItem('viemo:prefs')||'{}');var t=p.theme||'system';e.setAttribute('data-theme',t==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t);if(p.reduceMotion)e.setAttribute('data-motion','reduce');var a=JSON.parse(localStorage.getItem('viemo:accent')||'null');if(a&&a.css){var s=document.createElement('style');s.id='vm-accent';s.textContent=a.css;document.head.appendChild(s);e.setAttribute('data-vm-accent','')}}catch(x){}})();`;
 
+/* When the server runs on the saved snapshot, every screen says so (and how old it is). */
+function dataNote(): string | null {
+  const d = dataSource();
+  if (d.mode !== 'snapshot') return null;
+  const date = new Date(d.takenAt).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  return `Showing saved TMDB data from ${date} (${d.filmCount.toLocaleString('en')} films). Trending, cinema and where-to-watch lists won’t change until it’s refreshed.`;
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-theme="dark" suppressHydrationWarning>
@@ -30,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: boot }} />
       </head>
       <body>
-        <AppShell>{children}</AppShell>
+        <AppShell dataNote={dataNote()}>{children}</AppShell>
       </body>
     </html>
   );

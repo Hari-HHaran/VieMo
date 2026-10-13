@@ -13,6 +13,7 @@ h1, h2, h3, p { margin: 0; }
 /* Shell: bottom bar on phones, rail from 1024px */
 .shell-rail { display: none; }
 .shell-main { min-height: 100dvh; padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom)); outline: none; }
+.data-note { margin: 0; padding: var(--space-2) var(--space-4); background: var(--surface); border-bottom: 1px solid var(--line); color: var(--ink-muted); text-align: center; }
 .shell-credits { max-width: 1200px; margin: 0 auto; padding: var(--space-6) var(--space-4) var(--space-8); color: var(--ink-faint); }
 .shell-credits a { color: var(--ink-muted); }
 @media (min-width: 1024px) {

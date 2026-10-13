@@ -3,7 +3,7 @@ import { EmptyState } from '@/ds/client';
 import ClipsFeed, { type Clip } from '@/components/ClipsFeed';
 import Problem from '@/components/Problem';
 import { settle } from '@/lib/settle';
-import { movieWithVideos, pickTrailer, trending, yearOf } from '@/lib/tmdb';
+import { asOf, movieWithVideos, pickTrailer, trending, yearOf } from '@/lib/tmdb';
 
 export const metadata: Metadata = { title: 'Clips' };
 
@@ -25,5 +25,5 @@ export default async function Clips() {
     }];
   });
   if (!clips.length) return <div className="page"><EmptyState icon="clapperboard" title="No trailers right now" body="None of this week’s trending films has a trailer on TMDB yet." action={{ label: 'Browse films', href: '/discover' }} /></div>;
-  return <ClipsFeed clips={clips} />;
+  return <ClipsFeed clips={clips} sourceLabel={asOf('Trending on TMDB')} />;
 }

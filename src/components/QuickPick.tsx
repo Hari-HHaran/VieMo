@@ -16,7 +16,7 @@ const KEY = 'viemo:quickpick';
 
 /* Solo Quick pick: say what you want, vote on real films, get a ranked shortlist with reasons.
    State survives opening a film's details and coming back (sessionStorage). */
-export default function QuickPick({ services, place }: { services: { id: number; name: string }[]; place: string }) {
+export default function QuickPick({ services, place, availabilityNote }: { services: { id: number; name: string }[]; place: string; availabilityNote: string }) {
   const router = useRouter();
   const toast = useToast();
   const { add, has } = useWatchlist();
@@ -104,7 +104,7 @@ export default function QuickPick({ services, place }: { services: { id: number;
   if (s.phase === 'error') {
     const config = s.error === 'config';
     return <ErrorState icon={config ? 'settings' : 'wifi-off'} title={config ? 'Film data isn’t connected yet' : 'Films didn’t load'}
-      body={config ? 'This VieMo server has no TMDB token. Add TMDB_READ_TOKEN and reload.' : s.error === 'rate_limited' ? 'Too many requests in a minute. Wait a moment and try again.' : 'We couldn’t reach TMDB. Your choices are kept.'}
+      body={config ? 'This VieMo server has no TMDB token and no saved snapshot. Add TMDB_READ_TOKEN, or run the “TMDB snapshot” GitHub Action.' : s.error === 'rate_limited' ? 'Too many requests in a minute. Wait a moment and try again.' : 'We couldn’t reach TMDB. Your choices are kept.'}
       onRetry={() => deal(s.page)} secondaryAction={{ label: 'Change choices', onClick: () => setS({ ...s, phase: 'setup' }) }} />;
   }
 
@@ -191,7 +191,7 @@ export default function QuickPick({ services, place }: { services: { id: number;
         <p className="type-caption vm-muted">
           Films you marked Not interested are out. Interested scores {WEIGHTS.yes}, Unsure {WEIGHTS.skip}. A film in your mood’s genres adds {WEIGHTS.moodMatch};
           being on a service you chose adds {WEIGHTS.onChosenService}; the TMDB rating adds up to {WEIGHTS.tmdbRating} as a tie-breaker. Runtime and services were
-          hard limits when the films were dealt. Availability is from JustWatch via TMDB for {place}.
+          hard limits when the films were dealt. {availabilityNote}.
         </p>
       </details>
     </section>

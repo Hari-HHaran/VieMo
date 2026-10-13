@@ -12,7 +12,7 @@ export interface Clip {
 }
 const IMG = 'https://image.tmdb.org/t/p';
 
-export default function ClipsFeed({ clips }: { clips: Clip[] }) {
+export default function ClipsFeed({ clips, sourceLabel = 'Trending on TMDB' }: { clips: Clip[]; sourceLabel?: string }) {
   const [prefs] = usePrefs();
   const { has, add, remove } = useWatchlist();
   const toast = useToast();
@@ -49,7 +49,7 @@ export default function ClipsFeed({ clips }: { clips: Clip[] }) {
             <Trailer youtubeKey={c.trailerKey} title={c.title} still={c.backdropPath ? `${IMG}/w780${c.backdropPath}` : null}
               playing={playing === c.id} autoPlay={prefs.autoplay} onPlay={() => setPlaying(c.id)} />
             <div className="clip-info">
-              <p className="type-eyebrow vm-muted">{`${i + 1} of ${clips.length} · Trending on TMDB`}</p>
+              <p className="type-eyebrow vm-muted">{`${i + 1} of ${clips.length} · ${sourceLabel}`}</p>
               <h2 id={`clip-${c.id}`} className="type-display-md" tabIndex={-1}>{c.title}{c.year ? <span className="type-heading-md vm-muted"> {c.year}</span> : null}</h2>
               <p className="type-caption vm-muted">{[runtimeLabel(c.runtime), c.genres.join(', ')].filter(Boolean).join(' · ')}</p>
               {c.overview ? <p className="type-body clip-overview">{c.overview}</p> : null}

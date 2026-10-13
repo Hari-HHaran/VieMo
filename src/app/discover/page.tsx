@@ -8,7 +8,7 @@ import { dateLabel } from '@/lib/format';
 import { MOODS, moodById } from '@/lib/moods';
 import { regionName, viewerRegion } from '@/lib/region';
 import { settle } from '@/lib/settle';
-import { discover, HIDDEN_GEMS_RULE, hiddenGems, nowPlaying, regionProviders, trending, upcoming } from '@/lib/tmdb';
+import { asOf, discover, HIDDEN_GEMS_RULE, hiddenGems, nowPlaying, regionProviders, trending, upcoming } from '@/lib/tmdb';
 
 export const metadata: Metadata = { title: 'Discover' };
 
@@ -44,21 +44,21 @@ export default async function Discover({ searchParams }: { searchParams: Promise
         <Suspense><QueryChips param="mood" label="Mood" options={MOODS.map((m) => ({ id: m.id, label: m.label }))} /></Suspense>
         {mood && moodFilms ? (
           moodFilms.ok
-            ? <FilmRail id="mood" title={`${mood.label} picks`} caption={`Popular on TMDB in ${mood.genreNames.join(', ')}`} films={moodFilms.value} />
+            ? <FilmRail id="mood" title={`${mood.label} picks`} caption={asOf(`Popular on TMDB in ${mood.genreNames.join(', ')}`)} films={moodFilms.value} />
             : <Problem info={moodFilms.problem} compact />
         ) : null}
       </section>
 
-      {trend.ok ? <FilmRail id="trending" title="Trending now" caption="Trending on TMDB this week" films={trend.value} /> : <Problem info={trend.problem} compact />}
+      {trend.ok ? <FilmRail id="trending" title="Trending now" caption={asOf('Trending on TMDB this week')} films={trend.value} /> : <Problem info={trend.problem} compact />}
 
       {cinemas.ok
-        ? (cinemas.value.length ? <FilmRail id="cinemas" title="New in cinemas" caption={`Now playing in ${place}, from TMDB`} films={cinemas.value} /> : null)
+        ? (cinemas.value.length ? <FilmRail id="cinemas" title="New in cinemas" caption={asOf(`Now playing in ${place}, from TMDB`)} films={cinemas.value} /> : null)
         : <Problem info={cinemas.problem} compact />}
 
       <section aria-labelledby="stream-h" className="section">
         <div className="rail-head">
           <h2 id="stream-h" className="type-heading-lg">Explore streaming</h2>
-          <p className="type-caption vm-faint">{`Services in ${place}, from JustWatch via TMDB`}</p>
+          <p className="type-caption vm-faint">{asOf(`Services in ${place}, from JustWatch via TMDB`)}</p>
         </div>
         {providers.ok ? (
           <Suspense><QueryChips param="provider" label="Streaming service" options={topProviders.map((p) => ({ id: String(p.provider_id), label: p.provider_name }))} /></Suspense>
@@ -66,7 +66,7 @@ export default async function Discover({ searchParams }: { searchParams: Promise
         {provider && streaming ? (
           streaming.ok
             ? (streaming.value.length
-                ? <FilmRail id="stream" title={`On ${provider.provider_name}`} caption={`Subscription, free or with ads in ${place}, from JustWatch via TMDB`} films={streaming.value} />
+                ? <FilmRail id="stream" title={`On ${provider.provider_name}`} caption={asOf(`Subscription, free or with ads in ${place}, from JustWatch via TMDB`)} films={streaming.value} />
                 : <p className="type-body vm-muted">TMDB lists no popular films on {provider.provider_name} in {place} right now.</p>)
             : <Problem info={streaming.problem} compact />
         ) : null}
@@ -76,7 +76,7 @@ export default async function Discover({ searchParams }: { searchParams: Promise
 
       {soon.ok
         ? (soon.value.length
-            ? <FilmRail id="soon" title="Coming soon" caption={`Upcoming in ${place}, from TMDB`}
+            ? <FilmRail id="soon" title="Coming soon" caption={asOf(`Upcoming in ${place}, from TMDB`)}
                 films={soon.value.filter((m) => !m.release_date || m.release_date >= today)}
                 noteFor={(m) => (m.release_date ? `Out ${dateLabel(m.release_date)}` : undefined)} />
             : null)

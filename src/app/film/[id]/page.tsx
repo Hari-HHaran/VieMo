@@ -9,7 +9,7 @@ import Trailer from '@/components/Trailer';
 import { dateLabel, plural, runtimeLabel } from '@/lib/format';
 import { regionName, viewerRegion } from '@/lib/region';
 import { settle } from '@/lib/settle';
-import { certification, img, movie, pickTrailer, posterSet, theatricalRelease, yearOf, type ProviderOffer, type RegionProviders } from '@/lib/tmdb';
+import { asOf, certification, img, movie, pickTrailer, posterSet, theatricalRelease, yearOf, type ProviderOffer, type RegionProviders } from '@/lib/tmdb';
 
 type Props = { params: Promise<{ id: string }> };
 const parseId = (s: string) => (/^\d{1,9}$/.test(s) ? Number(s) : null);
@@ -82,7 +82,7 @@ export default async function FilmPage({ params }: Props) {
 
         <section aria-labelledby="where-h" className="section">
           <h2 id="where-h" className="type-heading-lg">Where to watch in {place}</h2>
-          <p className="type-caption vm-faint">Availability from JustWatch via TMDB. Links open TMDB’s watch page, which lists each service.</p>
+          <p className="type-caption vm-faint">{asOf('Availability from JustWatch via TMDB')}. Links open TMDB’s watch page, which lists each service.</p>
           {offers.length ? (
             <ul className="provider-list" role="list">
               {offers.map((o) => (

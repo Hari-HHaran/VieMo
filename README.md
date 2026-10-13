@@ -10,6 +10,16 @@ A social film club: discover films through friends, curate collections, and deci
 
 Posters, trailers and listings load from TMDB once the token is set; without it, every screen says film data isn't connected instead of showing invented films.
 
+## Run without a key: the TMDB snapshot
+
+The app can also run from a saved snapshot of real TMDB data (`data/tmdb-snapshot.json`): up to 1,500 of this week's trending, popular, top-rated, in-cinema, upcoming and per-genre films, with cast, trailers and where-to-watch for your region. Posters still load from TMDB's image server, which needs no key.
+
+1. On GitHub: **Settings → Secrets and variables → Actions → New repository secret**, name `TMDB_READ_TOKEN`, value your TMDB API Read Access Token.
+2. **Actions → TMDB snapshot → Run workflow** (regions default to `SG`; add more like `SG,MY`).
+3. The job commits the snapshot; Vercel redeploys on its own. Every screen then says which date the data is from.
+
+Run it again whenever you want fresher lists. Locally: `TMDB_READ_TOKEN=… npm run snapshot`. If a token is set on the server, live data is used instead of the snapshot. Before a public launch, check TMDB's API terms on caching and refresh the snapshot regularly.
+
 ## Deploy (Vercel)
 
 Import the GitHub repository in Vercel, add the environment variable `TMDB_READ_TOKEN` (and optionally `TMDB_DEFAULT_REGION`, default `SG`), and deploy. No other services are needed for the current screens.

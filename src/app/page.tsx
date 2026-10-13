@@ -2,7 +2,7 @@ import { EmptyState } from '@/ds/client';
 import FilmRail from '@/components/FilmRail';
 import Problem from '@/components/Problem';
 import { settle } from '@/lib/settle';
-import { trending } from '@/lib/tmdb';
+import { asOf, trending } from '@/lib/tmdb';
 
 /* Rendered per request; TMDB responses themselves are cached (see lib/tmdb.ts). */
 export const dynamic = 'force-dynamic';
@@ -28,7 +28,7 @@ export default async function Home() {
       </section>
 
       {trend.ok ? (
-        <FilmRail id="trending" title="Trending this week" caption="Trending on TMDB this week" films={trend.value.slice(0, 20)} />
+        <FilmRail id="trending" title="Trending this week" caption={asOf('Trending on TMDB this week')} films={trend.value.slice(0, 20)} />
       ) : (
         <Problem info={trend.problem} compact />
       )}

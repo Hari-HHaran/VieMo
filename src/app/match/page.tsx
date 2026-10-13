@@ -3,7 +3,7 @@ import { Icon } from '@/ds/client';
 import QuickPick from '@/components/QuickPick';
 import { regionName, viewerRegion } from '@/lib/region';
 import { settle } from '@/lib/settle';
-import { regionProviders } from '@/lib/tmdb';
+import { asOf, regionProviders } from '@/lib/tmdb';
 
 export const metadata: Metadata = { title: 'Match' };
 
@@ -24,7 +24,7 @@ export default async function Match() {
           <p className="type-caption vm-muted">Voting together in real time needs accounts, which come next. Quick pick below already works on this device.</p>
         </div>
       </aside>
-      <QuickPick services={services} place={regionName(region)} />
+      <QuickPick services={services} place={regionName(region)} availabilityNote={asOf(`Availability is from JustWatch via TMDB for ${regionName(region)}`)} />
     </div>
   );
 }

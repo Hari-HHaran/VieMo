@@ -1,7 +1,10 @@
 import 'server-only';
+import { snap, snapshotInfo } from './snapshot';
 
 /* Server-side TMDB client. The token never leaves the server. Every response is cached by
-   Next's fetch cache for `revalidate` seconds so repeated views do not repeat requests. */
+   Next's fetch cache for `revalidate` seconds so repeated views do not repeat requests.
+   With no token, the same functions answer from the saved snapshot (data/tmdb-snapshot.json)
+   when there is one; otherwise they report that film data is not connected. */
 
 const API_BASE = process.env.TMDB_API_BASE || 'https://api.themoviedb.org/3';
 export const IMAGE_BASE = process.env.TMDB_IMAGE_BASE || 'https://image.tmdb.org/t/p'; // override only for local tests
@@ -29,7 +32,7 @@ export interface MovieSummary {
   popularity?: number;
   original_language?: string;
 }
-interface Paged<T> { page: number; results: T[]; total_pages: number; total_results: number }
+export interface Paged<T> { page: number; results: T[]; total_pages: number; total_results: number }
 
 export interface Genre { id: number; name: string }
 export interface CastMember { id: number; name: string; character: string; profile_path: string | null; order: number }
@@ -51,6 +54,30 @@ export interface MovieDetails extends MovieSummary {
   'watch/providers'?: { results: Record<string, RegionProviders> };
   recommendations?: Paged<MovieSummary>;
 }
+
+const hasCredentials = () => !!(process.env.TMDB_READ_TOKEN?.trim() || process.env.TMDB_API_KEY?.trim());
+const useSnapshot = () => !hasCredentials() && snapshotInfo() !== null;
+
+export type DataSource =
+  | { mode: 'live' }
+  | { mode: 'snapshot'; takenAt: string; regions: string[]; filmCount: number }
+  | { mode: 'none' };
+export function dataSource(): DataSource {
+  if (hasCredentials()) return { mode: 'live' };
+  const s = snapshotInfo();
+  return s ? { mode: 'snapshot', ...s } : { mode: 'none' };
+}
+/* Adds "as of <date>" to a caption when the data is a saved snapshot rather than live. */
+export function asOf(caption: string): string {
+  const d = dataSource();
+  if (d.mode !== 'snapshot') return caption;
+  const date = new Date(d.takenAt).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  return `${caption}, as of ${date}`;
+}
+const fromSnapshot = <T,>(fn: () => T | null): Promise<T> => {
+  const v = fn();
+  return v === null ? Promise.reject(new TmdbError('not_found', 'Not in the saved snapshot.', 404)) : Promise.resolve(v);
+};
 
 function credentials(): { headers: Record<string, string>; key?: string } {
   const token = process.env.TMDB_READ_TOKEN?.trim();
@@ -92,13 +119,16 @@ export function posterSet(path: string | null | undefined, small: 'w185' | 'w342
 export const yearOf = (m: { release_date?: string }) => (m.release_date ? Number(m.release_date.slice(0, 4)) || undefined : undefined);
 
 /* ---- Lists ---- */
-export const trending = () => tmdb<Paged<MovieSummary>>('/trending/movie/week', {}, 3600).then((r) => r.results);
-export const nowPlaying = (region: string) => tmdb<Paged<MovieSummary>>('/movie/now_playing', { region }, 3600).then((r) => r.results);
-export const upcoming = (region: string) => tmdb<Paged<MovieSummary>>('/movie/upcoming', { region }, 3600).then((r) => r.results);
+export const trending = () => useSnapshot() ? fromSnapshot(snap.trending)
+  : tmdb<Paged<MovieSummary>>('/trending/movie/week', {}, 3600).then((r) => r.results);
+export const nowPlaying = (region: string) => useSnapshot() ? fromSnapshot(() => snap.nowPlaying(region))
+  : tmdb<Paged<MovieSummary>>('/movie/now_playing', { region }, 3600).then((r) => r.results);
+export const upcoming = (region: string) => useSnapshot() ? fromSnapshot(() => snap.upcoming(region))
+  : tmdb<Paged<MovieSummary>>('/movie/upcoming', { region }, 3600).then((r) => r.results);
 
 /* Hidden gems, by a stated rule: rated 7.3 or higher on TMDB by 300 to 3,000 voters. */
 export const HIDDEN_GEMS_RULE = 'Rated 7.3 or higher on TMDB by 300 to 3,000 voters';
-export const hiddenGems = () =>
+export const hiddenGems = () => useSnapshot() ? fromSnapshot(snap.hiddenGems) :
   tmdb<Paged<MovieSummary>>('/discover/movie', {
     sort_by: 'vote_average.desc', 'vote_average.gte': 7.3, 'vote_count.gte': 300, 'vote_count.lte': 3000,
     'with_runtime.gte': 40, include_adult: false,
@@ -113,7 +143,7 @@ export interface DiscoverQuery {
   region: string;
   page?: number;
 }
-export const discover = (q: DiscoverQuery) =>
+export const discover = (q: DiscoverQuery) => useSnapshot() ? fromSnapshot(() => snap.discover(q)) :
   tmdb<Paged<MovieSummary>>('/discover/movie', {
     sort_by: 'popularity.desc',
     include_adult: false,
@@ -128,27 +158,27 @@ export const discover = (q: DiscoverQuery) =>
     page: q.page ?? 1,
   }, 3600);
 
-export const searchMovies = (query: string, page = 1) =>
+export const searchMovies = (query: string, page = 1) => useSnapshot() ? fromSnapshot(() => snap.search(query, page)) :
   tmdb<Paged<MovieSummary>>('/search/movie', { query, page, include_adult: false }, 600);
 
-export const genres = () => tmdb<{ genres: Genre[] }>('/genre/movie/list', {}, 86400).then((r) => r.genres);
+export const genres = () => useSnapshot() ? fromSnapshot(snap.genres) : tmdb<{ genres: Genre[] }>('/genre/movie/list', {}, 86400).then((r) => r.genres);
 
 /* ---- One film ---- */
-export const movie = (id: number) =>
+export const movie = (id: number) => useSnapshot() ? fromSnapshot(() => snap.movie(id)) :
   tmdb<MovieDetails>(`/movie/${id}`, { append_to_response: 'credits,videos,release_dates,watch/providers,recommendations' }, 21600);
 
 /* Light details for lists that need runtime and where-to-watch (Quick pick). */
-export const movieBasics = (id: number) =>
+export const movieBasics = (id: number) => useSnapshot() ? fromSnapshot(() => snap.movie(id)) :
   tmdb<MovieDetails>(`/movie/${id}`, { append_to_response: 'watch/providers' }, 21600);
 
 /* Details plus videos, for the Clips feed. */
-export const movieWithVideos = (id: number) =>
+export const movieWithVideos = (id: number) => useSnapshot() ? fromSnapshot(() => snap.movie(id)) :
   tmdb<MovieDetails>(`/movie/${id}`, { append_to_response: 'videos' }, 21600);
 
-export const movieImages = (id: number) =>
+export const movieImages = (id: number) => useSnapshot() ? fromSnapshot(() => snap.images(id)) :
   tmdb<{ logos: ImageRef[]; posters: ImageRef[] }>(`/movie/${id}/images`, { include_image_language: 'en,null' }, 86400);
 
-export const movieVideos = (id: number) => tmdb<{ results: Video[] }>(`/movie/${id}/videos`, {}, 21600).then((r) => r.results);
+export const movieVideos = (id: number) => useSnapshot() ? fromSnapshot(() => snap.movie(id)?.videos?.results ?? null) : tmdb<{ results: Video[] }>(`/movie/${id}/videos`, {}, 21600).then((r) => r.results);
 
 /* The best YouTube trailer: official trailers first, English first, newest first. */
 export function pickTrailer(videos: Video[] | undefined): Video | null {
@@ -174,10 +204,10 @@ export function theatricalRelease(d: MovieDetails, region: string): string | nul
 
 /* ---- Where to watch ---- */
 export interface ProviderListItem { provider_id: number; provider_name: string; logo_path: string | null; display_priorities?: Record<string, number> }
-export const regionProviders = (region: string) =>
+export const regionProviders = (region: string) => useSnapshot() ? fromSnapshot(() => snap.providers(region)) :
   tmdb<{ results: ProviderListItem[] }>('/watch/providers/movie', { watch_region: region }, 86400).then((r) =>
     r.results.slice().sort((a, b) => (a.display_priorities?.[region] ?? 999) - (b.display_priorities?.[region] ?? 999)));
 
-export const regions = () =>
+export const regions = () => useSnapshot() ? fromSnapshot(snap.regions) :
   tmdb<{ results: { iso_3166_1: string; english_name: string }[] }>('/watch/providers/regions', {}, 604800).then((r) =>
     r.results.slice().sort((a, b) => a.english_name.localeCompare(b.english_name)));

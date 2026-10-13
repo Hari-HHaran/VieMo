@@ -25,7 +25,7 @@ function tabFor(path: string): string | null {
   return null; // secondary screens keep the tab they were opened from
 }
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+export default function AppShell({ children, dataNote }: { children: React.ReactNode; dataNote?: string | null }) {
   const router = useRouter();
   const pathname = usePathname();
   const [prefs] = usePrefs();
@@ -77,6 +77,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <BottomNav layout="rail" brand="VieMo" items={NAV as never} current={current} onNavigate={navigate} label="Primary" />
         </div>
         <main id="main" className="shell-main" tabIndex={-1}>
+          {dataNote ? <p className="data-note type-caption">{dataNote}</p> : null}
           {children}
           <footer className="shell-credits type-caption">
             Film data and images from <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a>.
