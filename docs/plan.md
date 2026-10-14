@@ -59,6 +59,7 @@ Next.js (App Router) + TypeScript, Tailwind mapped to the design tokens, Supabas
 | Match: Quick pick (solo): mood, length and services, swipe deck of real films, ranked shortlist with reasons and documented weights | Complete | Group Movie Night: Planned (Phase 2) |
 | Clips: full-screen trailer feed (YouTube player), one at a time, Previous/Next buttons, optional muted autoplay, captions setting | Complete | |
 | Profile: watchlist, theme, reduce motion, autoplay, captions, region, accent from favourite film's logo | Complete, device only | Stored in this browser until accounts exist; the UI says so |
+| ViewMo (`/viewmo`): up to 72 trending, in-cinema, popular and hidden-gem posters on a sphere; drag with inertia, arrow keys, Tab turns each poster to the front; select to fly the poster forward with details, Full details, Watchlist and Close; list view alternative; reduced motion respected | Complete | Opened from Discover and Home; the five tabs are unchanged |
 | TMDB snapshot mode: a GitHub Action saves up to 1,500 real films; the app runs from it with no token and dates every list | Complete | Needs the token once, as a GitHub secret |
 | Accounts, profiles, follows, friends' feed, diary, reviews, collections, notifications, moderation | Planned | Blocked on a Supabase project |
 | Movie Night (multi-device, realtime) | Planned | Blocked on Supabase |

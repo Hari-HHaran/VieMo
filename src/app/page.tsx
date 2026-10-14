@@ -1,4 +1,4 @@
-import { EmptyState } from '@/ds/client';
+import { EmptyState, Icon } from '@/ds/client';
 import FilmRail from '@/components/FilmRail';
 import Problem from '@/components/Problem';
 import { settle } from '@/lib/settle';
@@ -14,6 +14,11 @@ export default async function Home() {
       <header className="page-head">
         <h1 className="type-display-lg">Home</h1>
         <p className="type-body vm-muted">What the people you follow are watching.</p>
+        <a className="viewmo-promo" href="/viewmo">
+          <span className="viewmo-promo-icon" aria-hidden="true"><Icon name="globe" size={22} /></span>
+          <span><span className="type-heading-md">ViewMo</span><span className="type-caption vm-muted">Spin a sphere of this week’s posters and pick one.</span></span>
+          <Icon name="chevron-right" size={20} />
+        </a>
       </header>
 
       <section aria-labelledby="friends-h" className="section">

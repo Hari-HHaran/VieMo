@@ -18,7 +18,7 @@ const NAV = [
 
 function tabFor(path: string): string | null {
   if (path === '/') return 'home';
-  if (path.startsWith('/discover') || path.startsWith('/search')) return 'discover';
+  if (path.startsWith('/discover') || path.startsWith('/search') || path.startsWith('/viewmo')) return 'discover';
   if (path.startsWith('/match')) return 'match';
   if (path.startsWith('/clips')) return 'clips';
   if (path.startsWith('/profile')) return 'profile';

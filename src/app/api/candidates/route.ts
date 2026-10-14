@@ -17,6 +17,7 @@ export async function GET(req: Request) {
   try {
     const list = await discover({ genresAny: mood?.genres, runtimeGte: runtime.gte, runtimeLte: runtime.lte, providers, region, page });
     const details = await Promise.all(list.results.slice(0, 20).map((m) => movieBasics(m.id).catch(() => null)));
+    if (list.results.length && details.every((d) => !d)) return NextResponse.json({ error: 'upstream' }, { status: 502 });
     const candidates: Candidate[] = details.filter((d): d is NonNullable<typeof d> => !!d).map((d) => {
       const wp = d['watch/providers']?.results?.[region];
       const names = [...(wp?.flatrate ?? []), ...(wp?.free ?? []), ...(wp?.ads ?? [])].map((p) => p.provider_name);

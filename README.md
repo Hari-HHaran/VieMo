@@ -26,7 +26,7 @@ Import the GitHub repository in Vercel, add the environment variable `TMDB_READ_
 
 ## What's here
 
-- `src/app`: the five tabs (Home, Discover, Match, Clips, Profile), search and film pages, and API routes for Quick pick, search and logo colours.
+- `src/app`: the five tabs (Home, Discover, Match, Clips, Profile), ViewMo (`/viewmo`, a sphere of posters), search and film pages, and API routes for Quick pick, search and logo colours.
 - `src/lib/tmdb.ts`: the server-side TMDB client. Responses are cached (1 to 24 hours depending on the list).
 - `design-system/`: tokens, fonts, components and the brand book. Edit `design-system/src/` and run `npm run ds:build` to regenerate `components/bundle.js`, `components/viemo.mjs` and `tokens.css`.
 - `docs/plan.md`: product plan, data model and a feature-by-feature status table.

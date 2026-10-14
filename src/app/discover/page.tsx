@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { Icon } from '@/ds/client';
 import FilmRail from '@/components/FilmRail';
 import Problem from '@/components/Problem';
 import QueryChips from '@/components/QueryChips';
@@ -37,6 +38,11 @@ export default async function Discover({ searchParams }: { searchParams: Promise
       <header className="page-head">
         <h1 className="type-display-lg">Discover</h1>
         <SearchField />
+        <a className="viewmo-promo" href="/viewmo">
+          <span className="viewmo-promo-icon" aria-hidden="true"><Icon name="globe" size={22} /></span>
+          <span><span className="type-heading-md">ViewMo</span><span className="type-caption vm-muted">Spin a sphere of this week’s posters and pick one.</span></span>
+          <Icon name="chevron-right" size={20} />
+        </a>
       </header>
 
       <section aria-labelledby="mood-h" className="section">
