@@ -9,6 +9,7 @@ import Trailer from '@/components/Trailer';
 import { dateLabel, plural, runtimeLabel } from '@/lib/format';
 import { regionName, viewerRegion } from '@/lib/region';
 import { settle } from '@/lib/settle';
+import { posterAccent } from '@/lib/poster-accent';
 import { asOf, certification, img, movie, pickTrailer, posterSet, theatricalRelease, yearOf, type ProviderOffer, type RegionProviders } from '@/lib/tmdb';
 
 type Props = { params: Promise<{ id: string }> };
@@ -47,16 +48,20 @@ export default async function FilmPage({ params }: Props) {
   const backdrop = img(f.backdrop_path, 'w1280');
   const place = regionName(region);
   const recs = f.recommendations?.results.filter((m) => m.poster_path).slice(0, 16) ?? [];
+  const accent = await posterAccent(f.poster_path, `.film[data-film="${f.id}"]`);
 
   return (
-    <article className="film" aria-labelledby="film-title">
+    <article className="film" data-film={f.id} aria-labelledby="film-title">
+      {accent ? <style dangerouslySetInnerHTML={{ __html: accent.css }} /> : null}
       <div className="screen-bar"><BackButton /></div>
       {backdrop ? (
         <div className="film-backdrop"><img src={backdrop} srcSet={`${img(f.backdrop_path, 'w780')} 780w, ${backdrop} 1280w`} sizes="(min-width: 1024px) 960px, 100vw" alt="" /></div>
       ) : null}
       <div className="page film-body">
         <div className="film-hero">
-          <Poster src={poster.src} srcSet={poster.srcSet} sizes="168px" title={f.title} year={year} size="lg" alt={`${f.title} poster`} eager />
+          <div className="film-poster" data-vt-poster="" style={{ viewTransitionName: 'film-poster' }}>
+            <Poster src={poster.src} srcSet={poster.srcSet} sizes="168px" title={f.title} year={year} size="lg" alt={`${f.title} poster`} eager />
+          </div>
           <div className="film-id">
             <h1 id="film-title" className="type-display-lg">{f.title}{year ? <span className="film-year type-heading-lg"> {year}</span> : null}</h1>
             <p className="type-caption vm-muted">{[runtimeLabel(f.runtime), cert ? `Rated ${cert} in ${place}` : null, f.genres.map((g) => g.name).join(', ')].filter(Boolean).join(' · ')}</p>

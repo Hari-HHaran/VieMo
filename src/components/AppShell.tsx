@@ -1,8 +1,12 @@
 'use client';
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useTransition, ViewTransition } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { BottomNav, Toast } from '@/ds/client';
 import { applyPrefsToDocument, usePrefs } from '@/lib/device-store';
+import { DURATION, EASE } from '@/lib/motion';
+import { WORLD_NAMES, worldFor, type WorldId } from '@/lib/worlds';
+import MotionProvider from './MotionProvider';
 
 type ToastInput = { message: string; tone?: 'neutral' | 'positive' | 'negative'; icon?: string; action?: { label: string; onClick: () => void } };
 const ToastContext = createContext<(t: ToastInput) => void>(() => {});
@@ -33,6 +37,24 @@ export default function AppShell({ children, dataNote }: { children: React.React
   const [lastTab, setLastTab] = useState('home');
   const counter = useRef(0);
   const current = tabFor(pathname) ?? lastTab;
+  const world = worldFor(pathname);
+  const [pending, startNav] = useTransition();
+  const go = useCallback((href: string) => startNav(() => router.push(href)), [router]);
+  const [curtain, setCurtain] = useState<WorldId | null>(null);
+  const firstRender = useRef(true);
+
+  /* A curtain in the world's colours the first time each world opens in a session, never on the first page
+     load and never twice; content renders underneath, so nothing waits for it. */
+  useEffect(() => {
+    if (firstRender.current) { firstRender.current = false; try { sessionStorage.setItem(`viemo:seen:${world}`, '1'); } catch {} return; }
+    let seen = true;
+    try { seen = sessionStorage.getItem(`viemo:seen:${world}`) === '1'; sessionStorage.setItem(`viemo:seen:${world}`, '1'); } catch {}
+    if (!seen && !prefs.reduceMotion && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setCurtain(world);
+      const t = setTimeout(() => setCurtain(null), 60);
+      return () => clearTimeout(t);
+    }
+  }, [world]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const t = tabFor(pathname);
@@ -60,25 +82,35 @@ export default function AppShell({ children, dataNote }: { children: React.React
       if (url.origin !== location.origin) return;
       if (url.pathname === location.pathname && url.search === location.search && url.hash) return;
       e.preventDefault();
-      router.push(url.pathname + url.search + url.hash);
+      /* The poster you tapped becomes the film page's poster (shared-element morph). Only one element may
+         carry the name at a time, so it moves from the current page's hero to the tapped card. */
+      if (/^\/film\/\d+/.test(url.pathname)) {
+        document.querySelectorAll<HTMLElement>('[data-vt-poster]').forEach((el) => { el.style.viewTransitionName = 'none'; });
+        const card = a.closest('.vm-film-card, .vmx-light, .qp-top, .qp-alt, .clip, .lobby-card');
+        const poster = card?.querySelector<HTMLElement>('.vm-poster, .vmx-poster');
+        if (poster) { poster.style.viewTransitionName = 'film-poster'; poster.setAttribute('data-vt-poster', ''); }
+      }
+      go(url.pathname + url.search + url.hash);
     }
     document.addEventListener('click', onClick);
     return () => document.removeEventListener('click', onClick);
-  }, [router]);
+  }, [go]);
 
   const show = useCallback((t: ToastInput) => setToast({ ...t, key: ++counter.current }), []);
-  const navigate = (id: string) => router.push(NAV.find((n) => n.id === id)!.href);
+  const navigate = (id: string) => go(NAV.find((n) => n.id === id)!.href);
 
   return (
     <ToastContext.Provider value={show}>
       <a className="skip-link" href="#main">Skip to content</a>
-      <div className="shell">
+      <MotionProvider>
+      <div className={`nav-progress${pending ? ' is-on' : ''}`} role="progressbar" aria-label="Loading page" aria-hidden={!pending} />
+      <div className="shell" data-world={world}>
         <div className="shell-rail">
           <BottomNav layout="rail" brand="VieMo" items={NAV as never} current={current} onNavigate={navigate} label="Primary" />
         </div>
         <main id="main" className="shell-main" tabIndex={-1}>
           {dataNote ? <p className="data-note type-caption">{dataNote}</p> : null}
-          {children}
+          <ViewTransition>{children}</ViewTransition>
           <footer className="shell-credits type-caption">
             Film data and images from <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a>.
             This product uses the TMDB API but is not endorsed or certified by TMDB.
@@ -88,6 +120,15 @@ export default function AppShell({ children, dataNote }: { children: React.React
           <BottomNav items={NAV as never} current={current} onNavigate={navigate} label="Primary" fixed />
         </div>
       </div>
+      <AnimatePresence>
+        {curtain ? (
+          <motion.div key={curtain} className="curtain" data-world={curtain} aria-hidden="true"
+            initial={{ y: 0 }} animate={{ y: 0 }} exit={{ y: '-100%', transition: { duration: DURATION.cinematic, ease: EASE.inOut } }}>
+            <motion.span className="curtain-name" initial={{ opacity: 1 }} exit={{ opacity: 0, y: -24, transition: { duration: DURATION.reveal } }}>{WORLD_NAMES[curtain]}</motion.span>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+      </MotionProvider>
       {toast ? (
         <Toast key={toast.key} floating message={toast.message} tone={toast.tone} icon={toast.icon as never}
           action={toast.action ? { label: toast.action.label, onClick: () => { toast.action!.onClick(); setToast(null); } } : undefined}

@@ -61,10 +61,17 @@ Next.js (App Router) + TypeScript, Tailwind mapped to the design tokens, Supabas
 | Profile: watchlist, theme, reduce motion, autoplay, captions, region, accent from favourite film's logo | Complete, device only | Stored in this browser until accounts exist; the UI says so |
 | ViewMo (`/viewmo`): up to 72 trending, in-cinema, popular and hidden-gem posters on a sphere; drag with inertia, arrow keys, Tab turns each poster to the front; select to fly the poster forward with details, Full details, Watchlist and Close; list view alternative; reduced motion respected | Complete | Opened from Discover and Home; the five tabs are unchanged |
 | TMDB snapshot mode: a GitHub Action saves up to 1,500 real films; the app runs from it with no token and dates every list | Complete | Needs the token once, as a GitHub secret |
+| Cinematic worlds: each destination has its own grounds and accent (Lobby amber, Observatory navy and cyan, Casting Table wine and rose, Screening Room black and violet, Cinema Passport midnight and silver, Premiere from the poster), all checked to WCAG AA by `scripts/worlds.mjs`; a one-time curtain names each world on first entry | Complete | Studio, Record Store and Afterparty palettes are defined for the screens that come with Phase 2 |
+| Motion: shared motion tokens (`src/lib/motion.ts`), route cross-fades, the tapped poster morphs into the film page, navigation progress bar, springy buttons; the in-app Reduce motion setting and the system setting both turn it off | Complete | Uses the free `motion` library; no Motion+ components |
+| Home as the Festival Lobby: dated masthead, trending ticker (pauses on hover, focus or off-screen), this week's programme as an editorial grid with save toggles | Complete | "Now showing in your circle" waits for accounts and says so |
+| Discover mood constellation: moods as stars, the chosen star lights its lines and the results grid re-sorts in place | Complete | |
+| Match deck: drag with physics, fling or pass the threshold to vote, short drags snap back, next card rises; buttons and arrow keys do the same | Complete | |
+| Film page Premiere: accent tuned from the poster on the server (no flash), falls back to amber when the poster is grey or slow | Complete | |
+| Profile Cinema Passport: signature film, region, watchlist count from this device; stamps explained as coming with the diary | Complete, device only | |
 | Accounts, profiles, follows, friends' feed, diary, reviews, collections, notifications, moderation | Planned | Blocked on a Supabase project |
 | Movie Night (multi-device, realtime) | Planned | Blocked on Supabase |
 
-Verified in this environment against a local TMDB stand-in (TMDB is blocked here): production build, typecheck, every route, axe-core with no violations on all seven screens in both themes, no hydration errors, and journeys for save and undo, film page, Quick pick, reload persistence and the logo accent. Not yet seen against live TMDB data from here.
+Verified in this environment against a local TMDB stand-in (TMDB is blocked here): production build, typecheck, every route, axe-core with no violations on all seven screens in both themes, no hydration errors, and journeys for save and undo, film page, Quick pick (buttons, arrow keys and drag), reload persistence, the logo accent, the poster accent, the mood constellation, the world curtain and reduced motion. Not yet seen against live TMDB data from here.
 
 ## External dependencies and licensing
 

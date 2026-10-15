@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, EmptyState, ErrorState, FilterChip, Icon, Poster, Skeleton, SwipeCard } from '@/ds/client';
+import { Button, EmptyState, ErrorState, FilterChip, Icon, Poster, Skeleton } from '@/ds/client';
+import MotionDeck from './MotionDeck';
 import { useWatchlist } from '@/lib/device-store';
 import { MOODS, RUNTIMES, moodById, runtimeById } from '@/lib/moods';
 import { rank, WEIGHTS, type Candidate, type Vote } from '@/lib/scoring';
@@ -113,22 +114,10 @@ export default function QuickPick({ services, place, availabilityNote }: { servi
       return <EmptyState icon="search" title="No films fit all of that" body={`TMDB has no popular films matching ${[mood?.label, runtime.id !== 'any' ? runtime.label : null, serviceNames.length ? `on ${serviceNames.join(' or ')}` : null].filter(Boolean).join(', ')}.`}
         action={{ label: 'Change choices', onClick: () => setS({ ...s, phase: 'setup' }) }} />;
     }
-    const f = s.deck[s.index];
     const voted = Object.keys(s.votes).length;
     return (
       <section className="qp-vote" aria-label="Vote on films">
-        <SwipeCard
-          key={f.id}
-          film={{
-            title: f.title, year: f.year, runtime: f.runtime ?? undefined, genres: f.genres.map((g) => g.name),
-            synopsis: f.overview, posterSrc: f.posterPath ? `${IMG}/w500${f.posterPath}` : null,
-            rating: f.voteCount ? { value: f.voteAverage, source: 'tmdb' } : undefined,
-            providers: f.providers.map((name) => ({ name })),
-          }}
-          progress={{ current: s.index + 1, total: s.deck.length }}
-          onVote={vote}
-          onDetails={() => router.push(`/film/${f.id}`)}
-        />
+        <MotionDeck deck={s.deck} index={s.index} onVote={vote} onDetails={(id) => router.push(`/film/${id}`)} />
         <div className="qp-foot">
           <Button variant="ghost" size="sm" icon="chevron-left" onClick={() => setS({ ...s, phase: 'setup' })}>Change choices</Button>
           {voted >= 3 ? <Button variant="ghost" size="sm" iconAfter="chevron-right" onClick={() => setS({ ...s, phase: 'results' })}>See my shortlist</Button> : null}

@@ -11,8 +11,11 @@
     "ds:build": "node design-system/scripts/build.mjs",
     "snapshot": "node scripts/snapshot.mjs"
   },
-  "engines": { "node": ">=20.9.0" },
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "dependencies": {
+    "motion": "^13.4.6",
     "next": "16.3.8",
     "react": "19.3.0",
     "react-dom": "19.3.0",

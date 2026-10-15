@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Icon } from '@/ds/client';
-import FilmRail from '@/components/FilmRail';
+import FilmRail, { toCard } from '@/components/FilmRail';
+import MoodConstellation from '@/components/MoodConstellation';
+import ReflowGrid from '@/components/ReflowGrid';
 import Problem from '@/components/Problem';
 import QueryChips from '@/components/QueryChips';
 import SearchField from '@/components/SearchField';
@@ -34,7 +36,7 @@ export default async function Discover({ searchParams }: { searchParams: Promise
   const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <div className="page">
+    <div className="page observatory">
       <header className="page-head">
         <h1 className="type-display-lg">Discover</h1>
         <SearchField />
@@ -45,17 +47,24 @@ export default async function Discover({ searchParams }: { searchParams: Promise
         </a>
       </header>
 
-      <section aria-labelledby="mood-h" className="section">
-        <h2 id="mood-h" className="type-heading-lg">What are you in the mood for?</h2>
-        <Suspense><QueryChips param="mood" label="Mood" options={MOODS.map((m) => ({ id: m.id, label: m.label }))} /></Suspense>
-        {mood && moodFilms ? (
-          moodFilms.ok
-            ? <FilmRail id="mood" title={`${mood.label} picks`} caption={asOf(`Popular on TMDB in ${mood.genreNames.join(', ')}`)} films={moodFilms.value} />
-            : <Problem info={moodFilms.problem} compact />
-        ) : null}
+      <section aria-labelledby="mood-h" className="section mood-section">
+        <div className="rail-head">
+          <h2 id="mood-h" className="type-heading-lg">What are you in the mood for?</h2>
+          <p className="type-caption vm-muted">Pick a star. Pick it again to clear it.</p>
+        </div>
+        <Suspense><MoodConstellation moods={MOODS.map((m) => ({ id: m.id, label: m.label }))} /></Suspense>
+        <div className="mood-results">
+          <h3 className="type-heading-md" aria-live="polite">{mood ? `${mood.label} picks` : 'Trending this week'}</h3>
+          <p className="type-caption vm-faint">{mood ? asOf(`Popular on TMDB in ${mood.genreNames.join(', ')}`) : asOf('Trending on TMDB this week')}</p>
+          {mood && moodFilms && !moodFilms.ok ? <Problem info={moodFilms.problem} compact /> : (
+            <ReflowGrid label={mood ? `${mood.label} films` : 'Trending films'}
+              films={((mood && moodFilms?.ok ? moodFilms.value : trend.ok ? trend.value : []).filter((m) => m.poster_path).slice(0, 8)).map((m) => toCard(m))} />
+          )}
+        </div>
       </section>
 
-      {trend.ok ? <FilmRail id="trending" title="Trending now" caption={asOf('Trending on TMDB this week')} films={trend.value} /> : <Problem info={trend.problem} compact />}
+      {/* With no mood chosen the grid above already is this week's trending list. */}
+      {!trend.ok ? <Problem info={trend.problem} compact /> : mood ? <FilmRail id="trending" title="Trending now" caption={asOf('Trending on TMDB this week')} films={trend.value} /> : null}
 
       {cinemas.ok
         ? (cinemas.value.length ? <FilmRail id="cinemas" title="New in cinemas" caption={asOf(`Now playing in ${place}, from TMDB`)} films={cinemas.value} /> : null)

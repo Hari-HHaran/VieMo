@@ -1,0 +1,134 @@
+{
+  "_": "Colour worlds: grounds are bg, surface, surface-raised, surface-overlay, line, line-strong, skeleton (dark theme). scripts/worlds.mjs turns this into src/app/worlds.css.",
+  "ink": {
+    "ink": "#f3ece2",
+    "muted": "#b8ada3",
+    "faint": "#968b84"
+  },
+  "light": {
+    "bg": "#f5efe6",
+    "surface": "#faf6f0",
+    "surface-raised": "#ffffff",
+    "surface-overlay": "#ffffff",
+    "ink": "#1d1718"
+  },
+  "worlds": {
+    "lobby": {
+      "grounds": [
+        "#15100b",
+        "#1b150f",
+        "#231c14",
+        "#2c2319",
+        "#3a3024",
+        "#7d6f60",
+        "#2a2218"
+      ],
+      "seed": "#e2a73f",
+      "note": "Home: the Festival Lobby. Warm amber and charcoal."
+    },
+    "observatory": {
+      "grounds": [
+        "#0a1220",
+        "#0f192b",
+        "#152239",
+        "#1c2b45",
+        "#2a3a55",
+        "#6b7d9c",
+        "#18243a"
+      ],
+      "seed": "#5ec4d4",
+      "note": "Discover: the Mood Observatory. Deep navy, restrained cyan."
+    },
+    "casting": {
+      "grounds": [
+        "#18090e",
+        "#1f0d13",
+        "#29121a",
+        "#331820",
+        "#4a2630",
+        "#8e6670",
+        "#2c141c"
+      ],
+      "seed": "#d9667f",
+      "note": "Match: the Casting Table. Wine grounds, rose accent."
+    },
+    "studio": {
+      "grounds": [
+        "#0d0c0a",
+        "#141210",
+        "#1c1915",
+        "#25211c",
+        "#36302a",
+        "#7a7064",
+        "#221f1a"
+      ],
+      "seed": "#c9a45c",
+      "note": "Reel Director: the Director’s Studio. Obsidian and muted gold."
+    },
+    "screening": {
+      "grounds": [
+        "#000000",
+        "#0b0a0d",
+        "#141118",
+        "#1d1922",
+        "#2e2934",
+        "#736c7e",
+        "#16131b"
+      ],
+      "seed": "#8f74dc",
+      "note": "Clips: the Screening Room. True black, restrained violet."
+    },
+    "records": {
+      "grounds": [
+        "#0b1510",
+        "#101c15",
+        "#16251b",
+        "#1d2f23",
+        "#2b4233",
+        "#6e8a76",
+        "#1a2a1f"
+      ],
+      "seed": "#c39548",
+      "note": "Collections: the Record Store. Forest green and brass."
+    },
+    "passport": {
+      "grounds": [
+        "#0a0f1f",
+        "#0f1528",
+        "#151c33",
+        "#1c2440",
+        "#2a3352",
+        "#6d7896",
+        "#1a2138"
+      ],
+      "seed": "#c3c9d6",
+      "note": "Profile: the Cinema Passport. Midnight blue and silver; a personal accent replaces silver."
+    },
+    "premiere": {
+      "grounds": [
+        "#120d0a",
+        "#18120e",
+        "#211813",
+        "#2a1f18",
+        "#3b2d23",
+        "#7f6c5e",
+        "#261c15"
+      ],
+      "seed": "#e08a4a",
+      "note": "Film details: the Premiere. The accent is re-derived from each poster at runtime."
+    },
+    "afterparty": {
+      "grounds": [
+        "#150b19",
+        "#1b0f20",
+        "#24152c",
+        "#2d1b36",
+        "#42294d",
+        "#856f90",
+        "#2a1a33"
+      ],
+      "seed": "#a98bdc",
+      "note": "Post-Credits Club: the Afterparty. Plum and lavender."
+    }
+  }
+}

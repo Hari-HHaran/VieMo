@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import AccentSettings from '@/components/AccentSettings';
+import PassportCard from '@/components/PassportCard';
 import AppearanceSettings from '@/components/AppearanceSettings';
 import RegionSelect from '@/components/RegionSelect';
 import WatchlistView from '@/components/WatchlistView';
@@ -19,6 +20,7 @@ export default async function Profile() {
         <h1 className="type-display-lg">Profile</h1>
         <p className="type-body vm-muted">Saved on this device until accounts arrive.</p>
       </header>
+      <PassportCard region={region} regionLabel={regionName(region)} />
       <section aria-labelledby="wl-h" className="section">
         <h2 id="wl-h" className="type-heading-lg">Watchlist</h2>
         <WatchlistView />

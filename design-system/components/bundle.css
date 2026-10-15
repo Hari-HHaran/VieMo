@@ -17,7 +17,10 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 
 /* Button */
 .vm-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: var(--tap-min); padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid transparent; background: transparent; color: var(--ink); font-family: var(--font-sans); text-decoration: none; cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; transition: background-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out); }
-.vm-btn:active:not([disabled]) { transform: scale(0.98); }
+/* Press feedback: squash on press, spring back on release (a CSS spring, so it costs no script). */
+.vm-btn:active:not([disabled]) { transform: scale(0.96); transition-duration: var(--duration-fast); }
+.vm-btn { --vm-spring: linear(0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1); }
+.vm-btn:not(:active) { transition: background-color var(--duration-fast) var(--ease-out), transform 420ms var(--vm-spring); }
 .vm-btn-primary { background: var(--reel); color: var(--on-reel); }
 .vm-btn-primary:hover:not([disabled]) { background: color-mix(in srgb, var(--reel) 88%, var(--ink)); }
 .vm-btn-secondary { border-color: var(--line-strong); }

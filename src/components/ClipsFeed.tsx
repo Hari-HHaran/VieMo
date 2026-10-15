@@ -42,6 +42,7 @@ export default function ClipsFeed({ clips, sourceLabel = 'Trending on TMDB' }: {
   return (
     <div className="clips" aria-label="Trailers for films trending on TMDB this week">
       <h1 className="vm-sr">Clips</h1>
+      <div className="clips-reel" aria-hidden="true"><span style={{ transform: `scaleX(${(visible + 1) / Math.max(clips.length, 1)})` }} /></div>
       {clips.map((c, i) => {
         const saved = has(c.id);
         return (

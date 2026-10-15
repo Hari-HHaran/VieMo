@@ -1,6 +1,7 @@
 import '@ds/tokens.css';
 import '@ds/components/bundle.css';
 import './app.css';
+import './worlds.css';
 import type { Metadata, Viewport } from 'next';
 import AppShell from '@/components/AppShell';
 import { dataSource } from '@/lib/tmdb';
