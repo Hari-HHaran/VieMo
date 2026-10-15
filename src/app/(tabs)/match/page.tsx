@@ -24,6 +24,11 @@ export default async function Match() {
           <p className="type-caption vm-muted">Voting together in real time needs accounts, which come next. Quick pick below already works on this device.</p>
         </div>
       </aside>
+      <a className="viewmo-promo director-promo" href="/director">
+        <span className="viewmo-promo-icon" aria-hidden="true"><Icon name="clapperboard" size={22} /></span>
+        <span><span className="type-heading-md">Ask Reel Director</span><span className="type-caption vm-muted">Rather describe it in words? Get three picks with reasons.</span></span>
+        <Icon name="chevron-right" size={20} />
+      </a>
       <QuickPick services={services} place={regionName(region)} availabilityNote={asOf(`Availability is from JustWatch via TMDB for ${regionName(region)}`)} />
     </div>
   );

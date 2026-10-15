@@ -327,3 +327,47 @@ html[data-motion="reduce"] .lobby-card { animation: none; }
 .passport-slots { display: flex; }
 .passport-slots span { width: 30px; height: 30px; margin-right: -8px; border-radius: 50%; border: 1.5px dashed var(--line-strong); background: var(--surface); }
 .passport-mrz { margin: 0; font: 500 12px/1.4 var(--font-mono); letter-spacing: 0.18em; color: var(--ink-faint); white-space: nowrap; overflow: hidden; }
+
+/* Reel Director: the Director's Studio */
+.studio-head { gap: var(--space-2); }
+.studio-eyebrow { color: var(--reel-ink); }
+.studio-title { font-family: var(--font-display); font-weight: 400; font-size: clamp(36px, 9vw, 64px); line-height: 0.98; letter-spacing: -0.01em; max-width: 14ch; }
+.director { display: grid; gap: var(--space-6); }
+.director-brief { display: grid; gap: var(--space-3); max-width: 640px; }
+.director-input { width: 100%; min-height: 96px; padding: var(--space-3) var(--space-4); border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); resize: vertical; font-family: var(--font-sans); }
+.director-input::placeholder { color: var(--ink-faint); }
+.director-input:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); border-color: var(--reel-ink); }
+.director-example { min-height: var(--tap-min); padding: var(--space-2) var(--space-3); border: 1px dashed var(--line-strong); border-radius: var(--radius-full); background: transparent; color: var(--ink-muted); cursor: pointer; text-align: left; }
+.director-example:hover { color: var(--ink); border-color: var(--reel-ink); }
+.director-example:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.director-go { justify-self: start; }
+.director-promo .viewmo-promo-icon { color: var(--reel-ink); }
+.storyboard-wrap { display: grid; gap: var(--space-4); }
+.storyboard-head { display: grid; gap: 2px; }
+.storyboard-head h2:focus { outline: none; }
+.storyboard { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(260px, 82%); gap: var(--space-4); margin: 0 calc(var(--space-4) * -1); padding: var(--space-1) var(--space-4) var(--space-3); list-style: none; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--space-4); }
+.frame { position: relative; display: grid; gap: var(--space-2); align-content: start; padding: var(--space-4); border-radius: var(--radius-lg); background: var(--surface-raised); border: 1px solid var(--line); box-shadow: var(--shadow-float); scroll-snap-align: start; }
+.frame::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: repeating-linear-gradient(90deg, var(--reel) 0 14px, transparent 14px 24px); }
+.frame-scene { display: flex; justify-content: space-between; gap: var(--space-2); margin: 0; color: var(--ink-muted); }
+.frame-slot { color: var(--reel-ink); }
+.frame-poster { display: block; aspect-ratio: 2 / 3; border-radius: var(--radius-md); overflow: hidden; }
+.frame-poster .vm-poster { width: 100%; height: 100%; }
+.frame-title { overflow-wrap: anywhere; }
+.frame-title a { color: var(--ink); text-decoration: none; }
+.frame-title a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.frame-title a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 2px; }
+.frame-why { display: flex; gap: var(--space-2); margin: var(--space-1) 0 0; padding: var(--space-3); border-left: 2px solid var(--reel); background: var(--reel-soft); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: var(--ink); }
+.frame-why svg { flex: none; margin-top: 4px; color: var(--reel-ink); }
+.frame-where { display: inline-flex; gap: 6px; align-items: center; }
+.frame-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-1); }
+.frame-sketch { min-height: 420px; }
+.frame-sketch-poster, .frame-sketch-line { display: block; border-radius: var(--radius-md); background: var(--skeleton); }
+.frame-sketch-poster { aspect-ratio: 2 / 3; }
+.frame-sketch-line { height: 14px; width: 80%; }
+.frame-sketch-line.short { width: 50%; }
+.is-drawing .frame-sketch { animation: sketch 1.6s var(--ease-out) infinite alternate; animation-delay: calc(var(--i) * 200ms); }
+@keyframes sketch { from { opacity: 0.55; } to { opacity: 1; } }
+@media (min-width: 900px) { .storyboard { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; padding: 0; overflow: visible; } }
+@media (prefers-reduced-motion: reduce) { .is-drawing .frame-sketch { animation: none; } }
+html[data-motion="reduce"] .is-drawing .frame-sketch { animation: none; }

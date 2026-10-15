@@ -74,6 +74,11 @@ export default async function Home() {
             body="When sign-in arrives, ratings, reviews and collections from people you follow appear here. Nothing here is invented in the meantime."
             action={{ label: 'Browse films', icon: 'compass', href: '/discover' }} />
         </section>
+        <a className="viewmo-promo director-promo" href="/director">
+          <span className="viewmo-promo-icon" aria-hidden="true"><Icon name="clapperboard" size={22} /></span>
+          <span><span className="type-heading-md">Reel Director</span><span className="type-caption vm-muted">Describe your night; get a safe choice, a wildcard and a hidden gem.</span></span>
+          <Icon name="chevron-right" size={20} />
+        </a>
         <a className="viewmo-promo" href="/viewmo">
           <span className="viewmo-promo-icon" aria-hidden="true"><Icon name="globe" size={22} /></span>
           <span><span className="type-heading-md">ViewMo</span><span className="type-caption vm-muted">Spin a sphere of this week’s posters and pick one.</span></span>

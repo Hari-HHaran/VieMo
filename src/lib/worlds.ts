@@ -7,6 +7,7 @@ export const WORLD_NAMES: Record<WorldId, string> = {
 export function worldFor(path: string): WorldId {
   if (path.startsWith('/discover') || path.startsWith('/search') || path.startsWith('/viewmo')) return 'observatory';
   if (path.startsWith('/match')) return 'casting';
+  if (path.startsWith('/director')) return 'studio';
   if (path.startsWith('/clips')) return 'screening';
   if (path.startsWith('/profile')) return 'passport';
   if (path.startsWith('/film')) return 'premiere';

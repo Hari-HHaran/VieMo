@@ -68,6 +68,7 @@ Next.js (App Router) + TypeScript, Tailwind mapped to the design tokens, Supabas
 | Match deck: drag with physics, fling or pass the threshold to vote, short drags snap back, next card rises; buttons and arrow keys do the same | Complete | |
 | Film page Premiere: accent tuned from the poster on the server (no flash), falls back to amber when the poster is grey or slow | Complete | |
 | Profile Cinema Passport: signature film, region, watchlist count from this device; stamps explained as coming with the diary | Complete, device only | |
+| Reel Director (`/director`, the Director's Studio): describe the night in your own words and get a storyboard of three films (safe choice, wildcard, hidden gem) with short reasons; reached from Home and Match | Complete | Uses OpenAI on the server (`OPENAI_API_KEY`, model `OPENAI_MODEL`, default gpt-5-mini). The model only picks ids from a list of real TMDB films; every pick is checked against that list and the hidden-gem rule, and runtime against the chosen length. Card facts come from TMDB, not the AI. Rate limited to 6 a minute per visitor. Without a key the page says it's off |
 | Accounts, profiles, follows, friends' feed, diary, reviews, collections, notifications, moderation | Planned | Blocked on a Supabase project |
 | Movie Night (multi-device, realtime) | Planned | Blocked on Supabase |
 
