@@ -26,4 +26,7 @@
 /* Post-Credits Club: the Afterparty. Plum and lavender. */
 :is(.shell, .curtain)[data-world="afterparty"] { --bg: #150b19; --surface: #1b0f20; --surface-raised: #24152c; --surface-overlay: #2d1b36; --line: #42294d; --line-strong: #856f90; --skeleton: #2a1a33; --world-seed: #a98bdc; --reel: #a98bdc; --on-reel: #150b19; --reel-ink: #b799eb; --reel-soft: #2b1f3f; }
 [data-theme="light"] :is(.shell, .curtain)[data-world="afterparty"] { --bg: inherit; --surface: inherit; --surface-raised: inherit; --surface-overlay: inherit; --line: inherit; --line-strong: inherit; --skeleton: inherit; --reel: #7457a3; --on-reel: #f3ece2; --reel-ink: #7557a3; --reel-soft: #eee7ff; }
+/* Wall of Fame: the gallery after hours. Warm plaster dark, brass light. */
+:is(.shell, .curtain)[data-world="gallery"] { --bg: #100c0c; --surface: #181312; --surface-raised: #211a19; --surface-overlay: #2a2120; --line: #3a2f2c; --line-strong: #86756f; --skeleton: #231b1a; --world-seed: #d6a85c; --reel: #d6a85c; --on-reel: #100c0c; --reel-ink: #d6a85c; --reel-soft: #362200; }
+[data-theme="light"] :is(.shell, .curtain)[data-world="gallery"] { --bg: inherit; --surface: inherit; --surface-raised: inherit; --surface-overlay: inherit; --line: inherit; --line-strong: inherit; --skeleton: inherit; --reel: #8a6000; --on-reel: #f3ece2; --reel-ink: #8a6000; --reel-soft: #f8e9d2; }
 html[data-vm-accent] .shell[data-world="passport"] { --reel: inherit; --on-reel: inherit; --reel-ink: inherit; --reel-soft: inherit; }

@@ -4,6 +4,7 @@ import './app.css';
 import './worlds.css';
 import '../styles/nav.css';
 import '../styles/lobby.css';
+import '../styles/wall.css';
 import type { Metadata, Viewport } from 'next';
 import AppShell from '@/components/AppShell';
 import { dataSource } from '@/lib/tmdb';

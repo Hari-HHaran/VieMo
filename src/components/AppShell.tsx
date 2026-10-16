@@ -26,7 +26,7 @@ function tabFor(path: string): string | null {
   if (path.startsWith('/discover') || path.startsWith('/search') || path.startsWith('/viewmo')) return 'discover';
   if (path.startsWith('/match')) return 'match';
   if (path.startsWith('/clips')) return 'clips';
-  if (path.startsWith('/profile')) return 'profile';
+  if (path.startsWith('/profile') || path.startsWith('/wall')) return 'profile';
   return null; // secondary screens keep the tab they were opened from
 }
 

@@ -70,7 +70,7 @@ export default async function FilmPage({ params }: Props) {
               <Rating source="community" count={0} />
               {f.vote_count > 0 ? <Rating value={f.vote_average} source="tmdb" count={f.vote_count} /> : <span className="type-caption vm-muted">No TMDB votes yet</span>}
             </div>
-            <FilmActions film={{ id: f.id, title: f.title, year, posterPath: f.poster_path }} />
+            <FilmActions film={{ id: f.id, title: f.title, year, posterPath: f.poster_path, genres: f.genres.map((g) => g.name) }} />
           </div>
         </div>
 

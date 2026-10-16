@@ -129,6 +129,19 @@
       ],
       "seed": "#a98bdc",
       "note": "Post-Credits Club: the Afterparty. Plum and lavender."
+    },
+    "gallery": {
+      "grounds": [
+        "#100c0c",
+        "#181312",
+        "#211a19",
+        "#2a2120",
+        "#3a2f2c",
+        "#86756f",
+        "#231b1a"
+      ],
+      "seed": "#d6a85c",
+      "note": "Wall of Fame: the gallery after hours. Warm plaster dark, brass light."
     }
   }
 }

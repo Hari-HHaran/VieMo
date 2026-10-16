@@ -3,7 +3,7 @@ import { useCallback, useSyncExternalStore } from 'react';
 
 /* Small localStorage stores with React subscriptions. Until accounts arrive, a person's
    watchlist and settings live on this device only, and the UI says so. */
-function createStore<T>(key: string, fallback: T) {
+export function createStore<T>(key: string, fallback: T) {
   const listeners = new Set<() => void>();
   let cache: { value: T } | null = null;
   const read = (): T => {
