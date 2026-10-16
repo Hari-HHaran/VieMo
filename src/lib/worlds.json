@@ -15,16 +15,16 @@
   "worlds": {
     "lobby": {
       "grounds": [
-        "#15100b",
-        "#1b150f",
-        "#231c14",
-        "#2c2319",
-        "#3a3024",
-        "#7d6f60",
-        "#2a2218"
+        "#09090b",
+        "#18171d",
+        "#201f26",
+        "#29272f",
+        "#34323b",
+        "#7a7480",
+        "#1f1e24"
       ],
-      "seed": "#e2a73f",
-      "note": "Home: the Festival Lobby. Warm amber and charcoal."
+      "seed": "#e4b77c",
+      "note": "Home: the Projection Booth lobby. Cinematic black and charcoal, warm amber light, burgundy atmosphere."
     },
     "observatory": {
       "grounds": [

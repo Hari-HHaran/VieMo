@@ -31,7 +31,8 @@ Import the GitHub repository in Vercel, add the environment variable `TMDB_READ_
 - `design-system/`: tokens, fonts, components and the brand book. Edit `design-system/src/` and run `npm run ds:build` to regenerate `components/bundle.js`, `components/viemo.mjs` and `tokens.css`.
 - `src/lib/worlds.json` and `scripts/worlds.mjs`: the colour world for each destination. Edit the JSON, then run `node scripts/worlds.mjs`; it regenerates `src/app/worlds.css` and refuses to write a world that falls below WCAG AA.
 - `src/lib/ai.ts` and `src/app/api/director`: Reel Director. Set `OPENAI_API_KEY` in Vercel (Sensitive, no `NEXT_PUBLIC_` prefix) and redeploy; `OPENAI_MODEL` optionally changes the model.
-- `src/lib/motion.ts`: the shared durations, easings and springs.
+- `src/lib/motion.ts`: the shared durations, easings, springs, hover, press, magnet, scramble and page-transition tokens.
+- `src/components/fx/`: reusable effects (scramble labels, magnetic pull, tilt cards, drag rails). `src/components/nav/SiteNav.tsx` is the navigation; `src/styles/` holds the nav and Home styles.
 - `docs/plan.md`: product plan, data model and a feature-by-feature status table.
 
 Watchlist and settings are stored in the browser until accounts (Supabase) are added. Film data and images come from TMDB; this product uses the TMDB API but is not endorsed or certified by TMDB.

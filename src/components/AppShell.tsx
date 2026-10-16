@@ -2,11 +2,12 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, useTransition, ViewTransition } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { usePathname, useRouter } from 'next/navigation';
-import { BottomNav, Toast } from '@/ds/client';
+import { Toast } from '@/ds/client';
 import { applyPrefsToDocument, usePrefs } from '@/lib/device-store';
 import { DURATION, EASE } from '@/lib/motion';
 import { WORLD_NAMES, worldFor, type WorldId } from '@/lib/worlds';
 import MotionProvider from './MotionProvider';
+import SiteNav from './nav/SiteNav';
 
 type ToastInput = { message: string; tone?: 'neutral' | 'positive' | 'negative'; icon?: string; action?: { label: string; onClick: () => void } };
 const ToastContext = createContext<(t: ToastInput) => void>(() => {});
@@ -39,7 +40,9 @@ export default function AppShell({ children, dataNote }: { children: React.React
   const current = tabFor(pathname) ?? lastTab;
   const world = worldFor(pathname);
   const [pending, startNav] = useTransition();
-  const go = useCallback((href: string) => startNav(() => router.push(href)), [router]);
+  const [target, setTarget] = useState<string | null>(null);
+  const go = useCallback((href: string) => { setTarget(href); startNav(() => router.push(href)); }, [router]);
+  useEffect(() => { if (!pending) setTarget(null); }, [pending]);
   const [curtain, setCurtain] = useState<WorldId | null>(null);
   const firstRender = useRef(true);
 
@@ -86,8 +89,8 @@ export default function AppShell({ children, dataNote }: { children: React.React
          carry the name at a time, so it moves from the current page's hero to the tapped card. */
       if (/^\/film\/\d+/.test(url.pathname)) {
         document.querySelectorAll<HTMLElement>('[data-vt-poster]').forEach((el) => { el.style.viewTransitionName = 'none'; });
-        const card = a.closest('.vm-film-card, .vmx-light, .qp-top, .qp-alt, .clip, .lobby-card');
-        const poster = card?.querySelector<HTMLElement>('.vm-poster, .vmx-poster');
+        const card = a.closest('[data-film-card], .vm-film-card, .vmx-light, .qp-top, .qp-alt, .clip, .lobby-card');
+        const poster = card?.querySelector<HTMLElement>('[data-poster], .vm-poster, .vmx-poster');
         if (poster) { poster.style.viewTransitionName = 'film-poster'; poster.setAttribute('data-vt-poster', ''); }
       }
       go(url.pathname + url.search + url.hash);
@@ -97,7 +100,6 @@ export default function AppShell({ children, dataNote }: { children: React.React
   }, [go]);
 
   const show = useCallback((t: ToastInput) => setToast({ ...t, key: ++counter.current }), []);
-  const navigate = (id: string) => go(NAV.find((n) => n.id === id)!.href);
 
   return (
     <ToastContext.Provider value={show}>
@@ -105,9 +107,7 @@ export default function AppShell({ children, dataNote }: { children: React.React
       <MotionProvider>
       <div className={`nav-progress${pending ? ' is-on' : ''}`} role="progressbar" aria-label="Loading page" aria-hidden={!pending} />
       <div className="shell" data-world={world}>
-        <div className="shell-rail">
-          <BottomNav layout="rail" brand="VieMo" items={NAV as never} current={current} onNavigate={navigate} label="Primary" />
-        </div>
+        <SiteNav items={NAV} current={current} loadingHref={pending ? target : null} pathname={pathname} />
         <main id="main" className="shell-main" tabIndex={-1}>
           {dataNote ? <p className="data-note type-caption">{dataNote}</p> : null}
           <ViewTransition>{children}</ViewTransition>
@@ -116,9 +116,6 @@ export default function AppShell({ children, dataNote }: { children: React.React
             This product uses the TMDB API but is not endorsed or certified by TMDB.
           </footer>
         </main>
-        <div className="shell-bar">
-          <BottomNav items={NAV as never} current={current} onNavigate={navigate} label="Primary" fixed />
-        </div>
       </div>
       <AnimatePresence>
         {curtain ? (

@@ -1,0 +1,91 @@
+/* Navigation: the Projection Booth. A floating capsule from 768px; a labelled bottom bar on phones.
+   Colours come from the current world's tokens, so the bar takes on each page's light. */
+
+/* Scramble labels: the real text holds the width and the accessible name; the overlay does the decrypting. */
+.scr { position: relative; display: inline-block; white-space: nowrap; }
+.scr-real { color: transparent; }
+.scr-live { position: absolute; inset: 0; color: currentColor; font-variant-numeric: tabular-nums; }
+@media (forced-colors: active) { .scr-real { color: inherit; } .scr-live { display: none; } }
+
+/* Floating capsule */
+.fnav { display: none; }
+@media (min-width: 768px) {
+  .fnav { display: block; position: fixed; z-index: var(--z-nav); top: calc(env(safe-area-inset-top, 0px) + 14px); left: 50%; translate: -50% 0; width: min(calc(100% - 32px), 1040px); }
+}
+.fnav-bar { display: flex; align-items: center; gap: var(--space-2); padding: 6px 6px 6px var(--space-5); border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg) 72%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%);
+  transition: padding var(--duration-base) var(--ease-out), background-color var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out); }
+.fnav.is-condensed .fnav-bar, .fnav.is-open .fnav-bar { background: color-mix(in srgb, var(--surface) 92%, transparent); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35); padding-block: 4px; }
+.fnav-brand { flex: none; margin-right: var(--space-3); font: 400 26px/1 var(--font-display); color: var(--ink); text-decoration: none; letter-spacing: -0.01em; border-radius: var(--radius-sm); }
+.fnav-brand span { color: var(--reel-ink); font-style: italic; }
+.fnav-brand:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.fnav-list { display: flex; gap: 2px; margin: 0 auto 0 0; padding: 0; list-style: none; }
+.fnav-item { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius-full);
+  color: var(--ink-muted); text-decoration: none; font: 600 14px/1 var(--font-sans); letter-spacing: 0.01em; -webkit-tap-highlight-color: transparent; }
+.fnav-item:hover, .fnav-item:focus-visible { color: var(--ink); }
+.fnav-item.is-active { color: var(--ink); }
+.fnav-item:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.fnav-item .scr { z-index: 1; }
+/* The active "light pool": a warm pool of the world's accent, as if a lamp sits under the label. */
+.fnav-light { position: absolute; inset: 0; border-radius: inherit; z-index: 0;
+  background: radial-gradient(ellipse 80% 120% at 50% 130%, color-mix(in srgb, var(--reel) 60%, transparent), transparent 70%), color-mix(in srgb, var(--reel) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--reel-ink) 40%, transparent); }
+/* Loading: the destination's label carries a moving glint until the page arrives. */
+.fnav-item.is-loading::after, .mbar-item.is-loading::after { content: ''; position: absolute; left: 22%; right: 22%; bottom: 6px; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--reel-ink), transparent); background-size: 200% 100%; animation: nav-glint 0.9s linear infinite; }
+@keyframes nav-glint { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+.fnav-director, .fnav-menu { flex: none; display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius-full);
+  font: 600 14px/1 var(--font-sans); color: var(--ink); text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.fnav-director { border: 1px solid color-mix(in srgb, var(--reel-ink) 45%, transparent); background: color-mix(in srgb, var(--reel) 10%, transparent); }
+.fnav-director svg { color: var(--reel-ink); }
+.fnav-director:hover, .fnav-director.is-active { background: color-mix(in srgb, var(--reel) 22%, transparent); }
+.fnav-menu { border: 0; background: transparent; }
+.fnav-menu:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.fnav-director:focus-visible, .fnav-menu:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.fnav-menu-lines { display: grid; gap: 5px; width: 16px; }
+.fnav-menu-lines span { display: block; height: 1.5px; background: currentColor; border-radius: 1px; transition: transform var(--duration-base) var(--ease-out); }
+.fnav-menu[aria-expanded="true"] .fnav-menu-lines span:first-child { transform: translateY(3.25px) rotate(45deg); }
+.fnav-menu[aria-expanded="true"] .fnav-menu-lines span:last-child { transform: translateY(-3.25px) rotate(-45deg); }
+@media (min-width: 768px) and (max-width: 1023px) {
+  .fnav-bar { padding-left: var(--space-4); }
+  .fnav-item { padding: 0 var(--space-3); }
+  .fnav-director { padding: 0 var(--space-3); font-size: 0; gap: 0; }
+  .fnav-director svg { width: 18px; height: 18px; }
+}
+
+/* The menu panel drops from the bar like a lowered screen */
+.fnav-panel { position: absolute; right: 0; top: calc(100% + 10px); width: min(380px, 100%); padding: var(--space-2); border-radius: 20px;
+  background: var(--surface-overlay); border: 1px solid var(--line-strong); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45); }
+.fnav-panel ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.fnav-panel-link { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); align-items: center; min-height: 56px; padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); color: var(--ink); text-decoration: none; }
+.fnav-panel-link:hover { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.fnav-panel-link:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.fnav-panel-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--reel) 16%, transparent); color: var(--reel-ink); }
+.fnav-panel-title { display: block; font: 600 15px/1.3 var(--font-sans); }
+.fnav-panel-note { display: block; font: 400 13px/1.35 var(--font-sans); color: var(--ink-muted); }
+
+/* Phones: bottom bar */
+.mbar { position: fixed; z-index: var(--z-nav); left: 0; right: 0; bottom: 0; padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  background: color-mix(in srgb, var(--bg) 90%, transparent); border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.mbar ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); height: var(--mbar-height); margin: 0; padding: 0; list-style: none; }
+.mbar-item { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; height: 100%;
+  color: var(--ink-muted); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.mbar-item.is-active { color: var(--reel-ink); }
+.mbar-item:focus-visible { outline: 2px solid transparent; box-shadow: inset var(--focus-ring); border-radius: var(--radius-md); }
+.mbar-item svg, .mbar-label { position: relative; z-index: 1; }
+.mbar-label { font: 600 12px/16px var(--font-sans); }
+.mbar-item.is-active .mbar-label { font-weight: 700; }
+.mbar-light { position: absolute; z-index: 0; top: 0; left: 18%; right: 18%; bottom: 8px; border-radius: 0 0 18px 18px;
+  background: radial-gradient(ellipse 90% 70% at 50% 0%, color-mix(in srgb, var(--reel) 34%, transparent), transparent 75%);
+  box-shadow: inset 0 2px 0 var(--reel); }
+@media (min-width: 768px) { .mbar { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .fnav-item.is-loading::after, .mbar-item.is-loading::after { animation: none; background: var(--reel-ink); }
+  .fnav-bar, .fnav-menu-lines span { transition: none; }
+}
+html[data-motion="reduce"] .fnav-item.is-loading::after, html[data-motion="reduce"] .mbar-item.is-loading::after { background: var(--reel-ink); }
+[data-theme="light"] .fnav-bar { background: color-mix(in srgb, var(--surface-raised) 94%, transparent); }
