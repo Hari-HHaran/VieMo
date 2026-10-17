@@ -1,0 +1,2011 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Non-production demo seed for VieMo social discovery, profiles, collections, watch history, and reviews",
+  "disclaimer": "ALL people, profiles, user ratings and reviews in this file are synthetic DEMO data. Do not pass them off as real users or organic community activity. Do not run against production without explicit approval.",
+  "reference_date": "2026-10-18",
+  "movie_identity": "Resolve title + release_year against the actual TMDB API and persist verified TMDB IDs; reject ambiguous or unmatched results.",
+  "seed_execution": "Use a server-only Supabase Auth admin client to create linked demo users. No passwords are in this fixture. Seed idempotently by seed_key and limit cleanup to those records. Inspect existing schema and respect RLS, privacy, and Auth triggers.",
+  "accounts": [
+    {
+      "seed_key": "viemo_demo_cosmicframes",
+      "demo_email": "viemo.demo.cosmicframes@example.com",
+      "username": "cosmicframes",
+      "display_name": "Mira Tan",
+      "bio": "Sci-fi worlds, thoughtful stories, and big-screen wonder.",
+      "favorite_genres": [
+        "Sci-Fi",
+        "Drama"
+      ],
+      "is_demo": true,
+      "watched": [
+        {
+          "title": "Interstellar",
+          "release_year": 2014,
+          "watched_on": "2026-10-13",
+          "rating": 4.0,
+          "review": "The atmosphere pulled me in immediately, and I kept thinking about the last scene afterward.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Arrival",
+          "release_year": 2016,
+          "watched_on": "2026-09-14",
+          "rating": 4.5,
+          "review": "A memorable watch because of the details in the visuals and soundtrack.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Martian",
+          "release_year": 2015,
+          "watched_on": "2026-08-16",
+          "rating": 3.0,
+          "review": "It balances spectacle with emotion better than I expected.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Inception",
+          "release_year": 2010,
+          "watched_on": "2026-07-18",
+          "rating": 5.0,
+          "review": "An ambitious film with a few rough edges, but I admire the attempt.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Blade Runner 2049",
+          "release_year": 2017,
+          "watched_on": "2026-06-19",
+          "rating": 3.0,
+          "review": "An easy recommendation for anyone who enjoys this style of storytelling.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Dune",
+          "release_year": 2021,
+          "watched_on": "2026-05-21",
+          "rating": 4.0,
+          "review": "The tone is distinctive and the film commits to it fully.",
+          "review_visibility": "private"
+        },
+        {
+          "title": "Everything Everywhere All at Once",
+          "release_year": 2022,
+          "watched_on": "2026-04-22",
+          "rating": 2.5,
+          "review": null,
+          "review_visibility": "private"
+        },
+        {
+          "title": "Ex Machina",
+          "release_year": 2014,
+          "watched_on": "2026-03-24",
+          "rating": 4.0,
+          "review": null,
+          "review_visibility": "private"
+        }
+      ],
+      "watchlist": [
+        {
+          "title": "Dune",
+          "release_year": 2021
+        },
+        {
+          "title": "Everything Everywhere All at Once",
+          "release_year": 2022
+        },
+        {
+          "title": "Ex Machina",
+          "release_year": 2014
+        },
+        {
+          "title": "2001: A Space Odyssey",
+          "release_year": 1968
+        },
+        {
+          "title": "Her",
+          "release_year": 2013
+        }
+      ],
+      "collections": [
+        {
+          "seed_key": "cosmicframes_collection_1",
+          "title": "Beyond the Stars",
+          "description": "A demo-curated selection from Mira Tan's sci-fi movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Interstellar",
+              "release_year": 2014
+            },
+            {
+              "title": "Arrival",
+              "release_year": 2016
+            },
+            {
+              "title": "The Martian",
+              "release_year": 2015
+            },
+            {
+              "title": "Inception",
+              "release_year": 2010
+            },
+            {
+              "title": "Blade Runner 2049",
+              "release_year": 2017
+            }
+          ]
+        },
+        {
+          "seed_key": "cosmicframes_collection_2",
+          "title": "Mind-Bending Movie Nights",
+          "description": "A demo-curated selection from Mira Tan's sci-fi movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "The Martian",
+              "release_year": 2015
+            },
+            {
+              "title": "Inception",
+              "release_year": 2010
+            },
+            {
+              "title": "Blade Runner 2049",
+              "release_year": 2017
+            },
+            {
+              "title": "Dune",
+              "release_year": 2021
+            },
+            {
+              "title": "Everything Everywhere All at Once",
+              "release_year": 2022
+            }
+          ]
+        },
+        {
+          "seed_key": "cosmicframes_collection_3",
+          "title": "Personal Space Archive",
+          "description": "A demo-curated selection from Mira Tan's sci-fi movie shelf.",
+          "visibility": "private",
+          "movies": [
+            {
+              "title": "Arrival",
+              "release_year": 2016
+            },
+            {
+              "title": "The Martian",
+              "release_year": 2015
+            },
+            {
+              "title": "Inception",
+              "release_year": 2010
+            },
+            {
+              "title": "Blade Runner 2049",
+              "release_year": 2017
+            },
+            {
+              "title": "Dune",
+              "release_year": 2021
+            }
+          ]
+        }
+      ],
+      "profile_visibility": "public",
+      "watchlist_visibility": "public"
+    },
+    {
+      "seed_key": "viemo_demo_plotdetective",
+      "demo_email": "viemo.demo.plotdetective@example.com",
+      "username": "plotdetective",
+      "display_name": "Noah Lim",
+      "bio": "One more twist and I am sold.",
+      "favorite_genres": [
+        "Mystery",
+        "Thriller"
+      ],
+      "is_demo": true,
+      "watched": [
+        {
+          "title": "Knives Out",
+          "release_year": 2019,
+          "watched_on": "2026-10-02",
+          "rating": 4.0,
+          "review": "I loved the setup and the character dynamics more than the ending.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Gone Girl",
+          "release_year": 2014,
+          "watched_on": "2026-09-03",
+          "rating": 3.5,
+          "review": "There is a lot to appreciate in the craft, especially the pacing.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Prisoners",
+          "release_year": 2013,
+          "watched_on": "2026-08-05",
+          "rating": 2.5,
+          "review": "I enjoyed the first half more, though there are some excellent moments throughout.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Se7en",
+          "release_year": 1995,
+          "watched_on": "2026-07-07",
+          "rating": 4.0,
+          "review": "I went in with big expectations and came away mostly satisfied.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Prestige",
+          "release_year": 2006,
+          "watched_on": "2026-06-08",
+          "rating": 3.5,
+          "review": "I appreciated how much it trusted the audience to follow along.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Zodiac",
+          "release_year": 2007,
+          "watched_on": "2026-05-10",
+          "rating": 3.0,
+          "review": "Beautifully paced once it finds its rhythm. I would gladly revisit this one.",
+          "review_visibility": "private"
+        },
+        {
+          "title": "Shutter Island",
+          "release_year": 2010,
+          "watched_on": "2026-04-11",
+          "rating": 3.0,
+          "review": null,
+          "review_visibility": "private"
+        },
+        {
+          "title": "Memento",
+          "release_year": 2000,
+          "watched_on": "2026-03-13",
+          "rating": 4.0,
+          "review": null,
+          "review_visibility": "private"
+        }
+      ],
+      "watchlist": [
+        {
+          "title": "Zodiac",
+          "release_year": 2007
+        },
+        {
+          "title": "Shutter Island",
+          "release_year": 2010
+        },
+        {
+          "title": "Memento",
+          "release_year": 2000
+        },
+        {
+          "title": "The Usual Suspects",
+          "release_year": 1995
+        },
+        {
+          "title": "The Girl with the Dragon Tattoo",
+          "release_year": 2011
+        }
+      ],
+      "collections": [
+        {
+          "seed_key": "plotdetective_collection_1",
+          "title": "Twists You Never Saw Coming",
+          "description": "A demo-curated selection from Noah Lim's mystery movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Knives Out",
+              "release_year": 2019
+            },
+            {
+              "title": "Gone Girl",
+              "release_year": 2014
+            },
+            {
+              "title": "Prisoners",
+              "release_year": 2013
+            },
+            {
+              "title": "Se7en",
+              "release_year": 1995
+            },
+            {
+              "title": "The Prestige",
+              "release_year": 2006
+            }
+          ]
+        },
+        {
+          "seed_key": "plotdetective_collection_2",
+          "title": "Detective Mode",
+          "description": "A demo-curated selection from Noah Lim's mystery movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Prisoners",
+              "release_year": 2013
+            },
+            {
+              "title": "Se7en",
+              "release_year": 1995
+            },
+            {
+              "title": "The Prestige",
+              "release_year": 2006
+            },
+            {
+              "title": "Zodiac",
+              "release_year": 2007
+            },
+            {
+              "title": "Shutter Island",
+              "release_year": 2010
+            }
+          ]
+        },
+        {
+          "seed_key": "plotdetective_collection_3",
+          "title": "Case Files",
+          "description": "A demo-curated selection from Noah Lim's mystery movie shelf.",
+          "visibility": "private",
+          "movies": [
+            {
+              "title": "Gone Girl",
+              "release_year": 2014
+            },
+            {
+              "title": "Prisoners",
+              "release_year": 2013
+            },
+            {
+              "title": "Se7en",
+              "release_year": 1995
+            },
+            {
+              "title": "The Prestige",
+              "release_year": 2006
+            },
+            {
+              "title": "Zodiac",
+              "release_year": 2007
+            }
+          ]
+        }
+      ],
+      "profile_visibility": "public",
+      "watchlist_visibility": "private"
+    },
+    {
+      "seed_key": "viemo_demo_comfortcinema",
+      "demo_email": "viemo.demo.comfortcinema@example.com",
+      "username": "comfortcinema",
+      "display_name": "Sophie Chen",
+      "bio": "Movies for soft weekends and big feelings.",
+      "favorite_genres": [
+        "Romance",
+        "Drama"
+      ],
+      "is_demo": true,
+      "watched": [
+        {
+          "title": "About Time",
+          "release_year": 2013,
+          "watched_on": "2026-09-21",
+          "rating": 4.0,
+          "review": "One of those films I wanted to discuss immediately after watching.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Pride & Prejudice",
+          "release_year": 2005,
+          "watched_on": "2026-08-23",
+          "rating": 3.0,
+          "review": "The little visual touches made this feel special.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "La La Land",
+          "release_year": 2016,
+          "watched_on": "2026-07-25",
+          "rating": 3.0,
+          "review": "The atmosphere pulled me in immediately, and I kept thinking about the last scene afterward.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Before Sunrise",
+          "release_year": 1995,
+          "watched_on": "2026-06-26",
+          "rating": 5.0,
+          "review": "A memorable watch because of the details in the visuals and soundtrack.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Little Women",
+          "release_year": 2019,
+          "watched_on": "2026-05-28",
+          "rating": 2.5,
+          "review": "It balances spectacle with emotion better than I expected.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Notting Hill",
+          "release_year": 1999,
+          "watched_on": "2026-04-29",
+          "rating": 3.0,
+          "review": "An ambitious film with a few rough edges, but I admire the attempt.",
+          "review_visibility": "private"
+        },
+        {
+          "title": "The Notebook",
+          "release_year": 2004,
+          "watched_on": "2026-03-31",
+          "rating": 3.0,
+          "review": null,
+          "review_visibility": "private"
+        },
+        {
+          "title": "10 Things I Hate About You",
+          "release_year": 1999,
+          "watched_on": "2026-03-02",
+          "rating": 3.5,
+          "review": null,
+          "review_visibility": "private"
+        }
+      ],
+      "watchlist": [
+        {
+          "title": "Notting Hill",
+          "release_year": 1999
+        },
+        {
+          "title": "The Notebook",
+          "release_year": 2004
+        },
+        {
+          "title": "10 Things I Hate About You",
+          "release_year": 1999
+        },
+        {
+          "title": "The Holiday",
+          "release_year": 2006
+        },
+        {
+          "title": "Past Lives",
+          "release_year": 2023
+        }
+      ],
+      "collections": [
+        {
+          "seed_key": "comfortcinema_collection_1",
+          "title": "Rainy Day Films",
+          "description": "A demo-curated selection from Sophie Chen's romance movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "About Time",
+              "release_year": 2013
+            },
+            {
+              "title": "Pride & Prejudice",
+              "release_year": 2005
+            },
+            {
+              "title": "La La Land",
+              "release_year": 2016
+            },
+            {
+              "title": "Before Sunrise",
+              "release_year": 1995
+            },
+            {
+              "title": "Little Women",
+              "release_year": 2019
+            }
+          ]
+        },
+        {
+          "seed_key": "comfortcinema_collection_2",
+          "title": "Romances Worth Rewatching",
+          "description": "A demo-curated selection from Sophie Chen's romance movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "La La Land",
+              "release_year": 2016
+            },
+            {
+              "title": "Before Sunrise",
+              "release_year": 1995
+            },
+            {
+              "title": "Little Women",
+              "release_year": 2019
+            },
+            {
+              "title": "Notting Hill",
+              "release_year": 1999
+            },
+            {
+              "title": "The Notebook",
+              "release_year": 2004
+            }
+          ]
+        },
+        {
+          "seed_key": "comfortcinema_collection_3",
+          "title": "Comfort Archive",
+          "description": "A demo-curated selection from Sophie Chen's romance movie shelf.",
+          "visibility": "private",
+          "movies": [
+            {
+              "title": "Pride & Prejudice",
+              "release_year": 2005
+            },
+            {
+              "title": "La La Land",
+              "release_year": 2016
+            },
+            {
+              "title": "Before Sunrise",
+              "release_year": 1995
+            },
+            {
+              "title": "Little Women",
+              "release_year": 2019
+            },
+            {
+              "title": "Notting Hill",
+              "release_year": 1999
+            }
+          ]
+        }
+      ],
+      "profile_visibility": "public",
+      "watchlist_visibility": "private"
+    },
+    {
+      "seed_key": "viemo_demo_framebyframe",
+      "demo_email": "viemo.demo.framebyframe@example.com",
+      "username": "framebyframe",
+      "display_name": "Leah Kumar",
+      "bio": "A fan of bold directors and tiny details.",
+      "favorite_genres": [
+        "Independent",
+        "Drama"
+      ],
+      "is_demo": true,
+      "watched": [
+        {
+          "title": "Whiplash",
+          "release_year": 2014,
+          "watched_on": "2026-09-10",
+          "rating": 3.0,
+          "review": "The central performances make the whole story feel surprisingly personal.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Grand Budapest Hotel",
+          "release_year": 2014,
+          "watched_on": "2026-08-12",
+          "rating": 2.5,
+          "review": "The concept is strong, but a few moments did not work for me.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Lady Bird",
+          "release_year": 2017,
+          "watched_on": "2026-07-14",
+          "rating": 2.5,
+          "review": "I loved the setup and the character dynamics more than the ending.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Florida Project",
+          "release_year": 2017,
+          "watched_on": "2026-06-15",
+          "rating": 4.5,
+          "review": "There is a lot to appreciate in the craft, especially the pacing.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Moonlight",
+          "release_year": 2016,
+          "watched_on": "2026-05-17",
+          "rating": 3.0,
+          "review": "I enjoyed the first half more, though there are some excellent moments throughout.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Lobster",
+          "release_year": 2015,
+          "watched_on": "2026-04-18",
+          "rating": 4.0,
+          "review": "I went in with big expectations and came away mostly satisfied.",
+          "review_visibility": "private"
+        },
+        {
+          "title": "The Lighthouse",
+          "release_year": 2019,
+          "watched_on": "2026-03-20",
+          "rating": 3.0,
+          "review": null,
+          "review_visibility": "private"
+        },
+        {
+          "title": "Aftersun",
+          "release_year": 2022,
+          "watched_on": "2026-02-19",
+          "rating": 2.5,
+          "review": null,
+          "review_visibility": "private"
+        }
+      ],
+      "watchlist": [
+        {
+          "title": "The Lobster",
+          "release_year": 2015
+        },
+        {
+          "title": "The Lighthouse",
+          "release_year": 2019
+        },
+        {
+          "title": "Aftersun",
+          "release_year": 2022
+        },
+        {
+          "title": "Portrait of a Lady on Fire",
+          "release_year": 2019
+        },
+        {
+          "title": "Eternal Sunshine of the Spotless Mind",
+          "release_year": 2004
+        }
+      ],
+      "collections": [
+        {
+          "seed_key": "framebyframe_collection_1",
+          "title": "Beautifully Strange Cinema",
+          "description": "A demo-curated selection from Leah Kumar's independent movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Whiplash",
+              "release_year": 2014
+            },
+            {
+              "title": "The Grand Budapest Hotel",
+              "release_year": 2014
+            },
+            {
+              "title": "Lady Bird",
+              "release_year": 2017
+            },
+            {
+              "title": "The Florida Project",
+              "release_year": 2017
+            },
+            {
+              "title": "Moonlight",
+              "release_year": 2016
+            }
+          ]
+        },
+        {
+          "seed_key": "framebyframe_collection_2",
+          "title": "Quiet Masterpieces",
+          "description": "A demo-curated selection from Leah Kumar's independent movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Lady Bird",
+              "release_year": 2017
+            },
+            {
+              "title": "The Florida Project",
+              "release_year": 2017
+            },
+            {
+              "title": "Moonlight",
+              "release_year": 2016
+            },
+            {
+              "title": "The Lobster",
+              "release_year": 2015
+            },
+            {
+              "title": "The Lighthouse",
+              "release_year": 2019
+            }
+          ]
+        },
+        {
+          "seed_key": "framebyframe_collection_3",
+          "title": "Director Notes",
+          "description": "A demo-curated selection from Leah Kumar's independent movie shelf.",
+          "visibility": "private",
+          "movies": [
+            {
+              "title": "The Grand Budapest Hotel",
+              "release_year": 2014
+            },
+            {
+              "title": "Lady Bird",
+              "release_year": 2017
+            },
+            {
+              "title": "The Florida Project",
+              "release_year": 2017
+            },
+            {
+              "title": "Moonlight",
+              "release_year": 2016
+            },
+            {
+              "title": "The Lobster",
+              "release_year": 2015
+            }
+          ]
+        }
+      ],
+      "profile_visibility": "public",
+      "watchlist_visibility": "public"
+    },
+    {
+      "seed_key": "viemo_demo_adrenalinecut",
+      "demo_email": "viemo.demo.adrenalinecut@example.com",
+      "username": "adrenalinecut",
+      "display_name": "Ryan Koh",
+      "bio": "Cars, competition, underdogs, and big wins.",
+      "favorite_genres": [
+        "Sports",
+        "Action"
+      ],
+      "is_demo": true,
+      "watched": [
+        {
+          "title": "Ford v Ferrari",
+          "release_year": 2019,
+          "watched_on": "2026-08-30",
+          "rating": 3.0,
+          "review": "The quieter scenes were the ones that stayed with me.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Rush",
+          "release_year": 2013,
+          "watched_on": "2026-08-01",
+          "rating": 5.0,
+          "review": "Not exactly what I expected, and that was part of the fun.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Moneyball",
+          "release_year": 2011,
+          "watched_on": "2026-07-03",
+          "rating": 4.0,
+          "review": "One of those films I wanted to discuss immediately after watching.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Top Gun: Maverick",
+          "release_year": 2022,
+          "watched_on": "2026-06-04",
+          "rating": 5.0,
+          "review": "The little visual touches made this feel special.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Creed",
+          "release_year": 2015,
+          "watched_on": "2026-05-06",
+          "rating": 5.0,
+          "review": "The atmosphere pulled me in immediately, and I kept thinking about the last scene afterward.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Rocky",
+          "release_year": 1976,
+          "watched_on": "2026-04-07",
+          "rating": 4.5,
+          "review": "A memorable watch because of the details in the visuals and soundtrack.",
+          "review_visibility": "private"
+        },
+        {
+          "title": "Senna",
+          "release_year": 2010,
+          "watched_on": "2026-03-09",
+          "rating": 4.0,
+          "review": null,
+          "review_visibility": "private"
+        },
+        {
+          "title": "Gran Turismo",
+          "release_year": 2023,
+          "watched_on": "2026-02-08",
+          "rating": 2.5,
+          "review": null,
+          "review_visibility": "private"
+        }
+      ],
+      "watchlist": [
+        {
+          "title": "Rocky",
+          "release_year": 1976
+        },
+        {
+          "title": "Senna",
+          "release_year": 2010
+        },
+        {
+          "title": "Gran Turismo",
+          "release_year": 2023
+        },
+        {
+          "title": "Chariots of Fire",
+          "release_year": 1981
+        },
+        {
+          "title": "Remember the Titans",
+          "release_year": 2000
+        }
+      ],
+      "collections": [
+        {
+          "seed_key": "adrenalinecut_collection_1",
+          "title": "Full Throttle",
+          "description": "A demo-curated selection from Ryan Koh's sports movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Ford v Ferrari",
+              "release_year": 2019
+            },
+            {
+              "title": "Rush",
+              "release_year": 2013
+            },
+            {
+              "title": "Moneyball",
+              "release_year": 2011
+            },
+            {
+              "title": "Top Gun: Maverick",
+              "release_year": 2022
+            },
+            {
+              "title": "Creed",
+              "release_year": 2015
+            }
+          ]
+        },
+        {
+          "seed_key": "adrenalinecut_collection_2",
+          "title": "Game Day Movies",
+          "description": "A demo-curated selection from Ryan Koh's sports movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Moneyball",
+              "release_year": 2011
+            },
+            {
+              "title": "Top Gun: Maverick",
+              "release_year": 2022
+            },
+            {
+              "title": "Creed",
+              "release_year": 2015
+            },
+            {
+              "title": "Rocky",
+              "release_year": 1976
+            },
+            {
+              "title": "Senna",
+              "release_year": 2010
+            }
+          ]
+        },
+        {
+          "seed_key": "adrenalinecut_collection_3",
+          "title": "Personal Podium",
+          "description": "A demo-curated selection from Ryan Koh's sports movie shelf.",
+          "visibility": "private",
+          "movies": [
+            {
+              "title": "Rush",
+              "release_year": 2013
+            },
+            {
+              "title": "Moneyball",
+              "release_year": 2011
+            },
+            {
+              "title": "Top Gun: Maverick",
+              "release_year": 2022
+            },
+            {
+              "title": "Creed",
+              "release_year": 2015
+            },
+            {
+              "title": "Rocky",
+              "release_year": 1976
+            }
+          ]
+        }
+      ],
+      "profile_visibility": "public",
+      "watchlist_visibility": "private"
+    },
+    {
+      "seed_key": "viemo_demo_midnighthorror",
+      "demo_email": "viemo.demo.midnighthorror@example.com",
+      "username": "midnighthorror",
+      "display_name": "Nina Park",
+      "bio": "I volunteer to check behind the door.",
+      "favorite_genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "is_demo": true,
+      "watched": [
+        {
+          "title": "Get Out",
+          "release_year": 2017,
+          "watched_on": "2026-08-19",
+          "rating": 5.0,
+          "review": "The tone is distinctive and the film commits to it fully.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Hereditary",
+          "release_year": 2018,
+          "watched_on": "2026-07-21",
+          "rating": 4.0,
+          "review": "An entertaining watch, even if I guessed where parts of it were heading.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Conjuring",
+          "release_year": 2013,
+          "watched_on": "2026-06-22",
+          "rating": 4.0,
+          "review": "The central performances make the whole story feel surprisingly personal.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "A Quiet Place",
+          "release_year": 2018,
+          "watched_on": "2026-05-24",
+          "rating": 2.5,
+          "review": "The concept is strong, but a few moments did not work for me.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Babadook",
+          "release_year": 2014,
+          "watched_on": "2026-04-25",
+          "rating": 3.5,
+          "review": "I loved the setup and the character dynamics more than the ending.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "It Follows",
+          "release_year": 2014,
+          "watched_on": "2026-03-27",
+          "rating": 3.0,
+          "review": "There is a lot to appreciate in the craft, especially the pacing.",
+          "review_visibility": "private"
+        },
+        {
+          "title": "The Witch",
+          "release_year": 2015,
+          "watched_on": "2026-02-26",
+          "rating": 4.0,
+          "review": null,
+          "review_visibility": "private"
+        },
+        {
+          "title": "Talk to Me",
+          "release_year": 2022,
+          "watched_on": "2026-01-28",
+          "rating": 4.5,
+          "review": null,
+          "review_visibility": "private"
+        }
+      ],
+      "watchlist": [
+        {
+          "title": "It Follows",
+          "release_year": 2014
+        },
+        {
+          "title": "The Witch",
+          "release_year": 2015
+        },
+        {
+          "title": "Talk to Me",
+          "release_year": 2022
+        },
+        {
+          "title": "The Exorcist",
+          "release_year": 1973
+        },
+        {
+          "title": "Scream",
+          "release_year": 1996
+        }
+      ],
+      "collections": [
+        {
+          "seed_key": "midnighthorror_collection_1",
+          "title": "Do Not Watch Alone",
+          "description": "A demo-curated selection from Nina Park's horror movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Get Out",
+              "release_year": 2017
+            },
+            {
+              "title": "Hereditary",
+              "release_year": 2018
+            },
+            {
+              "title": "The Conjuring",
+              "release_year": 2013
+            },
+            {
+              "title": "A Quiet Place",
+              "release_year": 2018
+            },
+            {
+              "title": "The Babadook",
+              "release_year": 2014
+            }
+          ]
+        },
+        {
+          "seed_key": "midnighthorror_collection_2",
+          "title": "Modern Nightmares",
+          "description": "A demo-curated selection from Nina Park's horror movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "The Conjuring",
+              "release_year": 2013
+            },
+            {
+              "title": "A Quiet Place",
+              "release_year": 2018
+            },
+            {
+              "title": "The Babadook",
+              "release_year": 2014
+            },
+            {
+              "title": "It Follows",
+              "release_year": 2014
+            },
+            {
+              "title": "The Witch",
+              "release_year": 2015
+            }
+          ]
+        },
+        {
+          "seed_key": "midnighthorror_collection_3",
+          "title": "Midnight Notes",
+          "description": "A demo-curated selection from Nina Park's horror movie shelf.",
+          "visibility": "private",
+          "movies": [
+            {
+              "title": "Hereditary",
+              "release_year": 2018
+            },
+            {
+              "title": "The Conjuring",
+              "release_year": 2013
+            },
+            {
+              "title": "A Quiet Place",
+              "release_year": 2018
+            },
+            {
+              "title": "The Babadook",
+              "release_year": 2014
+            },
+            {
+              "title": "It Follows",
+              "release_year": 2014
+            }
+          ]
+        }
+      ],
+      "profile_visibility": "public",
+      "watchlist_visibility": "private"
+    },
+    {
+      "seed_key": "viemo_demo_animationclub",
+      "demo_email": "viemo.demo.animationclub@example.com",
+      "username": "animationclub",
+      "display_name": "Theo Wong",
+      "bio": "Animated films deserve their own standing ovation.",
+      "favorite_genres": [
+        "Animation",
+        "Adventure"
+      ],
+      "is_demo": true,
+      "watched": [
+        {
+          "title": "Spirited Away",
+          "release_year": 2001,
+          "watched_on": "2026-08-08",
+          "rating": 4.0,
+          "review": "Beautifully paced once it finds its rhythm. I would gladly revisit this one.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Spider-Man: Into the Spider-Verse",
+          "release_year": 2018,
+          "watched_on": "2026-07-10",
+          "rating": 2.5,
+          "review": "Worth watching with friends; we had a great conversation after the credits.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Toy Story",
+          "release_year": 1995,
+          "watched_on": "2026-06-11",
+          "rating": 2.5,
+          "review": "The quieter scenes were the ones that stayed with me.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Inside Out",
+          "release_year": 2015,
+          "watched_on": "2026-05-13",
+          "rating": 4.5,
+          "review": "Not exactly what I expected, and that was part of the fun.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Coco",
+          "release_year": 2017,
+          "watched_on": "2026-04-14",
+          "rating": 4.5,
+          "review": "One of those films I wanted to discuss immediately after watching.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Incredibles",
+          "release_year": 2004,
+          "watched_on": "2026-03-16",
+          "rating": 5.0,
+          "review": "The little visual touches made this feel special.",
+          "review_visibility": "private"
+        },
+        {
+          "title": "How to Train Your Dragon",
+          "release_year": 2010,
+          "watched_on": "2026-02-15",
+          "rating": 4.0,
+          "review": null,
+          "review_visibility": "private"
+        },
+        {
+          "title": "Kiki's Delivery Service",
+          "release_year": 1989,
+          "watched_on": "2026-01-17",
+          "rating": 3.0,
+          "review": null,
+          "review_visibility": "private"
+        }
+      ],
+      "watchlist": [
+        {
+          "title": "The Incredibles",
+          "release_year": 2004
+        },
+        {
+          "title": "How to Train Your Dragon",
+          "release_year": 2010
+        },
+        {
+          "title": "Kiki's Delivery Service",
+          "release_year": 1989
+        },
+        {
+          "title": "Ratatouille",
+          "release_year": 2007
+        },
+        {
+          "title": "My Neighbor Totoro",
+          "release_year": 1988
+        }
+      ],
+      "collections": [
+        {
+          "seed_key": "animationclub_collection_1",
+          "title": "Animated Masterpieces",
+          "description": "A demo-curated selection from Theo Wong's animation movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Spirited Away",
+              "release_year": 2001
+            },
+            {
+              "title": "Spider-Man: Into the Spider-Verse",
+              "release_year": 2018
+            },
+            {
+              "title": "Toy Story",
+              "release_year": 1995
+            },
+            {
+              "title": "Inside Out",
+              "release_year": 2015
+            },
+            {
+              "title": "Coco",
+              "release_year": 2017
+            }
+          ]
+        },
+        {
+          "seed_key": "animationclub_collection_2",
+          "title": "Childhood Rewind",
+          "description": "A demo-curated selection from Theo Wong's animation movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Toy Story",
+              "release_year": 1995
+            },
+            {
+              "title": "Inside Out",
+              "release_year": 2015
+            },
+            {
+              "title": "Coco",
+              "release_year": 2017
+            },
+            {
+              "title": "The Incredibles",
+              "release_year": 2004
+            },
+            {
+              "title": "How to Train Your Dragon",
+              "release_year": 2010
+            }
+          ]
+        },
+        {
+          "seed_key": "animationclub_collection_3",
+          "title": "Animation Vault",
+          "description": "A demo-curated selection from Theo Wong's animation movie shelf.",
+          "visibility": "private",
+          "movies": [
+            {
+              "title": "Spider-Man: Into the Spider-Verse",
+              "release_year": 2018
+            },
+            {
+              "title": "Toy Story",
+              "release_year": 1995
+            },
+            {
+              "title": "Inside Out",
+              "release_year": 2015
+            },
+            {
+              "title": "Coco",
+              "release_year": 2017
+            },
+            {
+              "title": "The Incredibles",
+              "release_year": 2004
+            }
+          ]
+        }
+      ],
+      "profile_visibility": "public",
+      "watchlist_visibility": "public"
+    },
+    {
+      "seed_key": "viemo_demo_classicreels",
+      "demo_email": "viemo.demo.classicreels@example.com",
+      "username": "classicreels",
+      "display_name": "Iris Goh",
+      "bio": "Old films, timeless ideas, always curious.",
+      "favorite_genres": [
+        "Classics",
+        "Drama"
+      ],
+      "is_demo": true,
+      "watched": [
+        {
+          "title": "The Godfather",
+          "release_year": 1972,
+          "watched_on": "2026-07-28",
+          "rating": 3.0,
+          "review": "An ambitious film with a few rough edges, but I admire the attempt.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "12 Angry Men",
+          "release_year": 1957,
+          "watched_on": "2026-06-29",
+          "rating": 4.0,
+          "review": "An easy recommendation for anyone who enjoys this style of storytelling.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Casablanca",
+          "release_year": 1942,
+          "watched_on": "2026-05-31",
+          "rating": 3.5,
+          "review": "The tone is distinctive and the film commits to it fully.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Rear Window",
+          "release_year": 1954,
+          "watched_on": "2026-05-02",
+          "rating": 4.0,
+          "review": "An entertaining watch, even if I guessed where parts of it were heading.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Psycho",
+          "release_year": 1960,
+          "watched_on": "2026-04-03",
+          "rating": 3.0,
+          "review": "The central performances make the whole story feel surprisingly personal.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Singin' in the Rain",
+          "release_year": 1952,
+          "watched_on": "2026-03-05",
+          "rating": 4.5,
+          "review": "The concept is strong, but a few moments did not work for me.",
+          "review_visibility": "private"
+        },
+        {
+          "title": "Citizen Kane",
+          "release_year": 1941,
+          "watched_on": "2026-02-04",
+          "rating": 4.0,
+          "review": null,
+          "review_visibility": "private"
+        },
+        {
+          "title": "The Apartment",
+          "release_year": 1960,
+          "watched_on": "2026-01-06",
+          "rating": 4.5,
+          "review": null,
+          "review_visibility": "private"
+        }
+      ],
+      "watchlist": [
+        {
+          "title": "Singin' in the Rain",
+          "release_year": 1952
+        },
+        {
+          "title": "Citizen Kane",
+          "release_year": 1941
+        },
+        {
+          "title": "The Apartment",
+          "release_year": 1960
+        },
+        {
+          "title": "Seven Samurai",
+          "release_year": 1954
+        },
+        {
+          "title": "Roman Holiday",
+          "release_year": 1953
+        }
+      ],
+      "collections": [
+        {
+          "seed_key": "classicreels_collection_1",
+          "title": "Golden Age Essentials",
+          "description": "A demo-curated selection from Iris Goh's classics movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "The Godfather",
+              "release_year": 1972
+            },
+            {
+              "title": "12 Angry Men",
+              "release_year": 1957
+            },
+            {
+              "title": "Casablanca",
+              "release_year": 1942
+            },
+            {
+              "title": "Rear Window",
+              "release_year": 1954
+            },
+            {
+              "title": "Psycho",
+              "release_year": 1960
+            }
+          ]
+        },
+        {
+          "seed_key": "classicreels_collection_2",
+          "title": "One More Classic",
+          "description": "A demo-curated selection from Iris Goh's classics movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Casablanca",
+              "release_year": 1942
+            },
+            {
+              "title": "Rear Window",
+              "release_year": 1954
+            },
+            {
+              "title": "Psycho",
+              "release_year": 1960
+            },
+            {
+              "title": "Singin' in the Rain",
+              "release_year": 1952
+            },
+            {
+              "title": "Citizen Kane",
+              "release_year": 1941
+            }
+          ]
+        },
+        {
+          "seed_key": "classicreels_collection_3",
+          "title": "Private Screening Room",
+          "description": "A demo-curated selection from Iris Goh's classics movie shelf.",
+          "visibility": "private",
+          "movies": [
+            {
+              "title": "12 Angry Men",
+              "release_year": 1957
+            },
+            {
+              "title": "Casablanca",
+              "release_year": 1942
+            },
+            {
+              "title": "Rear Window",
+              "release_year": 1954
+            },
+            {
+              "title": "Psycho",
+              "release_year": 1960
+            },
+            {
+              "title": "Singin' in the Rain",
+              "release_year": 1952
+            }
+          ]
+        }
+      ],
+      "profile_visibility": "public",
+      "watchlist_visibility": "private"
+    },
+    {
+      "seed_key": "viemo_demo_screenexplorer",
+      "demo_email": "viemo.demo.screenexplorer@example.com",
+      "username": "screenexplorer",
+      "display_name": "Amir Rahman",
+      "bio": "Cinema is a passport to other perspectives.",
+      "favorite_genres": [
+        "World Cinema",
+        "Drama"
+      ],
+      "is_demo": true,
+      "watched": [
+        {
+          "title": "Parasite",
+          "release_year": 2019,
+          "watched_on": "2026-07-17",
+          "rating": 4.5,
+          "review": "I went in with big expectations and came away mostly satisfied.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Train to Busan",
+          "release_year": 2016,
+          "watched_on": "2026-06-18",
+          "rating": 3.5,
+          "review": "I appreciated how much it trusted the audience to follow along.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Handmaiden",
+          "release_year": 2016,
+          "watched_on": "2026-05-20",
+          "rating": 5.0,
+          "review": "Beautifully paced once it finds its rhythm. I would gladly revisit this one.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Roma",
+          "release_year": 2018,
+          "watched_on": "2026-04-21",
+          "rating": 5.0,
+          "review": "Worth watching with friends; we had a great conversation after the credits.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Amélie",
+          "release_year": 2001,
+          "watched_on": "2026-03-23",
+          "rating": 4.0,
+          "review": "The quieter scenes were the ones that stayed with me.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Intouchables",
+          "release_year": 2011,
+          "watched_on": "2026-02-22",
+          "rating": 4.0,
+          "review": "Not exactly what I expected, and that was part of the fun.",
+          "review_visibility": "private"
+        },
+        {
+          "title": "City of God",
+          "release_year": 2002,
+          "watched_on": "2026-01-24",
+          "rating": 4.5,
+          "review": null,
+          "review_visibility": "private"
+        },
+        {
+          "title": "Pan's Labyrinth",
+          "release_year": 2006,
+          "watched_on": "2025-12-26",
+          "rating": 5.0,
+          "review": null,
+          "review_visibility": "private"
+        }
+      ],
+      "watchlist": [
+        {
+          "title": "The Intouchables",
+          "release_year": 2011
+        },
+        {
+          "title": "City of God",
+          "release_year": 2002
+        },
+        {
+          "title": "Pan's Labyrinth",
+          "release_year": 2006
+        },
+        {
+          "title": "Shoplifters",
+          "release_year": 2018
+        },
+        {
+          "title": "The Lives of Others",
+          "release_year": 2006
+        }
+      ],
+      "collections": [
+        {
+          "seed_key": "screenexplorer_collection_1",
+          "title": "Around the World in Films",
+          "description": "A demo-curated selection from Amir Rahman's world cinema movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "Parasite",
+              "release_year": 2019
+            },
+            {
+              "title": "Train to Busan",
+              "release_year": 2016
+            },
+            {
+              "title": "The Handmaiden",
+              "release_year": 2016
+            },
+            {
+              "title": "Roma",
+              "release_year": 2018
+            },
+            {
+              "title": "Amélie",
+              "release_year": 2001
+            }
+          ]
+        },
+        {
+          "seed_key": "screenexplorer_collection_2",
+          "title": "Global Gems",
+          "description": "A demo-curated selection from Amir Rahman's world cinema movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "The Handmaiden",
+              "release_year": 2016
+            },
+            {
+              "title": "Roma",
+              "release_year": 2018
+            },
+            {
+              "title": "Amélie",
+              "release_year": 2001
+            },
+            {
+              "title": "The Intouchables",
+              "release_year": 2011
+            },
+            {
+              "title": "City of God",
+              "release_year": 2002
+            }
+          ]
+        },
+        {
+          "seed_key": "screenexplorer_collection_3",
+          "title": "Personal Festival Notes",
+          "description": "A demo-curated selection from Amir Rahman's world cinema movie shelf.",
+          "visibility": "private",
+          "movies": [
+            {
+              "title": "Train to Busan",
+              "release_year": 2016
+            },
+            {
+              "title": "The Handmaiden",
+              "release_year": 2016
+            },
+            {
+              "title": "Roma",
+              "release_year": 2018
+            },
+            {
+              "title": "Amélie",
+              "release_year": 2001
+            },
+            {
+              "title": "The Intouchables",
+              "release_year": 2011
+            }
+          ]
+        }
+      ],
+      "profile_visibility": "public",
+      "watchlist_visibility": "private"
+    },
+    {
+      "seed_key": "viemo_demo_laughtrack",
+      "demo_email": "viemo.demo.laughtrack@example.com",
+      "username": "laughtrack",
+      "display_name": "Olivia Tan",
+      "bio": "A great movie night needs a good laugh.",
+      "favorite_genres": [
+        "Comedy"
+      ],
+      "is_demo": true,
+      "watched": [
+        {
+          "title": "The Hangover",
+          "release_year": 2009,
+          "watched_on": "2026-07-06",
+          "rating": 4.5,
+          "review": "A memorable watch because of the details in the visuals and soundtrack.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Superbad",
+          "release_year": 2007,
+          "watched_on": "2026-06-07",
+          "rating": 3.0,
+          "review": "It balances spectacle with emotion better than I expected.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "The Nice Guys",
+          "release_year": 2016,
+          "watched_on": "2026-05-09",
+          "rating": 2.5,
+          "review": "An ambitious film with a few rough edges, but I admire the attempt.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Game Night",
+          "release_year": 2018,
+          "watched_on": "2026-04-10",
+          "rating": 4.0,
+          "review": "An easy recommendation for anyone who enjoys this style of storytelling.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Booksmart",
+          "release_year": 2019,
+          "watched_on": "2026-03-12",
+          "rating": 4.0,
+          "review": "The tone is distinctive and the film commits to it fully.",
+          "review_visibility": "public"
+        },
+        {
+          "title": "Bridesmaids",
+          "release_year": 2011,
+          "watched_on": "2026-02-11",
+          "rating": 2.5,
+          "review": "An entertaining watch, even if I guessed where parts of it were heading.",
+          "review_visibility": "private"
+        },
+        {
+          "title": "Hot Fuzz",
+          "release_year": 2007,
+          "watched_on": "2026-01-13",
+          "rating": 4.5,
+          "review": null,
+          "review_visibility": "private"
+        },
+        {
+          "title": "Shaun of the Dead",
+          "release_year": 2004,
+          "watched_on": "2025-12-15",
+          "rating": 3.5,
+          "review": null,
+          "review_visibility": "private"
+        }
+      ],
+      "watchlist": [
+        {
+          "title": "Bridesmaids",
+          "release_year": 2011
+        },
+        {
+          "title": "Hot Fuzz",
+          "release_year": 2007
+        },
+        {
+          "title": "Shaun of the Dead",
+          "release_year": 2004
+        },
+        {
+          "title": "Palm Springs",
+          "release_year": 2020
+        },
+        {
+          "title": "School of Rock",
+          "release_year": 2003
+        }
+      ],
+      "collections": [
+        {
+          "seed_key": "laughtrack_collection_1",
+          "title": "Weekend Laughs",
+          "description": "A demo-curated selection from Olivia Tan's comedy movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "The Hangover",
+              "release_year": 2009
+            },
+            {
+              "title": "Superbad",
+              "release_year": 2007
+            },
+            {
+              "title": "The Nice Guys",
+              "release_year": 2016
+            },
+            {
+              "title": "Game Night",
+              "release_year": 2018
+            },
+            {
+              "title": "Booksmart",
+              "release_year": 2019
+            }
+          ]
+        },
+        {
+          "seed_key": "laughtrack_collection_2",
+          "title": "Comedy That Holds Up",
+          "description": "A demo-curated selection from Olivia Tan's comedy movie shelf.",
+          "visibility": "public",
+          "movies": [
+            {
+              "title": "The Nice Guys",
+              "release_year": 2016
+            },
+            {
+              "title": "Game Night",
+              "release_year": 2018
+            },
+            {
+              "title": "Booksmart",
+              "release_year": 2019
+            },
+            {
+              "title": "Bridesmaids",
+              "release_year": 2011
+            },
+            {
+              "title": "Hot Fuzz",
+              "release_year": 2007
+            }
+          ]
+        },
+        {
+          "seed_key": "laughtrack_collection_3",
+          "title": "Laugh Archive",
+          "description": "A demo-curated selection from Olivia Tan's comedy movie shelf.",
+          "visibility": "private",
+          "movies": [
+            {
+              "title": "Superbad",
+              "release_year": 2007
+            },
+            {
+              "title": "The Nice Guys",
+              "release_year": 2016
+            },
+            {
+              "title": "Game Night",
+              "release_year": 2018
+            },
+            {
+              "title": "Booksmart",
+              "release_year": 2019
+            },
+            {
+              "title": "Bridesmaids",
+              "release_year": 2011
+            }
+          ]
+        }
+      ],
+      "profile_visibility": "public",
+      "watchlist_visibility": "public"
+    }
+  ],
+  "follows": [
+    {
+      "follower": "cosmicframes",
+      "following": "plotdetective"
+    },
+    {
+      "follower": "cosmicframes",
+      "following": "comfortcinema"
+    },
+    {
+      "follower": "cosmicframes",
+      "following": "adrenalinecut"
+    },
+    {
+      "follower": "plotdetective",
+      "following": "comfortcinema"
+    },
+    {
+      "follower": "plotdetective",
+      "following": "framebyframe"
+    },
+    {
+      "follower": "plotdetective",
+      "following": "midnighthorror"
+    },
+    {
+      "follower": "comfortcinema",
+      "following": "framebyframe"
+    },
+    {
+      "follower": "comfortcinema",
+      "following": "adrenalinecut"
+    },
+    {
+      "follower": "comfortcinema",
+      "following": "animationclub"
+    },
+    {
+      "follower": "framebyframe",
+      "following": "adrenalinecut"
+    },
+    {
+      "follower": "framebyframe",
+      "following": "midnighthorror"
+    },
+    {
+      "follower": "framebyframe",
+      "following": "classicreels"
+    },
+    {
+      "follower": "adrenalinecut",
+      "following": "midnighthorror"
+    },
+    {
+      "follower": "adrenalinecut",
+      "following": "animationclub"
+    },
+    {
+      "follower": "adrenalinecut",
+      "following": "screenexplorer"
+    },
+    {
+      "follower": "midnighthorror",
+      "following": "animationclub"
+    },
+    {
+      "follower": "midnighthorror",
+      "following": "classicreels"
+    },
+    {
+      "follower": "midnighthorror",
+      "following": "laughtrack"
+    },
+    {
+      "follower": "animationclub",
+      "following": "classicreels"
+    },
+    {
+      "follower": "animationclub",
+      "following": "screenexplorer"
+    },
+    {
+      "follower": "animationclub",
+      "following": "cosmicframes"
+    },
+    {
+      "follower": "classicreels",
+      "following": "screenexplorer"
+    },
+    {
+      "follower": "classicreels",
+      "following": "laughtrack"
+    },
+    {
+      "follower": "classicreels",
+      "following": "plotdetective"
+    },
+    {
+      "follower": "screenexplorer",
+      "following": "laughtrack"
+    },
+    {
+      "follower": "screenexplorer",
+      "following": "cosmicframes"
+    },
+    {
+      "follower": "screenexplorer",
+      "following": "comfortcinema"
+    },
+    {
+      "follower": "laughtrack",
+      "following": "cosmicframes"
+    },
+    {
+      "follower": "laughtrack",
+      "following": "plotdetective"
+    },
+    {
+      "follower": "laughtrack",
+      "following": "framebyframe"
+    }
+  ]
+}

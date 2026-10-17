@@ -12,12 +12,13 @@ In Supabase, open **SQL Editor**. Paste each file below into a new query and run
 2. `supabase/migrations/20261018000002_library.sql` (watchlist, diary, collections)
 3. `supabase/migrations/20261018000003_sceneatlas.sql` (filming locations and their sources)
 4. `supabase/migrations/20261019000004_screening_activity.sql` (Screening Activity: daily totals and who can see them)
+5. `supabase/migrations/20261020000005_community.sql` (demo labels, review visibility, Explore, and the demo importer's functions)
 
 Each one should end with "Success. No rows returned". Run each file once only. If one fails, stop and send the error text, not the keys.
 
 If you use the Supabase CLI instead, `supabase db push` runs them in order.
 
-Every table has row level security switched on, and the default access Supabase gives the public API is removed. Each policy in those files is the only way in. The same files pass 93 checks locally (`supabase/tests/local/run.sh`), signed in as three different accounts and signed out.
+Every table has row level security switched on, and the default access Supabase gives the public API is removed. Each policy in those files is the only way in. The same files pass 145 checks locally (`supabase/tests/local/run.sh`), signed in as three different accounts and signed out.
 
 ## 2. Add the keys in Vercel
 
@@ -87,7 +88,32 @@ Use three email addresses you can open (A, B and C), and a private window for ea
 
 Steps 1 to 4 work now. Steps 5 to 7 come with the next update (My Cinema Library). Their database rules are already in place and tested. Step 8 works now, but the seats only fill once diaries are stored in accounts, which also comes with My Cinema Library. Until then, your own Profile tab draws Screening Activity from the diary on your device.
 
+## 6. The demo community (optional)
+
+Ten fictional accounts with collections, watch history, reviews and follows, for trying Explore, profiles and WheelMo. Everything they make is labelled **Demo**. They can't be signed into, and their `example.com` addresses can't receive mail. One button removes them all without touching real accounts.
+
+1. Run migration 5 (above).
+2. In Vercel, add `SUPABASE_SERVICE_ROLE_KEY` (tick **Sensitive**) and `DEMO_SEED_ENABLED` = `true`. Redeploy.
+3. Make your own account an editor. In the SQL Editor, run (with your username):
+   ```sql
+   update public.profiles set is_editor = true where username = 'your_username';
+   ```
+4. Sign in and open `/admin/demo`. Everyone else gets "not found" there.
+5. Press **Dry run** first. It looks up all 100 films on TMDB and writes nothing. Check the report:
+   - Films with no confident TMDB match are listed and left out, never guessed.
+   - Four films are accepted with a one-year difference, because TMDB dates them by a later release.
+6. Press **Import the demo community**. On the live site, first tick the approval box. Running it again updates the community without making duplicates.
+7. When you no longer need it, tick the removal box and press **Remove the demo community**. Then set `DEMO_SEED_ENABLED` back to `false`.
+
+The importer applies four fixes to the fixture and lists each one in its report:
+- twelve extra watches, so some films are rated differently by different people;
+- already-watched films taken off watchlists;
+- six reviews reworded to match their star rating;
+- six follows made mutual, so "friends only" can be tried.
+
 ## Troubleshooting
+
+- **Unsure what the site can see?** Open `/status`. It lists which variables were found (names only, never values), whether Supabase accepts the key, and which migrations have run.
 
 - **"Accounts aren't switched on here yet."** The server can't see the URL or the public key. Check the names above, then redeploy.
 - **"Your account has no profile yet."** The first migration hasn't run, so new accounts don't get a profile. Run step 1, then sign up again or ask for help adding the missing profile.
