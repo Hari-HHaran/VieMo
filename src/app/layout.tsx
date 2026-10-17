@@ -8,6 +8,7 @@ import '../styles/lobby.css';
 import '../styles/wall.css';
 import '../styles/atlas.css';
 import '../styles/mo.css';
+import '../styles/account.css';
 import type { Metadata, Viewport } from 'next';
 import AppShell from '@/components/AppShell';
 import { dataSource } from '@/lib/tmdb';

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import AccentSettings from '@/components/AccentSettings';
+import ProfileAccountNote from '@/components/account/ProfileAccountNote';
 import PassportCard from '@/components/PassportCard';
 import WallPreview from '@/components/wall/WallPreview';
 import AppearanceSettings from '@/components/AppearanceSettings';
@@ -19,7 +20,7 @@ export default async function Profile() {
     <div className="page">
       <header className="page-head">
         <h1 className="type-display-lg">Profile</h1>
-        <p className="type-body vm-muted">Saved on this device until accounts arrive.</p>
+        <ProfileAccountNote />
       </header>
       <PassportCard region={region} regionLabel={regionName(region)} />
       <WallPreview />

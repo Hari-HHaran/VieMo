@@ -6,6 +6,7 @@ import { DURATION, EASE, LAYOUT, PRESS, SPRING, stagger } from '@/lib/motion';
 import ScrambleLabel from '../fx/ScrambleLabel';
 import { useMagnetic } from '../fx/useMagnetic';
 import { useScramble } from '../fx/useScramble';
+import AccountLink from '../account/AccountLink';
 
 export interface NavItem { id: string; label: string; icon: string; href: string }
 interface Props { items: readonly NavItem[]; current: string; loadingHref: string | null; pathname: string }
@@ -73,6 +74,7 @@ function FloatingNav({ items, current, loadingHref, pathname }: Props) {
           whileTap={{ scale: PRESS.navScale }} transition={SPRING.tap}>
           <span className="fnav-menu-lines" aria-hidden="true"><span /><span /></span>Menu
         </motion.button>
+        <AccountLink className="fnav-account" />
       </nav>
       <AnimatePresence>
         {open ? (

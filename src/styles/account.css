@@ -1,0 +1,61 @@
+/* Accounts: one quiet card in the Lobby's light. Forms are the plainest thing on the site on purpose. */
+
+/* Nav entry */
+.acct-link { flex: none; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: 0 var(--space-4);
+  border-radius: var(--radius-full); font: 600 14px/1 var(--font-sans); color: var(--ink); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.acct-link:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.acct-link:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.acct-link.is-member { padding: 0; }
+.acct-link.is-member[aria-current="page"] .vm-avatar { box-shadow: 0 0 0 2px var(--reel-ink); }
+@media (min-width: 768px) and (max-width: 1023px) { .fnav-account:not(.is-member) { padding: 0 var(--space-3); } }
+
+/* Page */
+.acct { max-width: 520px; }
+.acct-card { display: grid; gap: var(--space-6); padding: var(--space-6) var(--space-5); border-radius: var(--radius-xl);
+  background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-card); }
+@media (min-width: 600px) { .acct-card { padding: var(--space-8); } }
+.acct-head { display: grid; gap: var(--space-2); }
+.acct-eyebrow { color: var(--reel-ink); text-transform: uppercase; }
+.acct-title { font-family: var(--font-display); font-weight: 400; font-size: clamp(34px, 8vw, 48px); line-height: 1; letter-spacing: -0.01em; }
+
+.acct-form { display: grid; gap: var(--space-5); }
+.acct-field { display: grid; gap: var(--space-1); }
+.acct-field > label { color: var(--ink); }
+.acct-input { width: 100%; min-height: var(--tap-lg, 52px); padding: 0 var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--line-strong);
+  background: var(--bg); color: var(--ink); font-family: var(--font-sans); margin-top: var(--space-1); }
+.acct-textarea { padding: var(--space-3) var(--space-4); min-height: 96px; resize: vertical; }
+.acct-input:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); border-color: var(--focus); }
+.acct-field.has-error .acct-input { border-color: var(--negative); border-width: 2px; }
+.acct-error { display: flex; align-items: flex-start; gap: var(--space-1); color: var(--negative); font-weight: 600; margin-top: var(--space-1); }
+.acct-error svg { flex: none; margin-top: 2px; }
+
+.acct-pass { position: relative; }
+.acct-pass .acct-input { padding-right: 84px; }
+.acct-show { position: absolute; right: 4px; bottom: 4px; min-height: 44px; min-width: 64px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-sm);
+  background: transparent; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.acct-show:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.acct-show:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+
+/* Kept in the page (empty) so screen readers announce errors when they appear; the margin cancels its gap. */
+.acct-alert-slot:empty { margin-bottom: calc(-1 * var(--space-5)); }
+.acct-alert, .acct-note { display: flex; gap: var(--space-2); align-items: flex-start; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); }
+.acct-alert { background: var(--negative-soft); color: var(--ink); border: 1px solid color-mix(in srgb, var(--negative) 50%, transparent); }
+.acct-alert svg { flex: none; color: var(--negative); margin-top: 2px; }
+.acct-note { background: color-mix(in srgb, var(--reel) 12%, transparent); border: 1px solid color-mix(in srgb, var(--reel-ink) 30%, transparent); }
+
+.acct-submit { width: 100%; justify-content: center; }
+.acct-inline { display: grid; gap: var(--space-2); justify-items: start; }
+.acct-sent { display: grid; gap: var(--space-3); }
+.acct-sent h2:focus { outline: none; }
+.acct-sent h2:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+.acct-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); padding-top: var(--space-5); border-top: 1px solid var(--line); }
+.acct-card a:not(.vm-btn), .acct-profile-note a { color: var(--reel-ink); text-underline-offset: 3px; }
+.acct-card a:not(.vm-btn):focus-visible, .acct-profile-note a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 2px; }
+
+.acct-choice { display: grid; gap: var(--space-1); border: 0; margin: 0; padding: 0; }
+.acct-choice legend { margin-bottom: var(--space-1); }
+.acct-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+.acct-saved { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--positive); font-weight: 600; }
+.acct-section { display: grid; gap: var(--space-3); padding-top: var(--space-5); border-top: 1px solid var(--line); }
+.acct-row { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.acct-row form { display: contents; }

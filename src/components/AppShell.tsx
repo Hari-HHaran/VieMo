@@ -8,6 +8,7 @@ import { DURATION, EASE } from '@/lib/motion';
 import { WORLD_NAMES, worldFor, type WorldId } from '@/lib/worlds';
 import MotionProvider from './MotionProvider';
 import SiteNav from './nav/SiteNav';
+import { AccountProvider } from './account/useAccount';
 
 type ToastInput = { message: string; tone?: 'neutral' | 'positive' | 'negative'; icon?: string; action?: { label: string; onClick: () => void } };
 const ToastContext = createContext<(t: ToastInput) => void>(() => {});
@@ -26,7 +27,7 @@ function tabFor(path: string): string | null {
   if (path.startsWith('/discover') || path.startsWith('/search') || path.startsWith('/viewmo') || path.startsWith('/atlas')) return 'discover';
   if (path.startsWith('/match')) return 'match';
   if (path.startsWith('/clips')) return 'clips';
-  if (path.startsWith('/profile') || path.startsWith('/wall')) return 'profile';
+  if (path.startsWith('/profile') || path.startsWith('/wall') || path.startsWith('/account')) return 'profile';
   return null; // secondary screens keep the tab they were opened from
 }
 
@@ -103,6 +104,7 @@ export default function AppShell({ children, dataNote }: { children: React.React
 
   return (
     <ToastContext.Provider value={show}>
+      <AccountProvider>
       <a className="skip-link" href="#main">Skip to content</a>
       <MotionProvider>
       <div className={`nav-progress${pending ? ' is-on' : ''}`} role="progressbar" aria-label="Loading page" aria-hidden={!pending} />
@@ -133,6 +135,7 @@ export default function AppShell({ children, dataNote }: { children: React.React
           action={toast.action ? { label: toast.action.label, onClick: () => { toast.action!.onClick(); setToast(null); } } : undefined}
           onDismiss={() => setToast(null)} duration={toast.action ? 6000 : 3500} />
       ) : null}
+      </AccountProvider>
     </ToastContext.Provider>
   );
 }

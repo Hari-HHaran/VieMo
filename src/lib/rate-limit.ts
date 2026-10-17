@@ -2,9 +2,13 @@ import 'server-only';
 
 /* Best-effort per-IP limit for routes that spend TMDB quota. In-memory, so per server instance. */
 const hits = new Map<string, { n: number; reset: number }>();
+export function clientIp(headers: Headers): string {
+  return (headers.get('x-forwarded-for') || '').split(',')[0].trim() || headers.get('x-real-ip') || 'local';
+}
 export function limited(req: Request, bucket: string, perMinute: number): boolean {
-  const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim() || req.headers.get('x-real-ip') || 'local';
-  const key = `${bucket}:${ip}`;
+  return limitedKey(`${bucket}:${clientIp(req.headers)}`, perMinute);
+}
+export function limitedKey(key: string, perMinute: number): boolean {
   const now = Date.now();
   const h = hits.get(key);
   if (!h || h.reset < now) { hits.set(key, { n: 1, reset: now + 60_000 }); return false; }

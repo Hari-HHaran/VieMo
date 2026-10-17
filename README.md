@@ -36,6 +36,8 @@ Import the GitHub repository in Vercel, add the environment variable `TMDB_READ_
 - `public/fonts/`: copies of the three first-paint fonts so they can be preloaded (keep in step with `design-system/fonts/`).
 - `src/lib/motion.ts`: the shared durations, easings, springs, hover, press, magnet, scramble and page-transition tokens.
 - `src/components/fx/`: reusable effects (scramble labels, magnetic pull, tilt cards, drag rails). `src/components/nav/SiteNav.tsx` is the navigation; `src/styles/` holds the nav and Home styles.
+- `supabase/migrations/` and `supabase/tests/local/`: the database (tables, row level security, server-only functions) and its local checks. `docs/supabase-setup.md` connects a Supabase project, step by step.
+- `src/lib/supabase/`: Supabase clients (as the signed-in person, and the server-only service role) and the session refresh run by `src/proxy.ts`. `src/app/(account)/` holds sign-in, sign-up, password reset and the account page; their form actions run on the server.
 - `docs/plan.md`: product plan, data model and a feature-by-feature status table.
 
-Watchlist and settings are stored in the browser until accounts (Supabase) are added. Film data and images come from TMDB; this product uses the TMDB API but is not endorsed or certified by TMDB.
+Accounts need a Supabase project (`docs/supabase-setup.md`). The watchlist, diary and settings are still stored in the browser; moving them into your account comes with My Cinema Library. Film data and images come from TMDB; this product uses the TMDB API but is not endorsed or certified by TMDB.
