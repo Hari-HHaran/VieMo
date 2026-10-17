@@ -17,7 +17,7 @@ export default function Director() {
       </header>
       {aiConfigured() ? <ReelDirector /> : (
         <EmptyState icon="clapperboard" title="Reel Director isn’t switched on here yet"
-          body="This VieMo server has no OpenAI key, so nothing is generated. Quick pick in Match works without it."
+          body="This VieMo server can’t find an OpenAI key, so nothing is generated. The site owner adds it in Vercel as OPENAI_API_KEY and redeploys. Quick pick in Match works without it."
           action={{ label: 'Open Quick pick', icon: 'users', href: '/match' }} />
       )}
     </div>

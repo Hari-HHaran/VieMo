@@ -33,6 +33,7 @@ export default function ReelDirector() {
   const [result, setResult] = useState<DirectorResult | null>(null);
   const [status, setStatus] = useState<'idle' | 'working' | 'error'>('idle');
   const [error, setError] = useState('upstream');
+  const [code, setCode] = useState<string | null>(null);
   const headRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export default function ReelDirector() {
     try {
       const res = await fetch('/api/director', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brief, runtime }) });
       const body = await res.json().catch(() => ({ error: 'upstream' }));
+      setCode(typeof body.code === 'string' ? body.code : null);
       if (!res.ok) throw new Error(body.error || 'upstream');
       setResult(body); setStatus('idle'); remember({ brief, runtime, result: body });
       requestAnimationFrame(() => headRef.current?.focus());
@@ -88,7 +90,7 @@ export default function ReelDirector() {
           ))}
         </div>
       ) : status === 'error' ? (
-        <ErrorState icon="triangle-alert" title={problem.title} body={problem.body} onRetry={() => direct()} />
+        <ErrorState icon="triangle-alert" title={problem.title} body={problem.body} onRetry={() => direct()} detail={code ? `OpenAI’s reason: ${code}` : undefined} />
       ) : result ? (
         <section className="storyboard-wrap" aria-labelledby="sb-h">
           <div className="storyboard-head">

@@ -98,7 +98,10 @@ export async function POST(req: Request) {
     const result: DirectorResult = { picks, poolSize: pool.length, model: AI_MODEL, caption: asOf(`Chosen from ${pool.length} films in TMDB’s current lists`) };
     return NextResponse.json(result);
   } catch (e) {
-    if (e instanceof AiError) return NextResponse.json({ error: e.kind }, { status: e.kind === 'config' ? 503 : 502 });
+    if (e instanceof AiError) {
+      console.error(`Reel Director: OpenAI ${e.kind}${e.code ? ` (${e.code})` : ''}`);
+      return NextResponse.json({ error: e.kind, code: e.code }, { status: e.kind === 'config' ? 503 : 502 });
+    }
     const kind = e instanceof TmdbError ? e.kind : 'upstream';
     return NextResponse.json({ error: kind === 'config' ? 'tmdb_config' : 'tmdb' }, { status: 502 });
   }
