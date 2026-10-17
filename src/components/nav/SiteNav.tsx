@@ -12,6 +12,7 @@ interface Props { items: readonly NavItem[]; current: string; loadingHref: strin
 
 const MORE = [
   { href: '/search', icon: 'search', label: 'Search', note: 'Any film on TMDB' },
+  { href: '/atlas', icon: 'compass', label: 'SceneAtlas', note: 'Where films were made, on a globe' },
   { href: '/viewmo', icon: 'globe', label: 'ViewMo', note: 'Spin a sphere of this week’s posters' },
   { href: '/director', icon: 'clapperboard', label: 'Reel Director', note: 'Describe your night, get three picks' },
   { href: '/wall', icon: 'star', label: 'Wall of Fame', note: 'Every film you’ve watched, framed' },

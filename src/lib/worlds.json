@@ -142,6 +142,19 @@
       ],
       "seed": "#d6a85c",
       "note": "Wall of Fame: the gallery after hours. Warm plaster dark, brass light."
+    },
+    "planetarium": {
+      "grounds": [
+        "#07080c",
+        "#0e1017",
+        "#141720",
+        "#1b1f2a",
+        "#272c39",
+        "#6f7891",
+        "#161a22"
+      ],
+      "seed": "#5b8cff",
+      "note": "SceneAtlas: the cinematic planetarium. Graphite night, electric blue and muted violet light."
     }
   }
 }

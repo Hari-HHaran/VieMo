@@ -32,6 +32,8 @@ Import the GitHub repository in Vercel, add the environment variable `TMDB_READ_
 - `src/lib/worlds.json` and `scripts/worlds.mjs`: the colour world for each destination. Edit the JSON, then run `node scripts/worlds.mjs`; it regenerates `src/app/worlds.css` and refuses to write a world that falls below WCAG AA.
 - `src/lib/ai.ts` and `src/app/api/director`: Reel Director. Set `OPENAI_API_KEY` in Vercel (Sensitive, no `NEXT_PUBLIC_` prefix) and redeploy; `OPENAI_MODEL` optionally changes the model.
 - `src/lib/wall.ts` (rules: stages, sorting, taste) and `src/lib/diary.ts` (your watches, ratings and reviews on this device): the Wall of Fame's data. `src/components/wall/` is the page, frames, views and dialogs.
+- `src/components/atlas/` and `src/lib/atlas/`: SceneAtlas (globe, flat map, search, panels; record types). `src/components/mo/`: Mo. `scripts/world-dots.mjs` regenerates the flat map's dots.
+- `public/fonts/`: copies of the three first-paint fonts so they can be preloaded (keep in step with `design-system/fonts/`).
 - `src/lib/motion.ts`: the shared durations, easings, springs, hover, press, magnet, scramble and page-transition tokens.
 - `src/components/fx/`: reusable effects (scramble labels, magnetic pull, tilt cards, drag rails). `src/components/nav/SiteNav.tsx` is the navigation; `src/styles/` holds the nav and Home styles.
 - `docs/plan.md`: product plan, data model and a feature-by-feature status table.

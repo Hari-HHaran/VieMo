@@ -1,10 +1,13 @@
 import '@ds/tokens.css';
 import '@ds/components/bundle.css';
+import '../styles/fonts.css';
 import './app.css';
 import './worlds.css';
 import '../styles/nav.css';
 import '../styles/lobby.css';
 import '../styles/wall.css';
+import '../styles/atlas.css';
+import '../styles/mo.css';
 import type { Metadata, Viewport } from 'next';
 import AppShell from '@/components/AppShell';
 import { dataSource } from '@/lib/tmdb';
@@ -41,6 +44,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: boot }} />
+        {['SchibstedGrotesk-Variable', 'BigShouldersDisplay-Variable', 'InstrumentSerif-Regular'].map((f) => (
+          <link key={f} rel="preload" href={`/fonts/${f}.woff2`} as="font" type="font/woff2" crossOrigin="anonymous" />
+        ))}
       </head>
       <body>
         <AppShell dataNote={dataNote()}>{children}</AppShell>

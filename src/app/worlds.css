@@ -29,4 +29,7 @@
 /* Wall of Fame: the gallery after hours. Warm plaster dark, brass light. */
 :is(.shell, .curtain)[data-world="gallery"] { --bg: #100c0c; --surface: #181312; --surface-raised: #211a19; --surface-overlay: #2a2120; --line: #3a2f2c; --line-strong: #86756f; --skeleton: #231b1a; --world-seed: #d6a85c; --reel: #d6a85c; --on-reel: #100c0c; --reel-ink: #d6a85c; --reel-soft: #362200; }
 [data-theme="light"] :is(.shell, .curtain)[data-world="gallery"] { --bg: inherit; --surface: inherit; --surface-raised: inherit; --surface-overlay: inherit; --line: inherit; --line-strong: inherit; --skeleton: inherit; --reel: #8a6000; --on-reel: #f3ece2; --reel-ink: #8a6000; --reel-soft: #f8e9d2; }
+/* SceneAtlas: the cinematic planetarium. Graphite night, electric blue and muted violet light. */
+:is(.shell, .curtain)[data-world="planetarium"] { --bg: #07080c; --surface: #0e1017; --surface-raised: #141720; --surface-overlay: #1b1f2a; --line: #272c39; --line-strong: #6f7891; --skeleton: #161a22; --world-seed: #5b8cff; --reel: #5b8cff; --on-reel: #07080c; --reel-ink: #81a8ff; --reel-soft: #182544; }
+[data-theme="light"] :is(.shell, .curtain)[data-world="planetarium"] { --bg: inherit; --surface: inherit; --surface-raised: inherit; --surface-overlay: inherit; --line: inherit; --line-strong: inherit; --skeleton: inherit; --reel: #335fce; --on-reel: #f3ece2; --reel-ink: #3962c4; --reel-soft: #e2ebff; }
 html[data-vm-accent] .shell[data-world="passport"] { --reel: inherit; --on-reel: inherit; --reel-ink: inherit; --reel-soft: inherit; }

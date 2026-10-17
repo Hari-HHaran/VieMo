@@ -1,0 +1,7 @@
+/* The three faces that paint first, served from fixed public paths so layout.tsx can preload them; declared after
+   design-system/tokens.css so these rules win and the browser fetches only the preloaded copies. Without the
+   preload, the late swap from fallback fonts shifted the Home hero and the nav (layout shift 0.103).
+   public/fonts mirrors design-system/fonts: copy the files again if those fonts ever change. */
+@font-face { font-family: 'Schibsted Grotesk'; src: url('/fonts/SchibstedGrotesk-Variable.woff2') format('woff2'); font-weight: 400 900; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Big Shoulders Display'; src: url('/fonts/BigShouldersDisplay-Variable.woff2') format('woff2'); font-weight: 700 900; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Instrument Serif'; src: url('/fonts/InstrumentSerif-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }

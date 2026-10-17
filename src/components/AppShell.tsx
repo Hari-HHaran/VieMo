@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useCallback, useContext, useEffect, useRef, useState, useTransition, ViewTransition } from 'react';
+import { addTransitionType, createContext, useCallback, useContext, useEffect, useRef, useState, useTransition, ViewTransition } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Toast } from '@/ds/client';
@@ -23,7 +23,7 @@ const NAV = [
 
 function tabFor(path: string): string | null {
   if (path === '/') return 'home';
-  if (path.startsWith('/discover') || path.startsWith('/search') || path.startsWith('/viewmo')) return 'discover';
+  if (path.startsWith('/discover') || path.startsWith('/search') || path.startsWith('/viewmo') || path.startsWith('/atlas')) return 'discover';
   if (path.startsWith('/match')) return 'match';
   if (path.startsWith('/clips')) return 'clips';
   if (path.startsWith('/profile') || path.startsWith('/wall')) return 'profile';
@@ -41,7 +41,7 @@ export default function AppShell({ children, dataNote }: { children: React.React
   const world = worldFor(pathname);
   const [pending, startNav] = useTransition();
   const [target, setTarget] = useState<string | null>(null);
-  const go = useCallback((href: string) => { setTarget(href); startNav(() => router.push(href)); }, [router]);
+  const go = useCallback((href: string) => { setTarget(href); startNav(() => { addTransitionType('nav'); router.push(href); }); }, [router]);
   useEffect(() => { if (!pending) setTarget(null); }, [pending]);
   const [curtain, setCurtain] = useState<WorldId | null>(null);
   const firstRender = useRef(true);
@@ -110,7 +110,9 @@ export default function AppShell({ children, dataNote }: { children: React.React
         <SiteNav items={NAV} current={current} loadingHref={pending ? target : null} pathname={pathname} />
         <main id="main" className="shell-main" tabIndex={-1}>
           {dataNote ? <p className="data-note type-caption">{dataNote}</p> : null}
-          <ViewTransition>{children}</ViewTransition>
+          {/* Only our own navigations animate. Background updates (Next prefetching, data refreshes) stay
+              instant, so a page with a live WebGL canvas is never frozen while the browser snapshots it. */}
+          <ViewTransition default={{ nav: 'auto', default: 'none' }}>{children}</ViewTransition>
           <footer className="shell-credits type-caption">
             Film data and images from <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a>.
             This product uses the TMDB API but is not endorsed or certified by TMDB.
