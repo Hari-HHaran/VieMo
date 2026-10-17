@@ -19,8 +19,11 @@ export default function AuthPage({ eyebrow, title, intro, children, foot }: { ey
 
 export function AccountsOff() {
   return (
-    <EmptyState icon="lock" title="Accounts aren’t switched on here yet"
-      body="This VieMo server isn’t connected to Supabase, so there’s nothing to sign in to. Your watchlist, diary and Wall of Fame still work, saved on this device."
-      action={{ label: 'Go to your watchlist', icon: 'bookmark', href: '/profile' }} />
+    <>
+      <EmptyState icon="lock" title="Accounts aren’t switched on here yet"
+        body="This VieMo server isn’t connected to Supabase, so there’s nothing to sign in to. Your watchlist, diary and Wall of Fame still work, saved on this device."
+        action={{ label: 'Go to your watchlist', icon: 'bookmark', href: '/profile' }} />
+      <p className="type-caption vm-muted">Site owner: <a href="/status">the status page</a> shows which settings this server found.</p>
+    </>
   );
 }
