@@ -7,6 +7,7 @@ import ScrambleLabel from '../fx/ScrambleLabel';
 import { useMagnetic } from '../fx/useMagnetic';
 import { useScramble } from '../fx/useScramble';
 import AccountLink from '../account/AccountLink';
+import DirectorReel from './DirectorReel';
 
 export interface NavItem { id: string; label: string; icon: string; href: string }
 interface Props { items: readonly NavItem[]; current: string; loadingHref: string | null; pathname: string }
@@ -37,7 +38,6 @@ function FloatingNav({ items, current, loadingHref, pathname }: Props) {
   const [open, setOpen] = useState(false);
   const menuBtn = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
-  const director = useMagnetic<HTMLAnchorElement>(0.3);
 
   useEffect(() => {
     let raf = 0;
@@ -65,14 +65,10 @@ function FloatingNav({ items, current, loadingHref, pathname }: Props) {
         <ul className="fnav-list" role="list">
           {items.map((it) => <FloatItem key={it.id} item={it} active={current === it.id} loading={loadingHref === it.href} />)}
         </ul>
-        <motion.a ref={director.ref} href="/director" className={`fnav-director${pathname.startsWith('/director') ? ' is-active' : ''}`}
-          aria-current={pathname.startsWith('/director') ? 'page' : undefined} style={{ x: director.x, y: director.y }}
-          whileTap={{ scale: PRESS.navScale }} transition={SPRING.tap}>
-          <Icon name="clapperboard" size={16} />Reel Director
-        </motion.a>
+        <DirectorReel active={pathname.startsWith('/director')} />
         <motion.button ref={menuBtn} type="button" className="fnav-menu" aria-expanded={open} aria-controls="site-menu" onClick={() => setOpen((o) => !o)}
           whileTap={{ scale: PRESS.navScale }} transition={SPRING.tap}>
-          <span className="fnav-menu-lines" aria-hidden="true"><span /><span /></span>Menu
+          <span className="fnav-menu-lines" aria-hidden="true"><span /><span /></span><span className="fnav-menu-label">Menu</span>
         </motion.button>
         <AccountLink className="fnav-account" />
       </nav>

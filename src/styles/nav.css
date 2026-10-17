@@ -51,8 +51,6 @@
 @media (min-width: 768px) and (max-width: 1023px) {
   .fnav-bar { padding-left: var(--space-4); }
   .fnav-item { padding: 0 var(--space-3); }
-  .fnav-director { padding: 0 var(--space-3); font-size: 0; gap: 0; }
-  .fnav-director svg { width: 18px; height: 18px; }
 }
 
 /* The menu panel drops from the bar like a lowered screen */
@@ -89,3 +87,45 @@
 }
 html[data-motion="reduce"] .fnav-item.is-loading::after, html[data-motion="reduce"] .mbar-item.is-loading::after { background: var(--reel-ink); }
 [data-theme="light"] .fnav-bar { background: color-mix(in srgb, var(--surface-raised) 94%, transparent); }
+
+/* Reel Director: a film reel that unspools a strip reading REEL DIRECTOR (DirectorReel.tsx). The film is
+   always dark stock with light printing, so it reads the same in every world and theme. */
+.reel-btn { gap: 0; padding: 0 6px; overflow: hidden; }
+.reel-spool { flex: none; width: 32px; height: 32px; overflow: visible; }
+.reel-rim { fill: color-mix(in srgb, var(--reel) 16%, transparent); stroke: var(--reel-ink); stroke-width: 1.6; }
+.reel-hub { fill: var(--reel-ink); }
+.reel-hole { fill: color-mix(in srgb, var(--reel-ink) 55%, transparent); }
+.reel-window { display: block; overflow: hidden; height: 30px; border-radius: 3px; }
+.reel-btn.is-open .reel-window { margin-left: 2px; }
+.reel-film { position: relative; display: inline-flex; flex: none; width: max-content; height: 30px; align-items: center; padding: 0 3px 0 0;
+  background: #15100f; box-shadow: inset 0 0 0 1px rgba(255, 236, 210, 0.08); }
+.reel-film::before, .reel-film::after { content: ''; position: absolute; left: 2px; right: 2px; height: 3px; border-radius: 1px;
+  background: repeating-linear-gradient(90deg, rgba(255, 236, 210, 0.62) 0 4px, transparent 4px 8px); }
+.reel-film::before { top: 3px; }
+.reel-film::after { bottom: 3px; }
+.reel-frame { display: inline-grid; place-items: center; height: 16px; border-left: 1px solid rgba(255, 236, 210, 0.2); }
+.reel-letter { width: 15px; font: 800 15px/1 var(--font-marquee); text-transform: uppercase; color: #f5cf7e; letter-spacing: 0; }
+.reel-frame:first-child { border-left: 0; }
+.reel-word { padding: 0 8px 0 7px; font: 400 16px/1 var(--font-display); color: #fff3e0; letter-spacing: 0.01em; }
+.reel-btn:hover, .reel-btn.is-open { background: color-mix(in srgb, var(--reel) 20%, transparent); }
+/* No hover to unroll it: show the words outright (reduced motion, and touch screens wide enough for them). */
+@media (prefers-reduced-motion: reduce) {
+  .reel-window { width: auto !important; margin-left: 2px; }
+  .reel-film, .reel-spool { transform: none !important; }
+}
+html[data-motion="reduce"] .reel-window { width: auto !important; margin-left: 2px; }
+html[data-motion="reduce"] .reel-film, html[data-motion="reduce"] .reel-spool { transform: none !important; }
+@media (hover: none) and (min-width: 1024px) {
+  .reel-window { width: auto !important; margin-left: 2px; }
+  .reel-film { transform: none !important; }
+}
+@media (forced-colors: active) {
+  .reel-film { background: Canvas; border: 1px solid CanvasText; }
+  .reel-letter, .reel-word { color: CanvasText; }
+}
+/* Narrow tablets: room for the unspooled reel. Menu keeps its name for screen readers, shown as its icon. */
+@media (min-width: 768px) and (max-width: 859px) {
+  .fnav-item { padding: 0 10px; }
+  .fnav-menu { padding: 0; width: 44px; justify-content: center; gap: 0; }
+  .fnav-menu-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
