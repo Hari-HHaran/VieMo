@@ -15,8 +15,8 @@ const SLOTS: Record<Slot, { label: string; scene: string }> = {
 };
 const EXAMPLES = ['Something cosy but clever for a rainy night', 'A thriller that isn’t too violent', 'Make me cry, in a good way', 'Fun for me and my parents'];
 const PROBLEMS: Record<string, { title: string; body: string }> = {
-  key: { title: 'OpenAI didn’t accept the key', body: 'The OPENAI_API_KEY on this server was rejected. Check it in Vercel’s environment variables, then redeploy.' },
-  quota: { title: 'The OpenAI account is out of credit', body: 'Add credit or raise the limit on platform.openai.com, then try again.' },
+  key: { title: 'The AI service didn’t accept the key', body: 'The OPENAI_API_KEY on this server was rejected. If the key isn’t from OpenAI itself, set OPENAI_BASE_URL in Vercel to your provider’s API address. Then redeploy.' },
+  quota: { title: 'The AI account is out of credit', body: 'Add credit or raise the limit with your AI provider, then try again.' },
   rate_limited: { title: 'Too many requests just now', body: 'Wait a minute and try again. Your brief is kept.' },
   tmdb_config: { title: 'Film data isn’t connected', body: 'Reel Director only picks from real TMDB films, and this server has no TMDB token or snapshot.' },
   tmdb: { title: 'Films didn’t load', body: 'We couldn’t reach TMDB to build the list Reel Director picks from. Your brief is kept.' },
@@ -57,7 +57,7 @@ export default function ReelDirector() {
     }
   }
 
-  const problem = PROBLEMS[error] ?? { title: 'Reel Director didn’t answer', body: 'OpenAI or TMDB didn’t respond in time. Your brief is kept; try again.' };
+  const problem = PROBLEMS[error] ?? { title: 'Reel Director didn’t answer', body: 'The AI service or TMDB didn’t respond in time. Your brief is kept; try again.' };
 
   return (
     <div className="director">
@@ -66,7 +66,7 @@ export default function ReelDirector() {
         <textarea id="brief" className="director-input type-body-lg" rows={3} maxLength={300} value={brief} onChange={(e) => setBrief(e.target.value)}
           placeholder="Who’s watching, the mood, something you loved lately…" aria-describedby="brief-help"
           onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) direct(); }} />
-        <p id="brief-help" className="type-caption vm-muted">{brief.length}/300. Don’t include personal details; your brief is sent to OpenAI to choose films.</p>
+        <p id="brief-help" className="type-caption vm-muted">{brief.length}/300. Don’t include personal details; your brief is sent to an AI service to choose films.</p>
         <div className="chip-row" role="group" aria-label="Examples">
           {EXAMPLES.map((x) => <button key={x} type="button" className="director-example type-caption" onClick={() => setBrief(x)}>{x}</button>)}
         </div>
@@ -90,7 +90,7 @@ export default function ReelDirector() {
           ))}
         </div>
       ) : status === 'error' ? (
-        <ErrorState icon="triangle-alert" title={problem.title} body={problem.body} onRetry={() => direct()} detail={code ? `OpenAI’s reason: ${code}` : undefined} />
+        <ErrorState icon="triangle-alert" title={problem.title} body={problem.body} onRetry={() => direct()} detail={code ? `The service’s reason: ${code}` : undefined} />
       ) : result ? (
         <section className="storyboard-wrap" aria-labelledby="sb-h">
           <div className="storyboard-head">
@@ -122,7 +122,7 @@ export default function ReelDirector() {
           <details className="qp-how">
             <summary className="type-label">How Reel Director works</summary>
             <p className="type-caption vm-muted">
-              Your brief and a list of films from TMDB’s current lists (popular films for every mood, trending and hidden gems) are sent to OpenAI ({result.model}).
+              Your brief and a list of films from TMDB’s current lists (popular films for every mood, trending and hidden gems) are sent to {result.provider === 'openai.com' || !result.provider ? 'OpenAI' : result.provider} ({result.model}).
               It picks three by id and writes the short reasons; VieMo then checks each pick is a real film from that list and drops any that aren’t.
               A hidden gem must be rated 7 or higher on TMDB by 300 to 3,000 voters. Titles, years, runtimes, ratings and where to watch come from TMDB and JustWatch, not from the AI.
             </p>

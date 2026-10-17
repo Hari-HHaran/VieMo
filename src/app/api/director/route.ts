@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { DirectorPick, DirectorResult, Slot } from '@/lib/director';
-import { AI_MODEL, AiError, chatJson } from '@/lib/ai';
+import { AI_MODEL, AI_PROVIDER, AiError, chatJson } from '@/lib/ai';
 import { MOODS, runtimeById } from '@/lib/moods';
 import { limited } from '@/lib/rate-limit';
 import { viewerRegion } from '@/lib/region';
@@ -95,11 +95,11 @@ export async function POST(req: Request) {
       }];
     });
     if (!picks.length) return NextResponse.json({ error: 'no_picks' }, { status: 502 });
-    const result: DirectorResult = { picks, poolSize: pool.length, model: AI_MODEL, caption: asOf(`Chosen from ${pool.length} films in TMDB’s current lists`) };
+    const result: DirectorResult = { picks, poolSize: pool.length, model: AI_MODEL, provider: AI_PROVIDER, caption: asOf(`Chosen from ${pool.length} films in TMDB’s current lists`) };
     return NextResponse.json(result);
   } catch (e) {
     if (e instanceof AiError) {
-      console.error(`Reel Director: OpenAI ${e.kind}${e.code ? ` (${e.code})` : ''}`);
+      console.error(`Reel Director: ${AI_PROVIDER} ${e.kind}${e.code ? ` (${e.code})` : ''}`);
       return NextResponse.json({ error: e.kind, code: e.code }, { status: e.kind === 'config' ? 503 : 502 });
     }
     const kind = e instanceof TmdbError ? e.kind : 'upstream';
