@@ -135,11 +135,13 @@ export async function saveProfile(_: FormState, form: FormData): Promise<FormSta
   const display_name = text(form, 'display_name', 80);
   const bio = text(form, 'bio', 400);
   const watchlist_visibility = form.get('watchlist_visibility') === 'public' ? 'public' : 'private';
+  const av = form.get('activity_visibility');
+  const activity = av == null ? {} : { activity_visibility: av === 'public' || av === 'friends' ? av : 'private' };
   if (!USERNAME.test(username)) return { error: 'Usernames are 3 to 24 characters: lowercase letters, numbers and underscores.', field: 'username' };
   if (display_name.length > 60) return { error: 'Keep your name to 60 characters.', field: 'display_name' };
   if (bio.length > 280) return { error: 'Keep your bio to 280 characters.', field: 'bio' };
   const { error } = await sb.from('profiles')
-    .update({ username, display_name: display_name || null, bio: bio || null, watchlist_visibility, onboarded: true })
+    .update({ username, display_name: display_name || null, bio: bio || null, watchlist_visibility, ...activity, onboarded: true })
     .eq('id', user.id);
   if (error) {
     if (error.code === '23505') return { error: `@${username} is taken. Try another.`, field: 'username' };

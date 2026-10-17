@@ -12,5 +12,9 @@ export default function ProfileAccountNote() {
       </p>
     );
   }
-  return <p className="type-body vm-muted acct-profile-note">Signed in as {accountLabel(me)}. <a href="/account">Account settings</a></p>;
+  return (
+    <p className="type-body vm-muted acct-profile-note">
+      Signed in as {accountLabel(me)}. {me.profile ? <><a href={`/u/${me.profile.username}`}>Your public profile</a> · </> : null}<a href="/account">Account settings</a>
+    </p>
+  );
 }

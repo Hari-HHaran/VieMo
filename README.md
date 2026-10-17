@@ -37,6 +37,7 @@ Import the GitHub repository in Vercel, add the environment variable `TMDB_READ_
 - `src/lib/motion.ts`: the shared durations, easings, springs, hover, press, magnet, scramble and page-transition tokens.
 - `src/components/fx/`: reusable effects (scramble labels, magnetic pull, tilt cards, drag rails). `src/components/nav/SiteNav.tsx` is the navigation; `src/styles/` holds the nav and Home styles.
 - `supabase/migrations/` and `supabase/tests/local/`: the database (tables, row level security, server-only functions) and its local checks. `docs/supabase-setup.md` connects a Supabase project, step by step.
+- `src/lib/screening.ts` (scoring, streaks, month layout) and `src/components/screening/`: Screening Activity, the seat-chart contribution graph. `DeviceScreening` draws it from this device's diary; `RemoteScreening` reads `/api/screening`, which calls the `screening_month` and `screening_day` database functions (they enforce the owner's privacy setting).
 - `src/lib/supabase/`: Supabase clients (as the signed-in person, and the server-only service role) and the session refresh run by `src/proxy.ts`. `src/app/(account)/` holds sign-in, sign-up, password reset and the account page; their form actions run on the server.
 - `docs/plan.md`: product plan, data model and a feature-by-feature status table.
 

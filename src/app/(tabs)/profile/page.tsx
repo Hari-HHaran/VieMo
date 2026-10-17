@@ -3,6 +3,7 @@ import AccentSettings from '@/components/AccentSettings';
 import ProfileAccountNote from '@/components/account/ProfileAccountNote';
 import PassportCard from '@/components/PassportCard';
 import WallPreview from '@/components/wall/WallPreview';
+import DeviceScreening from '@/components/screening/DeviceScreening';
 import AppearanceSettings from '@/components/AppearanceSettings';
 import RegionSelect from '@/components/RegionSelect';
 import WatchlistView from '@/components/WatchlistView';
@@ -24,6 +25,7 @@ export default async function Profile() {
       </header>
       <PassportCard region={region} regionLabel={regionName(region)} />
       <WallPreview />
+      <DeviceScreening />
       <section aria-labelledby="wl-h" className="section">
         <h2 id="wl-h" className="type-heading-lg">Watchlist</h2>
         <WatchlistView />

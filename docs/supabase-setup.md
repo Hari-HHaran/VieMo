@@ -11,12 +11,13 @@ In Supabase, open **SQL Editor**. Paste each file below into a new query and run
 1. `supabase/migrations/20261018000001_foundation.sql` (films, profiles, follows)
 2. `supabase/migrations/20261018000002_library.sql` (watchlist, diary, collections)
 3. `supabase/migrations/20261018000003_sceneatlas.sql` (filming locations and their sources)
+4. `supabase/migrations/20261019000004_screening_activity.sql` (Screening Activity: daily totals and who can see them)
 
 Each one should end with "Success. No rows returned". Run each file once only. If one fails, stop and send the error text, not the keys.
 
 If you use the Supabase CLI instead, `supabase db push` runs them in order.
 
-Every table has row level security switched on, and the default access Supabase gives the public API is removed. Each policy in those files is the only way in. The same files pass 64 checks locally (`supabase/tests/local/run.sh`), signed in as three different accounts and signed out.
+Every table has row level security switched on, and the default access Supabase gives the public API is removed. Each policy in those files is the only way in. The same files pass 93 checks locally (`supabase/tests/local/run.sh`), signed in as three different accounts and signed out.
 
 ## 2. Add the keys in Vercel
 
@@ -82,7 +83,9 @@ Use three email addresses you can open (A, B and C), and a private window for ea
 6. **Unlisted.** A switches the collection to unlisted and sends B the link. B can open it. C still can't find it in search or Explore.
 7. **Editing.** A adds B as an editor. B can add and reorder films, but can't rename it, change who sees it, or delete it. C saving a copy gets a private copy C owns, with no edit rights on A's.
 
-Steps 1 to 4 work now. Steps 5 to 7 come with the next update (My Cinema Library). Their database rules are already in place and tested.
+8. **Screening Activity.** It starts on "Only me", so B opening A's profile (`/u/<username>`) sees "keeps their Screening Activity private". When A switches to Friends, B still sees nothing until they follow each other. When A switches to Anyone, a private window that isn't signed in sees A's seats. Switching back to Only me hides them straight away.
+
+Steps 1 to 4 work now. Steps 5 to 7 come with the next update (My Cinema Library). Their database rules are already in place and tested. Step 8 works now, but the seats only fill once diaries are stored in accounts, which also comes with My Cinema Library. Until then, your own Profile tab draws Screening Activity from the diary on your device.
 
 ## Troubleshooting
 

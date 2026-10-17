@@ -4,7 +4,7 @@ import { Button, Icon } from '@/ds/client';
 import { saveProfile, type FormState } from '@/app/(account)/actions';
 import { Field, FormProblem } from './Field';
 
-export interface ProfileValues { username: string; display_name: string | null; bio: string | null; watchlist_visibility: 'private' | 'public' }
+export interface ProfileValues { username: string; display_name: string | null; bio: string | null; watchlist_visibility: 'private' | 'public'; activity_visibility: 'private' | 'friends' | 'public' | null }
 
 export default function ProfileForm({ profile, next, welcome }: { profile: ProfileValues; next?: string; welcome: boolean }) {
   const [state, action, pending] = useActionState(saveProfile, {} as FormState);
@@ -36,6 +36,16 @@ export default function ProfileForm({ profile, next, welcome }: { profile: Profi
         <label className="option"><input type="radio" name="watchlist_visibility" value="public" defaultChecked={profile.watchlist_visibility === 'public'} />
           <span className="type-body">Anyone with my profile</span></label>
       </fieldset>
+      {profile.activity_visibility ? <fieldset className="acct-choice">
+        <legend className="type-label">Who can see your Screening Activity</legend>
+        <p className="type-caption vm-muted">The seat chart on your profile: which days you watched, rated and reviewed, the films and your reviews. Never your private notes.</p>
+        <label className="option"><input type="radio" name="activity_visibility" value="private" defaultChecked={profile.activity_visibility === 'private'} />
+          <span><span className="type-body">Only me</span> <span className="type-caption vm-muted">(recommended)</span></span></label>
+        <label className="option"><input type="radio" name="activity_visibility" value="friends" defaultChecked={profile.activity_visibility === 'friends'} />
+          <span><span className="type-body">Friends</span> <span className="type-caption vm-muted">(people you follow who follow you back)</span></span></label>
+        <label className="option"><input type="radio" name="activity_visibility" value="public" defaultChecked={profile.activity_visibility === 'public'} />
+          <span className="type-body">Anyone</span></label>
+      </fieldset> : null}
       <div className="acct-actions">
         <Button type="submit" variant="primary" size="lg" busy={pending}>{pending ? 'Saving' : welcome ? 'Save and continue' : 'Save profile'}</Button>
         <p role="status" className="type-body acct-saved">{state.saved ? <><Icon name="check" size={16} /> Saved.</> : null}</p>
