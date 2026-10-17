@@ -10,6 +10,7 @@ import '../styles/atlas.css';
 import '../styles/mo.css';
 import '../styles/account.css';
 import '../styles/screening.css';
+import '../styles/community.css';
 import type { Metadata, Viewport } from 'next';
 import AppShell from '@/components/AppShell';
 import { dataSource } from '@/lib/tmdb';

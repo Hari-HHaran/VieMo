@@ -3,12 +3,14 @@ import { notFound } from 'next/navigation';
 import { Avatar } from '@/ds/client';
 import AuthPage, { AccountsOff } from '@/components/account/AuthPage';
 import RemoteScreening from '@/components/screening/RemoteScreening';
+import DemoBadge from '@/components/community/DemoBadge';
+import { MemberCollections, MemberReviews, MemberWatchlist } from '@/components/community/MemberSections';
 import { accountsConfigured } from '@/lib/supabase/env';
 import { currentUser } from '@/lib/supabase/server';
 import { setFollow } from '../actions';
 
 export const dynamic = 'force-dynamic';
-type Params = { params: Promise<{ username: string }> };
+type Params = { params: Promise<{ username: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { username } = await params;
@@ -16,7 +18,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 /* A member's public profile: who they are, follow, and their Screening Activity if they share it with you. */
-export default async function Member({ params }: Params) {
+export default async function Member({ params, searchParams }: Params) {
+  const tabParam = (await searchParams).tab;
+  const tab = (['collections', 'watchlist', 'reviews', 'activity'] as const).find((t) => t === tabParam) ?? 'collections';
   const username = decodeURIComponent((await params).username).toLowerCase();
   if (!/^[a-z0-9_]{3,24}$/.test(username)) notFound();
   if (!accountsConfigured()) return <AuthPage eyebrow="Member" title={`@${username}`}><AccountsOff /></AuthPage>;
@@ -45,7 +49,7 @@ export default async function Member({ params }: Params) {
       <header className="member-head">
         <Avatar name={name} src={p.avatar_url ?? undefined} size="lg" />
         <div className="member-id">
-          <h1 className="member-name">{name}</h1>
+          <h1 className="member-name">{name} {p.is_demo ? <DemoBadge /> : null}</h1>
           <p className="type-body sa-muted">@{p.username}</p>
           {p.bio ? <p className="type-body member-bio">{p.bio}</p> : null}
           <p className="type-caption member-counts">
@@ -67,7 +71,16 @@ export default async function Member({ params }: Params) {
           )}
         </div>
       </header>
-      <RemoteScreening ownerId={p.id} owner={possessive} isOwn={isOwn} privateNote={privateNote} />
+      {p.is_demo ? <p className="explore-demo type-body" role="note">A demo account: fictional, made for testing VieMo. Its collections, ratings and reviews aren’t a real person’s activity.</p> : null}
+      <nav className="member-tabs" aria-label={`${possessive} profile`}>
+        {([['collections', 'Collections'], ['watchlist', 'Watchlist'], ['reviews', 'Reviews'], ['activity', 'Screening Activity']] as const).map(([id, label]) => (
+          <a key={id} href={`/u/${p.username}${id === 'collections' ? '' : `?tab=${id}`}`} className="member-tab type-label" aria-current={tab === id ? 'page' : undefined}>{label}</a>
+        ))}
+      </nav>
+      {tab === 'collections' ? <MemberCollections owner={p.id} name={name} isOwn={isOwn} /> : null}
+      {tab === 'watchlist' ? <MemberWatchlist owner={p.id} name={name} isOwn={isOwn} visibility={p.watchlist_visibility} /> : null}
+      {tab === 'reviews' ? <MemberReviews owner={p.id} name={name} isOwn={isOwn} /> : null}
+      {tab === 'activity' ? <RemoteScreening ownerId={p.id} owner={possessive} isOwn={isOwn} privateNote={privateNote} /> : null}
     </div>
   );
 }

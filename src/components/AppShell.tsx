@@ -24,10 +24,10 @@ const NAV = [
 
 function tabFor(path: string): string | null {
   if (path === '/') return 'home';
-  if (path.startsWith('/discover') || path.startsWith('/search') || path.startsWith('/viewmo') || path.startsWith('/atlas')) return 'discover';
+  if (path.startsWith('/discover') || path.startsWith('/search') || path.startsWith('/viewmo') || path.startsWith('/atlas') || path.startsWith('/explore') || path.startsWith('/c/')) return 'discover';
   if (path.startsWith('/match')) return 'match';
   if (path.startsWith('/clips')) return 'clips';
-  if (path.startsWith('/profile') || path.startsWith('/wall') || path.startsWith('/account')) return 'profile';
+  if (path.startsWith('/profile') || path.startsWith('/wall') || path.startsWith('/account') || path.startsWith('/library')) return 'profile';
   return null; // secondary screens keep the tab they were opened from
 }
 
@@ -93,6 +93,12 @@ export default function AppShell({ children, dataNote }: { children: React.React
         const card = a.closest('[data-film-card], .vm-film-card, .vmx-light, .qp-top, .qp-alt, .clip, .lobby-card');
         const poster = card?.querySelector<HTMLElement>('[data-poster], .vm-poster, .vmx-poster');
         if (poster) { poster.style.viewTransitionName = 'film-poster'; poster.setAttribute('data-vt-poster', ''); }
+      }
+      /* Opening a collection: its sleeve grows into the collection page's cover. */
+      if (/^\/c\/[a-z0-9]+$/.test(url.pathname)) {
+        document.querySelectorAll<HTMLElement>('[data-vt-cover]').forEach((el) => { el.style.viewTransitionName = 'none'; el.removeAttribute('data-vt-cover'); });
+        const cover = a.closest('[data-collection-card]')?.querySelector<HTMLElement>('[data-collection-cover]');
+        if (cover) { cover.style.viewTransitionName = 'collection-cover'; cover.setAttribute('data-vt-cover', ''); }
       }
       go(url.pathname + url.search + url.hash);
     }

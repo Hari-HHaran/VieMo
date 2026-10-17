@@ -13,5 +13,6 @@ export function worldFor(path: string): WorldId {
   if (path.startsWith('/wall')) return 'gallery';
   if (path.startsWith('/atlas')) return 'planetarium';
   if (path.startsWith('/film')) return 'premiere';
+  if (path.startsWith('/explore') || path.startsWith('/c/') || path.startsWith('/library')) return 'records';
   return 'lobby';
 }

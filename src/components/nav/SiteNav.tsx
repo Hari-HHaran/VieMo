@@ -13,12 +13,13 @@ export interface NavItem { id: string; label: string; icon: string; href: string
 interface Props { items: readonly NavItem[]; current: string; loadingHref: string | null; pathname: string }
 
 const MORE = [
+  { href: '/explore', icon: 'list-plus', label: 'Explore collections', note: 'Shelves of films from the community' },
   { href: '/search', icon: 'search', label: 'Search', note: 'Any film on TMDB' },
   { href: '/atlas', icon: 'compass', label: 'SceneAtlas', note: 'Where films were made, on a globe' },
   { href: '/viewmo', icon: 'globe', label: 'ViewMo', note: 'Spin a sphere of this week’s posters' },
   { href: '/director', icon: 'clapperboard', label: 'Reel Director', note: 'Describe your night, get three picks' },
   { href: '/wall', icon: 'star', label: 'Wall of Fame', note: 'Every film you’ve watched, framed' },
-  { href: '/profile', icon: 'bookmark', label: 'Your watchlist', note: 'Saved on this device' },
+  { href: '/library', icon: 'bookmark', label: 'Your library', note: 'Collections, saves and watchlist in your account' },
 ] as const;
 
 /* Links are plain <a href>; AppShell turns same-site clicks into client-side transitions, so these keep working

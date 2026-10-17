@@ -45,6 +45,11 @@ export default async function Discover({ searchParams }: { searchParams: Promise
           <span><span className="type-heading-md">ViewMo</span><span className="type-caption vm-muted">Spin a sphere of this week’s posters and pick one.</span></span>
           <Icon name="chevron-right" size={20} />
         </a>
+        <a className="viewmo-promo" href="/explore">
+          <span className="viewmo-promo-icon" aria-hidden="true"><Icon name="list-plus" size={22} /></span>
+          <span><span className="type-heading-md">Explore collections</span><span className="type-caption vm-muted">Shelves of films put together by the community.</span></span>
+          <Icon name="chevron-right" size={20} />
+        </a>
       </header>
 
       <section aria-labelledby="mood-h" className="section mood-section">

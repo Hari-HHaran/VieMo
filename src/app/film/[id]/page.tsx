@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { Avatar, Poster, ProviderBadge, Rating } from '@/ds/client';
 import BackButton from '@/components/BackButton';
 import FilmActions from '@/components/FilmActions';
+import AddToCollection from '@/components/community/AddToCollection';
+import FilmReviews from '@/components/community/FilmReviews';
 import FilmRail from '@/components/FilmRail';
 import Problem from '@/components/Problem';
 import Trailer from '@/components/Trailer';
@@ -71,6 +73,7 @@ export default async function FilmPage({ params }: Props) {
               {f.vote_count > 0 ? <Rating value={f.vote_average} source="tmdb" count={f.vote_count} /> : <span className="type-caption vm-muted">No TMDB votes yet</span>}
             </div>
             <FilmActions film={{ id: f.id, title: f.title, year, posterPath: f.poster_path, genres: f.genres.map((g) => g.name) }} />
+            <AddToCollection tmdbId={f.id} title={f.title} />
           </div>
         </div>
 
@@ -115,8 +118,10 @@ export default async function FilmPage({ params }: Props) {
           </section>
         ) : null}
 
+        <FilmReviews tmdbId={f.id} title={f.title} />
+
         {recs.length ? <FilmRail id="recs" title="More like this" caption="TMDB recommendations" films={recs} /> : null}
-        <p className="type-caption vm-faint film-source">{`${plural(f.vote_count, 'TMDB vote', 'TMDB votes')}. VieMo ratings and reviews arrive with accounts.`}</p>
+        <p className="type-caption vm-faint film-source">{`${plural(f.vote_count, 'TMDB vote', 'TMDB votes')}.`}</p>
       </div>
     </article>
   );
