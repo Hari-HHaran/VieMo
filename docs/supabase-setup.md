@@ -13,12 +13,14 @@ In Supabase, open **SQL Editor**. Paste each file below into a new query and run
 3. `supabase/migrations/20261018000003_sceneatlas.sql` (filming locations and their sources)
 4. `supabase/migrations/20261019000004_screening_activity.sql` (Screening Activity: daily totals and who can see them)
 5. `supabase/migrations/20261020000005_community.sql` (demo labels, review visibility, Explore, and the demo importer's functions)
+6. `supabase/migrations/20261021000006_wheelmo.sql` (WheelMo spins: the winner is chosen in the database)
+7. `supabase/migrations/20261022000007_movie_nights.sql` (Movie Night rooms, private votes, and live updates)
 
 Each one should end with "Success. No rows returned". Run each file once only. If one fails, stop and send the error text, not the keys.
 
 If you use the Supabase CLI instead, `supabase db push` runs them in order.
 
-Every table has row level security switched on, and the default access Supabase gives the public API is removed. Each policy in those files is the only way in. The same files pass 145 checks locally (`supabase/tests/local/run.sh`), signed in as three different accounts and signed out.
+Every table has row level security switched on, and the default access Supabase gives the public API is removed. Each policy in those files is the only way in. The same files pass 220 checks locally (`supabase/tests/local/run.sh`), signed in as three different accounts and signed out.
 
 ## 2. Add the keys in Vercel
 
@@ -84,9 +86,11 @@ Use three email addresses you can open (A, B and C), and a private window for ea
 6. **Unlisted.** A switches the collection to unlisted and sends B the link. B can open it. C still can't find it in search or Explore.
 7. **Editing.** A adds B as an editor. B can add and reorder films, but can't rename it, change who sees it, or delete it. C saving a copy gets a private copy C owns, with no edit rights on A's.
 
-8. **Screening Activity.** It starts on "Only me", so B opening A's profile (`/u/<username>`) sees "keeps their Screening Activity private". When A switches to Friends, B still sees nothing until they follow each other. When A switches to Anyone, a private window that isn't signed in sees A's seats. Switching back to Only me hides them straight away.
+8. **Movie Night.** A opens `/match/night`, makes a room and copies the invite link. C opens the link without joining and sees only "You're invited", nothing inside. B joins. Both add films. During voting, B sees how many films A has voted on, never how. After A shows the results, both see totals and the films everyone said yes to. A spins Match Decider; B's screen turns at the same time and lands on the same film. C joins late and sees the same result straight away. B reloads and still sees it. Only A can confirm tonight's film.
 
-Steps 1 to 4 work now. Steps 5 to 7 come with the next update (My Cinema Library). Their database rules are already in place and tested. Step 8 works now, but the seats only fill once diaries are stored in accounts, which also comes with My Cinema Library. Until then, your own Profile tab draws Screening Activity from the diary on your device.
+9. **Screening Activity.** It starts on "Only me", so B opening A's profile (`/u/<username>`) sees "keeps their Screening Activity private". When A switches to Friends, B still sees nothing until they follow each other. When A switches to Anyone, a private window that isn't signed in sees A's seats. Switching back to Only me hides them straight away.
+
+All nine steps work once migrations 1 to 7 have run. Collections are managed in My Cinema Library (`/library`). Screening Activity seats fill from diaries stored in accounts; your own Profile tab also draws on the diary on your device.
 
 ## 6. The demo community (optional)
 
@@ -110,6 +114,14 @@ The importer applies four fixes to the fixture and lists each one in its report:
 - already-watched films taken off watchlists;
 - six reviews reworded to match their star rating;
 - six follows made mutual, so "friends only" can be tried.
+
+## 7. Live updates for Movie Night (Realtime)
+
+Movie Night rooms update live through Supabase Realtime. Migration 7 adds one table, `movie_nights`, to Realtime's `supabase_realtime` publication. It carries no votes or films; it only tells each screen "this room changed", and each screen then asks the database for what that person may see. Realtime applies the same row level security, so only people in a room hear about it.
+
+To check it: in Supabase, open **Database → Publications → supabase_realtime**. `movie_nights` should be listed, and nothing else from Movie Night. If you ran migration 7 on a project without that publication, it skipped this step; run the migration again after enabling Realtime.
+
+A room shows **Live** when Realtime is connected. Otherwise it says **Updating every few seconds** and checks every 4 seconds, so rooms still work, just with a short delay. To turn Realtime off on purpose, set `NIGHT_REALTIME` = `off` in Vercel.
 
 ## Troubleshooting
 

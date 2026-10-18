@@ -38,6 +38,9 @@ export async function siteStatus(): Promise<{ accounts: Check[]; database: Check
         await table('Migration 0002: watchlists, diaries and collections', 'movie_collections');
         await table('Migration 0003: SceneAtlas', 'places');
         await fn('Migration 0004: Screening Activity', 'can_view_activity', { p_owner: '00000000-0000-0000-0000-000000000000' });
+        await table('Migration 0005: community and demo labels', 'demo_seed_runs');
+        await table('Migration 0006: WheelMo', 'wheel_spins');
+        await table('Migration 0007: Movie Night rooms', 'movie_nights');
       }
     } catch (e) {
       accounts.push({ label: 'Supabase accepts the key', ok: false, detail: (e as Error).message === 'timeout' ? 'No answer within 5 seconds.' : 'Couldn’t reach the Supabase address.' });

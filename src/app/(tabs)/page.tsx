@@ -54,7 +54,7 @@ export default async function Home() {
               <p className="booth-meta">{[yearOf(lead), genreLine(lead, 3)].filter(Boolean).join(' · ')}</p>
               {lead.overview ? <p className="booth-overview">{lead.overview}</p> : null}
               <div className="booth-actions">
-                <a className="booth-btn booth-btn-amber" href="/match"><Icon name="users" size={18} />Plan a movie night</a>
+                <a className="booth-btn booth-btn-amber" href="/match/night"><Icon name="users" size={18} />Plan a movie night</a>
                 <a className="booth-btn booth-btn-ghost" href="/director"><Icon name="clapperboard" size={18} />Ask Reel Director</a>
                 <SaveToggle film={saveable(lead)} label="text" />
               </div>

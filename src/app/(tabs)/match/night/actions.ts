@@ -1,6 +1,8 @@
 'use server';
+import { headers } from 'next/headers';
 import { ensureFilms } from '@/lib/films-server';
 import { CODE } from '@/lib/night';
+import { clientIp, limitedKey } from '@/lib/rate-limit';
 import { currentUser } from '@/lib/supabase/server';
 import type { Spin } from '@/lib/wheel';
 
@@ -38,6 +40,8 @@ export async function createNight(title: string): Promise<Done<{ code: string }>
 export async function joinNight(code: string): Promise<Done<{ code: string }>> {
   const c = String(code ?? '').trim().toUpperCase().replace(/[\s-]/g, '');
   if (!CODE.test(c)) return { ok: false, message: 'A room code is six letters and numbers.' };
+  /* Codes are the invitation, so guessing them is slowed down: 20 tries a minute from one address. */
+  if (limitedKey(`night-join:${clientIp(await headers())}`, 20)) return { ok: false, message: 'Too many tries. Wait a minute, then check the code with the host.' };
   const sb = await me();
   if (!sb) return { ok: false, message: 'Sign in to join a Movie Night.' };
   const { error } = await sb.rpc('join_night', { p_code: c });

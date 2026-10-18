@@ -1,6 +1,6 @@
 # Proposal: demo community and WheelMo
 
-Status: approved and in progress. Written after auditing the code, the migrations and `viemo_demo_community_seed.json`.
+Status: approved and built (phases 1 to 7). Written after auditing the code, the migrations and `viemo_demo_community_seed.json`.
 
 Decisions (18 Oct 2026):
 - Seed this Supabase project, labelled Demo.
@@ -11,6 +11,10 @@ Decisions (18 Oct 2026):
 Done so far:
 - Phase 1: Supabase variable detection and `/status`.
 - Phase 2: migration 0005 and the importer at `/admin/demo`.
+- Phase 3: Explore, collection pages, profile tabs, film reviews and My Cinema Library.
+- Phases 4 and 5: WheelMo solo modes with server-side selection. The WheelMo migration ended up as 0006 and Movie Night rooms as 0007, the reverse of the plan below, because the solo wheel was built first.
+- Phase 6: Movie Night rooms, group wheel and Match Decider, with Realtime and a polling fallback.
+- Phase 7: tests across three accounts, phone sizes and both themes. Not verified here: Supabase Realtime on your project (it can't run in this environment).
 
 ## 1. What exists today
 
