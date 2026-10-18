@@ -196,7 +196,7 @@ Your month as a cinema seating chart: one seat per day, lit up by how much you d
 
 ### Explore, collections and members
 
-- **Explore** (`/explore`): public collections shown as record sleeves that fan out on hover, plus members to discover. You can search, and sort by newest or most popular.
+- **Explore** (`/explore`): public collections shown as record sleeves that fan out on hover, plus members to discover. You can search, and sort by newest or most saved.
 - **Collections** (`/c/<share id>`):
   - **Visibility:** private (the default), unlisted (anyone with the link) or public (also listed in Explore).
   - **Others can** save (bookmark), copy (make their own private copy) or spin it on WheelMo.

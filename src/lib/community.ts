@@ -20,12 +20,19 @@ export interface CollectionPage {
   films: { tmdb_id: number; title: string; year: number | null; poster_path: string | null; genres: string[]; runtime: number | null; note: string | null }[];
 }
 
-type Result<T> = { ok: true; value: T } | { ok: false; why: 'offline' | 'error' };
+/* Why a read failed, so screens can say what to fix: accounts not connected at all ('offline'), the database
+   function not there because its migration hasn't run ('missing'), or Supabase refusing or not answering. */
+export type Why = 'offline' | 'missing' | 'error';
+type Result<T> = { ok: true; value: T } | { ok: false; why: Why; detail?: string };
 async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<Result<T>> {
   const sb = await supabaseServer();
   if (!sb) return { ok: false, why: 'offline' };
   const { data, error } = await sb.rpc(fn, args);
-  if (error) return { ok: false, why: 'error' };
+  if (error) {
+    const missing = error.code === 'PGRST202' || error.code === '42883' || /could not find the function|does not exist/i.test(error.message);
+    if (!missing) console.error(`[community] ${fn} failed: ${error.code ?? ''} ${error.message}`);
+    return { ok: false, why: missing ? 'missing' : 'error', detail: error.code ?? undefined };
+  }
   return { ok: true, value: data as T };
 }
 

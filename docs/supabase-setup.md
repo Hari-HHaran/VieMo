@@ -125,6 +125,7 @@ A room shows **Live** when Realtime is connected. Otherwise it says **Updating e
 
 ## Troubleshooting
 
+- **Explore says "Explore isn't set up in the database yet", or "Collections didn't load".** Run migration 5 (`20261020000005_community.sql`) and the ones after it. If you've just run them, run `NOTIFY pgrst, 'reload schema';` in the SQL Editor so Supabase's API sees the new functions straight away. Explore stays empty until people make collections public or you import the demo community (section 6): the seed file isn't read on its own.
 - **Unsure what the site can see?** Open `/status`. It lists which variables were found (names only, never values), whether Supabase accepts the key, and which migrations have run.
 
 - **"Accounts aren't switched on here yet."** The server can't see the URL or the public key. Check the names above, then redeploy.

@@ -44,7 +44,11 @@ export default async function Explore({ searchParams }: { searchParams: Promise<
         </p>
       ) : null}
 
-      {!cols.ok ? <EmptyState icon="triangle-alert" title="Collections didn’t load" body="The account service didn’t answer. Try again in a moment." /> : null}
+      {!cols.ok ? (
+        cols.why === 'offline' ? <EmptyState icon="triangle-alert" title="Accounts aren’t connected yet" body="Explore shows collections people keep in their accounts, and this site can’t see its Supabase project. The site owner can check the settings on the status page." action={{ label: 'Open the status page', icon: 'info', href: '/status' }} />
+        : cols.why === 'missing' ? <EmptyState icon="triangle-alert" title="Explore isn’t set up in the database yet" body="Supabase is connected, but the community migration (number 5, 20261020000005_community.sql) hasn’t been run. The site owner can run it in Supabase’s SQL Editor. Just ran it? Supabase can take a minute to notice; running NOTIFY pgrst, 'reload schema'; in the SQL Editor makes it immediate. The status page lists which migrations are in place." action={{ label: 'Open the status page', icon: 'info', href: '/status' }} />
+        : <EmptyState icon="triangle-alert" title="Collections didn’t load" body={`Supabase didn’t answer${cols.detail ? ` (${cols.detail})` : ''}. Try again in a moment; if it keeps happening, the status page shows what’s connected.`} action={{ label: 'Open the status page', icon: 'info', href: '/status' }} />
+      ) : null}
 
       {people.length ? (
         <section aria-labelledby="ex-people" className="explore-section">

@@ -38,7 +38,7 @@ export async function siteStatus(): Promise<{ accounts: Check[]; database: Check
         await table('Migration 0002: watchlists, diaries and collections', 'movie_collections');
         await table('Migration 0003: SceneAtlas', 'places');
         await fn('Migration 0004: Screening Activity', 'can_view_activity', { p_owner: '00000000-0000-0000-0000-000000000000' });
-        await table('Migration 0005: community and demo labels', 'demo_seed_runs');
+        await fn('Migration 0005: community, Explore and demo labels', 'explore_collections', { p_q: null, p_sort: 'recent', p_limit: 1, p_offset: 0, p_include_demo: true, p_owner: null });
         await table('Migration 0006: WheelMo', 'wheel_spins');
         await table('Migration 0007: Movie Night rooms', 'movie_nights');
       }
