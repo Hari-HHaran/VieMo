@@ -1,0 +1,85 @@
+/* Movie Night rooms: the lobby, private voting, results and the room's WheelMo. Uses the page's own theme; only
+   the wheel itself keeps WheelMo's fixed dark machine. */
+.nr-page { gap: var(--space-6); }
+.nr-eyebrow { color: var(--reel-ink); text-transform: uppercase; letter-spacing: 0.12em; }
+.nr-eyebrow a { color: inherit; }
+.nr { display: grid; gap: var(--space-6); min-width: 0; }
+.nr-head { display: grid; gap: var(--space-3); }
+.nr-title { overflow-wrap: anywhere; }
+.nr-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.nr-stack { display: grid; gap: var(--space-3); }
+.nr-full { flex-basis: 100%; }
+.nr-field { display: grid; gap: 4px; max-width: 420px; }
+.nr-field .search-input { padding-left: var(--space-3); }
+.nr-error { padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--negative-soft); border: 1px solid var(--negative); color: var(--ink); }
+
+.nr-code { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.nr-code-value { font: 700 22px/1 var(--font-mono, ui-monospace, monospace); letter-spacing: 0.2em; padding: 6px 10px; border-radius: var(--radius-md); background: var(--surface-raised); border: 1px dashed var(--line-strong); }
+.nr-code-input { font-family: var(--font-mono, ui-monospace, monospace); letter-spacing: 0.2em; text-transform: uppercase; max-width: 12ch; }
+.nr-live { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); border: 1px solid var(--line-strong); color: var(--ink-muted); }
+.nr-live.is-live { color: var(--ink); border-color: var(--positive); background: var(--positive-soft); }
+
+.nr-steps { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.nr-steps li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: var(--radius-full); border: 1px solid var(--line); color: var(--ink-muted); }
+.nr-steps li span { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-raised); font-size: 12px; }
+.nr-steps li.is-done { color: var(--ink); }
+.nr-steps li[aria-current] { color: var(--on-reel); background: var(--reel); border-color: var(--reel); }
+.nr-steps li[aria-current] span { background: color-mix(in srgb, var(--on-reel) 18%, transparent); }
+
+.nr-people { display: grid; gap: var(--space-3); }
+.nr-people ul { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.nr-person { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: var(--radius-full); background: var(--surface); border: 1px solid var(--line); }
+.nr-tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: var(--radius-full); border: 1px solid var(--line-strong); color: var(--ink); vertical-align: middle; }
+.nr-here { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-muted); }
+.nr-here::before { content: ''; width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--ink-muted); }
+.nr-here.is-here { color: var(--ink); }
+.nr-here.is-here::before { background: var(--positive); border-color: var(--positive); }
+
+.nr-stage { display: grid; gap: var(--space-4); min-width: 0; }
+.nr-stage-head { display: grid; gap: var(--space-2); max-width: 760px; }
+.nr-films { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.nr-film { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); }
+.nr-film-poster { display: block; width: 64px; aspect-ratio: 2 / 3; border-radius: var(--radius-sm); overflow: hidden; }
+.nr-film-body { display: grid; align-content: start; gap: 4px; min-width: 0; }
+.nr-film-body > .vm-btn { justify-self: start; }
+.nr-film-title { color: var(--ink); overflow-wrap: anywhere; }
+.nr-vote { display: flex; gap: var(--space-2); margin-top: var(--space-1); }
+.nr-vote-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius-full); border: 1px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; }
+.nr-vote-btn:hover:not(:disabled) { border-color: var(--ink); }
+.nr-vote-btn:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.nr-vote-btn:disabled { cursor: progress; }
+.nr-vote-btn.is-yes { background: var(--positive-soft); border-color: var(--positive); }
+.nr-vote-btn.is-no { background: var(--negative-soft); border-color: var(--negative); }
+
+.nr-tally { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.nr-tally li { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto auto; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--surface); }
+.nr-tally li.is-everyone { border-color: var(--positive); background: color-mix(in srgb, var(--positive-soft) 60%, var(--surface)); }
+.nr-tally-title { overflow-wrap: anywhere; }
+.nr-tally-n { color: var(--ink-muted); white-space: nowrap; }
+@media (max-width: 520px) { .nr-tally li { grid-template-columns: 40px minmax(0, 1fr); } .nr-tally li > :nth-child(n + 3) { grid-column: 2; justify-self: start; } }
+.nr-thumb { display: block; width: 40px; aspect-ratio: 2 / 3; border-radius: 4px; overflow: hidden; }
+
+.nr-add { display: grid; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-lg); border: 1px dashed var(--line-strong); }
+.nr-tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); border: 0; margin: 0; padding: 0; }
+.nr-tab { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius-full); border: 1px solid var(--line-strong); color: var(--ink); cursor: pointer; }
+.nr-tab input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.nr-tab.is-on { background: var(--reel); border-color: var(--reel); color: var(--on-reel); }
+.nr-tab:has(input:focus-visible) { box-shadow: var(--focus-ring); }
+.nr-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 0 var(--space-4); margin: 0; padding: 0; list-style: none; max-height: 360px; overflow: auto; }
+.nr-results { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.nr-results li { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: var(--space-3); }
+
+.nr-wheel { scroll-margin-top: 80px; }
+.nr-choose summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+.nr-tonight { display: grid; grid-template-columns: minmax(0, 160px) minmax(0, 1fr); gap: var(--space-5); align-items: center; padding: var(--space-5); border-radius: var(--radius-xl); background: var(--surface); border: 1px solid var(--line-strong); }
+.nr-tonight-poster { display: block; aspect-ratio: 2 / 3; border-radius: var(--radius-md); overflow: hidden; }
+@media (max-width: 520px) { .nr-tonight { grid-template-columns: 1fr; } .nr-tonight-poster { max-width: 160px; } }
+
+.nr-start { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: var(--space-4); align-items: start; }
+.nr-start > .acct-alert-slot { grid-column: 1 / -1; }
+.nr-card { display: grid; gap: var(--space-3); padding: var(--space-5); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); }
+.nr-card > .vm-btn { justify-self: start; }
+.nr-recent ul { display: grid; gap: var(--space-2); margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+.nr-recent li { display: grid; gap: 2px; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--line); }
+.nr-recent a { color: var(--ink); }
+.nr-gone { display: grid; gap: var(--space-3); justify-items: start; }
