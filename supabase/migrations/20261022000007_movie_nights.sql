@@ -82,10 +82,13 @@ create policy "members see the picks" on public.night_picks for select to authen
 create policy "members see the room's spins" on public.wheel_spins for select to authenticated using (night_id is not null and public.is_night_member(night_id));
 grant select on public.movie_nights, public.night_participants, public.night_candidates, public.night_votes, public.night_picks to authenticated;
 
--- Live updates for participants (Supabase Realtime applies these same policies). Skipped where Realtime isn't installed.
+-- Live updates: every change to a room also touches its movie_nights row, and only that table is published to
+-- Supabase Realtime (which applies the policy above, so only members hear about it). The event carries no votes or
+-- films; each screen then asks night_state for what it may see. Skipped where Realtime isn't installed.
 do $$ begin
-  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
-    alter publication supabase_realtime add table public.movie_nights, public.night_participants, public.night_candidates, public.night_picks, public.wheel_spins;
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime')
+     and not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'movie_nights') then
+    alter publication supabase_realtime add table public.movie_nights;
   end if;
 end $$;
 
@@ -117,6 +120,7 @@ begin
   select * into n from public.movie_nights where code = upper(btrim(p_code));
   if n.id is null or n.expires_at < now() or n.status = 'closed' then raise exception 'no open room with that code' using errcode = 'P0002'; end if;
   insert into public.night_participants (night_id, user_id, role) values (n.id, me, 'guest') on conflict (night_id, user_id) do update set last_seen = now();
+  update public.movie_nights set updated_at = now() where id = n.id;
   return n.id;
 end $$;
 
@@ -158,9 +162,10 @@ end $$;
 create or replace function public.night_remove(p_night uuid, p_tmdb integer) returns void
 language plpgsql volatile security definer set search_path = '' as $$
 begin
-  if not exists (select 1 from public.movie_nights where id = p_night and status = 'lobby') then raise exception 'the pool is locked' using errcode = '55000'; end if;
+  if not exists (select 1 from public.movie_nights where id = p_night and status = 'lobby') or not public.is_night_member(p_night) then raise exception 'the pool is locked' using errcode = '55000'; end if;
   delete from public.night_candidates where night_id = p_night and tmdb_id = p_tmdb
     and (added_by = (select auth.uid()) or public.is_night_host(p_night));
+  update public.movie_nights set updated_at = now() where id = p_night;
 end $$;
 
 -- Host moves the room between stages.
@@ -187,6 +192,7 @@ begin
   if not exists (select 1 from public.movie_nights where id = p_night and status = 'voting') then raise exception 'voting isn''t open' using errcode = '55000'; end if;
   insert into public.night_votes (night_id, user_id, tmdb_id, vote) values (p_night, (select auth.uid()), p_tmdb, p_vote)
   on conflict (night_id, user_id, tmdb_id) do update set vote = excluded.vote, voted_at = now();
+  update public.movie_nights set updated_at = now() where id = p_night;
 end $$;
 
 -- Everything a participant may see, in one call. Votes: during voting only how many each person has cast; after
@@ -226,7 +232,7 @@ end $$;
 -- yes to (after results), so a random pick is only ever made between films the whole group accepted.
 create or replace function public.spin_night(p_request uuid, p_night uuid, p_mode text, p_ids integer[]) returns jsonb
 language plpgsql volatile security definer set search_path = '' as $$
-declare n public.movie_nights; short integer[]; voters integer; existing public.wheel_spins;
+declare n public.movie_nights; short integer[]; voters integer; existing public.wheel_spins; made jsonb;
 begin
   select * into n from public.movie_nights where id = p_night;
   if n.id is null or n.host_id <> (select auth.uid()) then raise exception 'only the host can spin for the room' using errcode = '42501'; end if;
@@ -253,7 +259,9 @@ begin
   end if;
   -- A spin older than its animation counts as revealed; one still turning blocks a second (unique index).
   update public.wheel_spins set status = 'revealed', revealed_at = now() where night_id = p_night and status = 'spinning' and created_at < now() - interval '7 seconds';
-  return public.wheel_spin_core(p_request, (select auth.uid()), p_night, p_mode, n.code, p_ids);
+  made := public.wheel_spin_core(p_request, (select auth.uid()), p_night, p_mode, n.code, p_ids);
+  update public.movie_nights set updated_at = now() where id = p_night;
+  return made;
 end $$;
 
 -- The host confirms tonight's film; it goes into the room's history for everyone.

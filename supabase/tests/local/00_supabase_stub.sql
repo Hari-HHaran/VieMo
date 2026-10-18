@@ -23,3 +23,5 @@ grant usage on schema test to anon, authenticated, service_role;
 create function test.ok(cond boolean, msg text) returns void language plpgsql as $$
 begin raise notice '%', case when coalesce(cond, false) then 'PASS ' else 'FAIL ' end || msg; end $$;
 grant execute on function test.ok(boolean, text) to anon, authenticated, service_role;
+-- Supabase creates this publication for Realtime; migrations add the tables that broadcast changes.
+create publication supabase_realtime;

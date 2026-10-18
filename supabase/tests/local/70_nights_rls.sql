@@ -132,3 +132,4 @@ do $$ begin perform public.create_night('x'); perform test.ok(false, 'anon creat
 exception when insufficient_privilege then perform test.ok(true, 'signed-out visitors can''t open rooms'); end $$;
 commit;
 delete from public.movie_nights where id = (select v::uuid from test.vars where k = 'night');
+select test.ok((select array_agg(tablename::text) = array['movie_nights'] from pg_publication_tables where pubname = 'supabase_realtime'), 'only the rooms table is published to Realtime (never votes)');
