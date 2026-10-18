@@ -31,38 +31,47 @@ a.wm-mode { color: var(--wm-muted); }
 
 /* The machine */
 .wm-stage { display: grid; gap: var(--space-4); justify-items: center; }
-.wm-machine { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 72px; align-items: center; gap: var(--space-2); width: min(100%, 680px); padding-top: 64px; }
+.wm-machine { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 72px; align-items: center; gap: var(--space-2); width: min(100%, 920px); padding-top: 64px; }
 @media (min-width: 560px) { .wm-machine { grid-template-columns: minmax(0, 1fr) 120px; gap: var(--space-4); } }
 .wm-marquee { position: absolute; top: 0; left: calc(50% - 36px); translate: -50% 0; display: flex; gap: 6px; padding: 4px 18px; border-radius: 999px;
   background: linear-gradient(180deg, #2a0b12, #14070a); border: 2px solid #c99a4b; box-shadow: 0 0 0 4px #1a080c, 0 0 24px rgba(227, 192, 122, 0.35);
   font: 800 22px/1 var(--font-marquee); letter-spacing: 0.14em; text-transform: uppercase; color: #ffe9b8; text-shadow: 0 0 10px rgba(255, 205, 120, 0.8); }
 @media (min-width: 560px) { .wm-marquee { left: calc(50% - 60px); font-size: 28px; } }
 .wm-marquee span:last-child { color: #ff9a8a; text-shadow: 0 0 10px rgba(255, 120, 100, 0.8); }
-.wm-wheel-wrap { position: relative; width: 100%; max-width: 520px; justify-self: center; }
-.wm-wheel-wrap[data-hint]:not([data-hint=""]):hover::after { content: attr(data-hint) ' →'; position: absolute; left: 50%; bottom: 8%; translate: -50% 0; padding: 6px 14px; border-radius: 999px;
+/* The reel: a brass cabinet with a filmstrip of posters running past a lit window */
+.wm-reel-wrap { position: relative; width: 100%; min-width: 0; }
+.wm-reel-wrap[data-hint]:not([data-hint=""]):hover::after { content: attr(data-hint) ' →'; position: absolute; right: 12px; bottom: -6px; padding: 6px 14px; border-radius: 999px; z-index: 4;
   background: rgba(18, 10, 12, 0.9); border: 1px solid #c99a4b; color: #ffe9b8; font: 600 13px/1 var(--font-sans); pointer-events: none; white-space: nowrap; }
-.wm-wheel { position: relative; width: 100%; aspect-ratio: 1; filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.6)); }
-.wm-disc { position: absolute; inset: 0; will-change: transform; }
-.wm-disc svg { width: 100%; height: 100%; display: block; overflow: visible; }
-.wm-bezel { fill: #0b0507; }
-.wm-rim { fill: none; stroke: #120709; stroke-width: 6; }
-.wm-wedge-edge { fill: none; stroke: #c99a4b; stroke-width: 1.6; }
-.wm-wedge-light { fill: transparent; transition: fill 120ms linear; }
-.wm-wedge.is-active .wm-wedge-light { fill: rgba(255, 224, 160, 0.16); }
-.wm-wedge.is-winner .wm-wedge-light { fill: rgba(255, 214, 120, 0.26); }
-.wm-wedge.is-winner .wm-wedge-edge { stroke: #ffe9b8; stroke-width: 4; filter: drop-shadow(0 0 6px rgba(255, 210, 120, 0.9)); }
-.has-winner .wm-wedge:not(.is-winner) image { filter: brightness(0.55) saturate(0.7); transition: filter 500ms ease; }
-.wm-wedge-title { fill: #ffe9b8; font: 600 13px var(--font-sans); }
-.wm-hub { fill: #4a0f1b; stroke: #1a070b; stroke-width: 2; }
-.wm-hub-hole { fill: #120709; }
-.wm-bulb { fill: #ffe9b8; filter: drop-shadow(0 0 3px rgba(255, 220, 140, 0.9)); animation: wm-idle 2.4s ease-in-out infinite; animation-delay: var(--d); }
-.is-spinning .wm-bulb { animation: wm-chase 0.42s steps(2, jump-none) infinite; animation-delay: var(--d); }
-.has-winner .wm-bulb { animation: wm-win 0.5s ease-in-out 4 alternate; }
-@keyframes wm-idle { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
-@keyframes wm-chase { 0% { opacity: 1; } 100% { opacity: 0.25; } }
-@keyframes wm-win { from { opacity: 1; } to { opacity: 0.4; } }
-.wm-pointer { position: absolute; top: -3%; left: 50%; width: 11%; translate: -50% 0; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6)); }
-.wm-pointer-bulb { fill: #ff9a8a; filter: drop-shadow(0 0 4px rgba(255, 120, 100, 0.9)); }
+.wm-reel { --slot: clamp(84px, 22vw, 132px); position: relative; display: grid; gap: 10px; padding: 14px 0; border-radius: 22px;
+  background: linear-gradient(180deg, #2a0b12, #14070a 40%, #14070a 60%, #2a0b12); border: 3px solid #c99a4b;
+  box-shadow: 0 0 0 5px #1a080c, 0 24px 50px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(0, 0, 0, 0.6); }
+.wm-reel-bulbs { display: flex; justify-content: space-between; padding: 0 16px; }
+.wm-reel-bulbs .wm-bulb { width: 8px; height: 8px; border-radius: 50%; background: #ffe9b8; box-shadow: 0 0 6px 1px rgba(255, 220, 140, 0.85); animation: wm-idle 2.4s ease-in-out infinite; animation-delay: var(--d); }
+.wm-reel.is-spinning .wm-bulb { animation: wm-chase 0.36s steps(2, jump-none) infinite; animation-delay: var(--d); }
+.wm-reel.has-winner .wm-bulb { animation: wm-win 0.5s ease-in-out 4 alternate; }
+@keyframes wm-idle { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+@keyframes wm-chase { 0% { opacity: 1; } 100% { opacity: 0.2; } }
+@keyframes wm-win { from { opacity: 1; } to { opacity: 0.35; } }
+.wm-reel-window { position: relative; overflow: hidden; height: calc(var(--slot) * 1.5 + 44px); margin: 0 12px; border-radius: 12px; background: #0a0405;
+  box-shadow: inset 0 0 0 2px #3e2128;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent); mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent); }
+.wm-reel-strip { position: absolute; top: 0; bottom: 0; left: 50%; display: flex; align-items: center; column-gap: 10px; will-change: transform; }
+.wm-slot { position: relative; flex: none; display: grid; grid-template-rows: 14px 1fr 14px; width: var(--slot); height: calc(var(--slot) * 1.5 + 32px); padding: 2px 0;
+  background: #0b0b0b; border-radius: 6px; transition: transform 380ms cubic-bezier(.2,.8,.2,1), filter 400ms ease; }
+.wm-slot img, .wm-slot-title { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 3px; background: #2a0f16; }
+.wm-slot-title { display: grid; place-items: center; padding: 8px; color: #ffe9b8; font: 600 13px/1.25 var(--font-sans); text-align: center; overflow-wrap: anywhere; }
+.wm-slot-sprockets { display: block; margin: 0 4px; background: radial-gradient(circle at 50% 50%, #2b2b2b 0 2.6px, transparent 3px) 0 50% / 14px 10px repeat-x; }
+.wm-reel.has-winner .wm-slot:not(.is-winner) { filter: brightness(0.45) saturate(0.6); }
+.wm-slot.is-winner { transform: scale(1.08); z-index: 2; box-shadow: 0 0 0 3px #ffe9b8, 0 0 28px 6px rgba(255, 205, 120, 0.7); }
+.wm-reel-frame { position: absolute; top: 4px; bottom: 4px; left: 50%; width: calc(var(--slot) + 14px); translate: -50% 0; border: 3px solid #e3c07a; border-radius: 10px; pointer-events: none; z-index: 3;
+  box-shadow: 0 0 18px rgba(227, 192, 122, 0.55), inset 0 0 18px rgba(227, 192, 122, 0.25); }
+.wm-reel.is-spinning .wm-reel-frame { animation: wm-frame 0.5s ease-in-out infinite alternate; }
+@keyframes wm-frame { from { box-shadow: 0 0 10px rgba(227, 192, 122, 0.4), inset 0 0 10px rgba(227, 192, 122, 0.15); } to { box-shadow: 0 0 26px rgba(255, 210, 130, 0.85), inset 0 0 22px rgba(255, 210, 130, 0.35); } }
+.wm-reel-pointer { position: absolute; left: 50%; z-index: 4; width: 0; height: 0; translate: -50% 0; border-left: 11px solid transparent; border-right: 11px solid transparent; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6)); }
+.wm-reel-pointer.is-top { top: 0; border-top: 14px solid #f1d18e; }
+.wm-reel-pointer.is-bottom { bottom: 0; border-bottom: 14px solid #f1d18e; }
+@media (prefers-reduced-motion: reduce) { .wm-reel .wm-bulb, .wm-reel-frame { animation: none !important; } .wm-slot { transition: none; } }
+html[data-motion="reduce"] :is(.wm-reel .wm-bulb, .wm-reel-frame) { animation: none !important; }
 
 /* The lever, seen from the front: a slot, a brass housing at the pivot, a chrome rod and a red ball */
 .wm-lever { position: relative; height: 300px; width: 100%; }
@@ -146,4 +155,13 @@ html[data-motion="reduce"] .wm-sparkles { display: none; }
   .decide-list { grid-template-columns: 1fr 1fr; gap: var(--space-2); }
   .decide-list .match-mode { min-height: 56px; padding: var(--space-2) var(--space-3); gap: var(--space-2); }
   .decide-list .match-mode .type-caption { display: none; }
+}
+/* Phones: a slimmer lever and smaller posters, so about three posters show in the window. */
+@media (max-width: 559px) {
+  .wm-machine { grid-template-columns: minmax(0, 1fr) 56px; gap: var(--space-2); }
+  .wm-reel { --slot: 64px; padding: 10px 0; border-radius: 16px; }
+  .wm-reel-window { margin: 0 8px; }
+  .wm-reel-bulbs { padding: 0 10px; }
+  .wm-reel-bulbs .wm-bulb:nth-child(even) { display: none; }
+  .wm-lever-hint { white-space: normal; width: 64px; line-height: 1.25; }
 }

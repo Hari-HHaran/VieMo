@@ -117,17 +117,20 @@ The ranking weights are documented in `docs/plan.md`.
 
 #### WheelMo
 
-A film roulette in the style of an old cinema machine. There's no betting, no prizes and no payment.
+A film roulette in the style of an old cinema machine: a reel of real posters runs past a lit window and stops on tonight's film. There's no betting, no prizes and no payment.
 
-- **What goes on the wheel:** your watchlist, a collection, or a surprise deal of eight films filtered by length, mood and service.
-- **Bigger lists:** the wheel holds 2 to 12 films. A larger list gets a random shortlist first, or you choose the twelve yourself. The wheel only ever holds the films you can see.
-- **Spinning:** pull the lever (drag it past the mark) or just press **Spin**.
+- **What goes on the reel:** your watchlist, a collection, or a surprise deal of eight films filtered by length, mood and service.
+- **Bigger lists:** the reel holds 2 to 12 films. A larger list gets a random shortlist first, or you choose the twelve yourself. The reel only ever holds the films you can see.
+- **Spinning:**
+  - Pulling the lever nudges the reel. Let go past the mark and the reel runs, or just press **Spin**.
+  - While the server picks, the reel keeps rolling. Then it slows down, overshoots slightly and clicks back, framing the winning poster in the gold window.
+  - The other posters dim and the winner glows. At speed the reel blurs with motion.
 - **How the winner is picked:**
-  - The server picks the winner with a cryptographic random number and saves it before the wheel turns. The animation only lands on that saved result.
+  - The server picks the winner with a cryptographic random number and saves it before the reel stops. The animation only lands on that saved result: at least 28 posters pass the window, and it always stops with exactly one poster framed.
   - A double-click, a retry or a reload shows the same winner rather than spinning again.
-  - Every film has the same chance, and the wheel says so ("each has a 1 in 5 chance").
+  - Every film has the same chance, and the page says so ("each has a 1 in 5 chance").
 - **The winner:** a card with its poster, facts from TMDB and where to watch it, plus buttons to add it to your watchlist or open the film.
-- **Sound** is off until you turn it on. With reduced motion, the result shows straight away.
+- **Sound** is off until you turn it on; with it on, each poster clicks as it passes the window. With reduced motion, the result shows straight away, with no rolling or blur.
 
 #### Reel Director
 

@@ -214,12 +214,12 @@ export default function NightRoom({ initial, realtime }: { initial: NightState; 
             <p className="type-eyebrow wm-eyebrow">{wheelKind === 'decider' ? 'Match Decider' : 'Group wheel'}</p>
             <h2 id={`${uid}-wheel`} className="wm-title">{wheelKind === 'decider' ? 'Between the films you all said yes to' : 'A random pick from the room’s films'}</h2>
             <p className="type-body wm-muted">{wheelKind === 'decider'
-              ? `Every film on this wheel got a yes from everyone who voted. Each has a 1 in ${wheelFilms.length} chance; the database picks before the wheel turns, and everyone sees the same result.`
-              : `This isn’t a vote and doesn’t mean everyone agreed: it’s a fair random pick between the ${wheelFilms.length} films on the wheel, each with a 1 in ${wheelFilms.length} chance. Everyone sees the same result.`}</p>
+              ? `Every film on this reel got a yes from everyone who voted. Each has a 1 in ${wheelFilms.length} chance; the database picks before the reel moves, and everyone sees the same result.`
+              : `This isn’t a vote and doesn’t mean everyone agreed: it’s a fair random pick between the ${wheelFilms.length} films on the reel, each with a 1 in ${wheelFilms.length} chance. Everyone sees the same result.`}</p>
           </header>
           {!spin && wheel === 'group' && films.length > MAX_POOL ? (
             <details className="nr-choose">
-              <summary className="type-label">Choose the {MAX_POOL} films ({chosen.length} on the wheel)</summary>
+              <summary className="type-label">Choose the {MAX_POOL} films ({chosen.length} on the reel)</summary>
               <ul role="list" className="wm-pick">
                 {films.map((f) => {
                   const on = chosen.includes(f.tmdb_id);
@@ -229,9 +229,9 @@ export default function NightRoom({ initial, realtime }: { initial: NightState; 
             </details>
           ) : null}
           <WheelStage films={wheelFilms} spin={spin} busy={busy === 'spin'} canSpin={s.is_host && !spin && wheelFilms.length >= MIN_POOL}
-            cantSpinReason={!s.is_host ? 'Only the host spins. You’ll see the same result here at the same moment.' : wheelFilms.length < MIN_POOL ? 'Put at least two films on the wheel.' : undefined}
+            cantSpinReason={!s.is_host ? 'Only the host spins. You’ll see the same result here at the same moment.' : wheelFilms.length < MIN_POOL ? 'Put at least two films on the reel.' : undefined}
             onSpin={() => doSpin(false)} onRevealed={setRevealed} spinLabel={wheelKind === 'decider' ? 'Spin Match Decider' : 'Spin for the room'} />
-          {!spin && s.is_host ? <div className="nr-row"><Button variant="ghost" onClick={() => setWheel(null)}>Close the wheel</Button></div> : null}
+          {!spin && s.is_host ? <div className="nr-row"><Button variant="ghost" onClick={() => setWheel(null)}>Close the reel</Button></div> : null}
         </section>
       ) : null}
 

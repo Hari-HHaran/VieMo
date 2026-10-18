@@ -11,7 +11,7 @@ import WheelStage from './WheelStage';
 const IMG = 'https://image.tmdb.org/t/p';
 type Sources = { signedIn: boolean; watchlist: WheelFilm[]; collections: { share_id: string; title: string; count: number; mine: boolean }[] };
 
-/* A fair random sample (crypto), shown before the spin, for sources with more films than the wheel holds. */
+/* A fair random sample (crypto), shown before the spin, for sources with more films than the reel holds. */
 function sample<T>(list: T[], k: number): T[] {
   const a = [...list];
   for (let i = a.length - 1; i > 0; i--) {
@@ -116,7 +116,7 @@ export default function WheelMo({ initialShare, services, auto }: { initialShare
     finally { setDealing(false); }
   };
 
-  /* Opened from a confirmed Mo card (?auto=…): spin once, as soon as the films are on the wheel. The address is
+  /* Opened from a confirmed Mo card (?auto=…): spin once, as soon as the films are on the reel. The address is
      tidied first, so a reload never spins again. */
   const autoRun = useRef(auto ?? null);
   useEffect(() => {
@@ -143,11 +143,11 @@ export default function WheelMo({ initialShare, services, auto }: { initialShare
       <header className="wm-head">
         <p className="type-eyebrow wm-eyebrow">WheelMo</p>
         <h2 id={`${uid}-h`} className="wm-title">Pull the lever. Let cinema decide.</h2>
-        <p className="type-body wm-muted">A film roulette: every film on the wheel has the same chance, and the result is chosen on the server before the wheel turns. No betting, no prizes; just tonight’s film.</p>
+        <p className="type-body wm-muted">A film roulette: every film on the reel has the same chance, and the result is chosen on the server before the reel moves. No betting, no prizes; just tonight’s film.</p>
       </header>
 
       <fieldset className="wm-modes">
-        <legend className="vm-sr">What goes on the wheel</legend>
+        <legend className="vm-sr">What goes on the reel</legend>
         {([['watchlist', 'My watchlist'], ['playlist', 'A collection'], ['surprise', 'Surprise me']] as const).map(([id, label]) => (
           <label key={id} className={`wm-mode type-label${mode === id ? ' is-on' : ''}`}>
             <input type="radio" name={`${uid}-mode`} value={id} checked={mode === id} disabled={busy} onChange={() => { setMode(id); setSpin(null); setRevealed(null); }} />{label}
@@ -193,7 +193,7 @@ export default function WheelMo({ initialShare, services, auto }: { initialShare
 
       {chosen && source.films.length > MAX_POOL ? (
         <div className="wm-shortlist">
-          <p className="type-body">{source.label[0].toUpperCase() + source.label.slice(1)} has {source.films.length} films; the wheel holds {MAX_POOL}. {picking ? 'Choose up to 12.' : 'These 12 were shortlisted at random.'}</p>
+          <p className="type-body">{source.label[0].toUpperCase() + source.label.slice(1)} has {source.films.length} films; the reel holds {MAX_POOL}. {picking ? 'Choose up to 12.' : 'These 12 were shortlisted at random.'}</p>
           <div className="wm-row">
             <Button variant="secondary" size="sm" onClick={() => setChosen(sample(source.films, MAX_POOL).map((f) => f.tmdb_id))}>Shuffle the shortlist</Button>
             <Button variant="ghost" size="sm" aria-expanded={picking} onClick={() => setPicking(!picking)}>{picking ? 'Done choosing' : 'Choose my own'}</Button>
@@ -216,13 +216,13 @@ export default function WheelMo({ initialShare, services, auto }: { initialShare
       {pool.length >= MIN_POOL || spin ? (
         <WheelStage films={pool} spin={spin} busy={busy} canSpin={can} cantSpinReason={why} onSpin={() => doSpin(false)} onRevealed={(s) => { setRevealed(s); fetch('/api/wheel/reveal', { method: 'POST', body: JSON.stringify({ id: s.id }) }).catch(() => {}); }} />
       ) : (
-        <EmptyState icon="rotate-cw" title="Nothing on the wheel yet" body={why ?? ''} action={mode === 'watchlist' ? { label: 'Find films', icon: 'search', href: '/discover' } : undefined} />
+        <EmptyState icon="rotate-cw" title="Nothing on the reel yet" body={why ?? ''} action={mode === 'watchlist' ? { label: 'Find films', icon: 'search', href: '/discover' } : undefined} />
       )}
       {error ? <p className="wm-error type-body" role="alert">{error} {request.current ? <button type="button" className="fd-link" onClick={() => doSpin(true)}>Try again</button> : null}</p> : null}
 
       {pool.length >= MIN_POOL ? (
         <section aria-labelledby={`${uid}-pool`} className="wm-pool">
-          <h3 id={`${uid}-pool`} className="type-label">On the wheel ({pool.length}) · each has a 1 in {pool.length} chance</h3>
+          <h3 id={`${uid}-pool`} className="type-label">On the reel ({pool.length}) · each has a 1 in {pool.length} chance</h3>
           <ol role="list" className="wm-pool-list">
             {pool.map((f, i) => (
               <li key={f.tmdb_id} className={revealed && revealed.winner_index === i && revealed.pool === pool ? 'is-winner' : ''}>

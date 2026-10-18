@@ -3,19 +3,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { animate, useMotionValue, useMotionValueEvent, type AnimationPlaybackControls } from 'motion/react';
 import { Button, Icon } from '@/ds/client';
 import { usePrefs } from '@/lib/device-store';
-import { landingRotation, wedgeAt, type Spin, type WheelFilm } from '@/lib/wheel';
+import { mod, reelLanding, type Spin, type WheelFilm } from '@/lib/wheel';
 import Lever from './Lever';
+import Reel from './Reel';
 import { chime, tick } from './sound';
-import Wheel from './Wheel';
 
 export const SPIN_SECONDS = 5.2;
+const DRIFT = 8;   // posters a second while the reel rolls and waits for the server's answer
 
-/* Same spin, same stopping point on every screen: the pointer's place inside the winning wedge comes from the
-   spin's id, not from each browser. It only changes where in the wedge it stops, never which wedge. */
-const nudgeFor = (id: string) => ((parseInt(id.replace(/-/g, '').slice(0, 6), 16) % 1000) / 1000) - 0.5;
-
-/* The machine: wheel, lever, Spin button, sound switch and the spoken status. It animates whichever spin it is
-   given toward that spin's saved winner; it never decides a result. */
+/* The machine: the poster reel, the lever, the Spin button, the sound switch and the spoken status. It runs the
+   reel to whichever spin it's given and stops on that spin's saved winner; it never decides a result.
+   Pulling the lever nudges the reel; letting go past the mark asks the server for a spin, and the reel keeps
+   rolling until the answer arrives, then slows down and frames the winner. */
 export default function WheelStage({ films, spin, busy, canSpin, cantSpinReason, onSpin, onRevealed, spinLabel = 'Spin WheelMo' }: {
   films: WheelFilm[]; spin: Spin | null; busy: boolean; canSpin: boolean; cantSpinReason?: string;
   onSpin: () => void; onRevealed: (s: Spin) => void; spinLabel?: string;
@@ -24,79 +23,117 @@ export default function WheelStage({ films, spin, busy, canSpin, cantSpinReason,
   const [osReduced, setOsReduced] = useState(false);
   useEffect(() => { const m = matchMedia('(prefers-reduced-motion: reduce)'); setOsReduced(m.matches); const on = () => setOsReduced(m.matches); m.addEventListener('change', on); return () => m.removeEventListener('change', on); }, []);
   const reduced = prefs.reduceMotion || osReduced;
-  const rotation = useMotionValue(0);
-  const [active, setActive] = useState<number | null>(null);
-  const [phase, setPhase] = useState<'idle' | 'spinning' | 'revealed'>('idle');
+  const pos = useMotionValue(0);
+  const [landed, setLanded] = useState<number | null>(null);
+  const [phase, setPhase] = useState<'idle' | 'rolling' | 'spinning' | 'revealed'>('idle');
   const [sound, setSound] = useState(false);
   const [say, setSay] = useState('');
   const anim = useRef<AnimationPlaybackControls | null>(null);
   const done = useRef<string | null>(null);
   const target = useRef(0);
+  const rest = useRef(0);
+  const lastTick = useRef(0);
+  const rolling = useRef(false);   // set at once, so effects in the same render see it
   const n = films.length;
 
   useEffect(() => { try { setSound(localStorage.getItem('viemo:wheel-sound') === 'on'); } catch {} }, []);
-  useMotionValueEvent(rotation, 'change', (r) => {
-    if (phase !== 'spinning' || !n) return;
-    const w = wedgeAt(r, n);
-    setActive((prev) => { if (prev !== w && sound) tick(0.8); return w; });
+  /* A click each time a poster passes the window. */
+  useMotionValueEvent(pos, 'change', (p) => {
+    const c = Math.round(p);
+    if (c !== lastTick.current) { lastTick.current = c; if (sound && phase !== 'revealed') tick(0.8); }
   });
 
   const finish = useCallback((s: Spin) => {
     if (done.current === s.id) return;
     done.current = s.id;
-    rotation.set(target.current);
-    setActive(s.winner_index);
+    anim.current?.stop();
+    pos.set(target.current);
+    rest.current = target.current;
+    setLanded(Math.round(target.current));
     setPhase('revealed');
     setSay(`WheelMo chose ${s.pool[s.winner_index]?.title ?? 'a film'}.`);
     if (sound) chime();
     onRevealed(s);
-  }, [onRevealed, rotation, sound]);
+  }, [onRevealed, pos, sound]);
 
-  /* A new spin arrived: turn to its winner. Spins that are already over (a late arrival, a reload) jump straight
-     to the result, so nobody sees a second, different roll. */
+  /* Waiting for the server: the reel keeps rolling at an even pace. The repeat wraps by exactly one run of the
+     pool, which looks identical, so it can roll for as long as it takes. */
+  useEffect(() => {
+    if (!busy || reduced || !n || (spin && done.current !== spin.id)) return;
+    anim.current?.stop();
+    const base = mod(pos.get(), n);
+    pos.set(base);
+    setLanded(null); setPhase('rolling'); setSay('Spinning…');
+    rolling.current = true;
+    anim.current = animate(pos, [base, base + n], { duration: n / DRIFT, ease: 'linear', repeat: Infinity });
+  }, [busy]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* A spin arrived: run the reel to its winner. Spins that are already over (a late arrival, a reload) show the
+     result at once, so nobody sees a second, different roll. */
   useEffect(() => {
     if (!spin || !n || done.current === spin.id) return;
+    const wasRolling = rolling.current;
+    rolling.current = false;
     anim.current?.stop();
-    const from = rotation.get();
-    target.current = landingRotation(from, spin.winner_index, n, 6, nudgeFor(spin.id));
+    const from = mod(pos.get(), n);
+    pos.set(from);
+    target.current = reelLanding(from, spin.winner_index, n);
     const elapsed = (Date.now() - new Date(spin.created_at).getTime()) / 1000;
     const remaining = SPIN_SECONDS - Math.max(0, Math.min(elapsed, SPIN_SECONDS));
     if (reduced || spin.status !== 'spinning' || remaining < 0.8) { finish(spin); return; }
-    setPhase('spinning');
-    setSay('Spinning…');
-    const to = target.current;
-    anim.current = animate(rotation, [from, from + (to - from) * 0.09, to], {
-      duration: remaining, times: [0, 0.13, 1], ease: ['easeIn', [0.1, 0.6, 0.06, 1]],
-      onComplete: () => finish(spin),
-    });
-    return () => anim.current?.stop();
+    setLanded(null); setPhase('spinning'); setSay('Spinning…');
+    const to = target.current, d = to - from;
+    /* Fast at first (straight on from the rolling reel, or a short wind-up from rest), a long slow-down, a little
+       past the winner, and back: it settles like a real reel clicking into place. */
+    anim.current = wasRolling
+      ? animate(pos, [from, to + 0.32, to], { duration: remaining, times: [0, 0.93, 1], ease: [[0.18, 0.62, 0.22, 1], 'easeInOut'], onComplete: () => finish(spin) })
+      : animate(pos, [from, from + d * 0.06, to + 0.32, to], { duration: remaining, times: [0, 0.1, 0.93, 1], ease: ['easeIn', [0.15, 0.55, 0.2, 1], 'easeInOut'], onComplete: () => finish(spin) });
   }, [spin?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* A different pool resets the wheel to rest. */
+  /* If the request fails, the reel coasts to rest on the poster it's nearest. */
+  useEffect(() => {
+    if (busy || !rolling.current) return;
+    rolling.current = false;
+    anim.current?.stop();
+    const to = Math.round(pos.get()) + 1;
+    rest.current = to;
+    anim.current = animate(pos, to, { type: 'spring', stiffness: 120, damping: 20 });
+    setPhase('idle'); setSay('');
+  }, [busy]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => () => anim.current?.stop(), []);
+
+  /* A different pool resets the reel to rest. */
   const poolKey = films.map((f) => f.tmdb_id).join(',');
   const lastPool = useRef(poolKey);
   useEffect(() => {
     if (lastPool.current === poolKey) return;
     lastPool.current = poolKey;
-    if (!spin || spin.pool.map((f) => f.tmdb_id).join(',') !== poolKey) { setPhase('idle'); setActive(null); }
-  }, [poolKey, spin]);
+    if (!spin || spin.pool.map((f) => f.tmdb_id).join(',') !== poolKey) { anim.current?.stop(); pos.set(0); rest.current = 0; setPhase('idle'); setLanded(null); }
+  }, [poolKey, spin, pos]);
 
-  const spinning = phase === 'spinning';
+  /* Pulling the lever nudges the reel forward; letting go short of the mark lets it fall back. */
+  const onLever = useCallback((v: number) => {
+    if (phase === 'spinning' || phase === 'rolling' || busy) return;
+    pos.set(rest.current + v * 0.85);
+  }, [phase, busy, pos]);
+
+  const spinning = phase === 'spinning' || phase === 'rolling';
   const blocked = !canSpin || busy || spinning;
   return (
     <div className={`wm-stage${spinning ? ' is-spinning' : ''}`}>
       <div className="wm-machine">
         <div className="wm-marquee" aria-hidden="true"><span>Wheel</span><span>Mo</span></div>
-        <div className="wm-wheel-wrap" data-hint={blocked ? '' : 'Pull the lever'}>
-          <Wheel films={films} rotation={rotation} active={active} winner={phase === 'revealed' ? spin?.winner_index ?? null : null} spinning={spinning} />
+        <div className="wm-reel-wrap" data-hint={blocked ? '' : 'Pull the lever'}>
+          <Reel films={films} pos={pos} landed={phase === 'revealed' ? landed : null} spinning={spinning} still={reduced} />
         </div>
-        <Lever disabled={blocked} onPull={onSpin} reduced={reduced} />
+        <Lever disabled={blocked} onPull={onSpin} reduced={reduced} onProgress={onLever} />
       </div>
       <div className="wm-controls">
         <Button variant="primary" size="lg" icon="rotate-cw" busy={busy} disabled={blocked} onClick={onSpin} className="wm-spin-btn">
-          {busy ? 'Asking the wheel' : spinning ? 'Spinning' : spinLabel}
+          {busy ? 'Asking the reel' : spinning ? 'Spinning' : spinLabel}
         </Button>
-        {spinning ? <Button variant="ghost" onClick={() => { anim.current?.stop(); if (spin) finish(spin); }}>Show the result now</Button> : null}
+        {phase === 'spinning' ? <Button variant="ghost" onClick={() => { anim.current?.stop(); if (spin) finish(spin); }}>Show the result now</Button> : null}
         <button type="button" className="wm-sound type-label" aria-pressed={sound} onClick={() => { const v = !sound; setSound(v); try { localStorage.setItem('viemo:wheel-sound', v ? 'on' : 'off'); } catch {} }}>
           <Icon name={sound ? 'volume-2' : 'volume-x'} size={18} />{sound ? 'Sound on' : 'Sound off'}
         </button>

@@ -8,7 +8,7 @@ const THRESHOLD = 0.78;  // how far down counts as a pull
 
 /* A machine lever. Drag the knob down past the mark and let go to spin; it springs back. Pressing it (click,
    Enter or Space) does the same pull for you, so dragging is never required. */
-export default function Lever({ disabled, onPull, reduced }: { disabled: boolean; onPull: () => void; reduced: boolean }) {
+export default function Lever({ disabled, onPull, reduced, onProgress }: { disabled: boolean; onPull: () => void; reduced: boolean; onProgress?: (v: number) => void }) {
   const pull = useMotionValue(0);
   /* Seen from the front, the arm swings toward you: the ball drops straight down past the pivot, the rod
      shortens then grows below it, and the ball looms a little larger mid-swing. */
@@ -21,7 +21,7 @@ export default function Lever({ disabled, onPull, reduced }: { disabled: boolean
   const [dragging, setDragging] = useState(false);
   const start = useRef<{ y: number; id: number } | null>(null);
   const moved = useRef(false);
-  useMotionValueEvent(pull, 'change', (v) => setArmed(v >= THRESHOLD));
+  useMotionValueEvent(pull, 'change', (v) => { setArmed(v >= THRESHOLD); onProgress?.(v); });
   useEffect(() => { if (disabled) animate(pull, 0, { type: 'spring', stiffness: 260, damping: 18 }); }, [disabled, pull]);
 
   const release = (fire: boolean) => {

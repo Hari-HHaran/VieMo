@@ -1,4 +1,4 @@
-/* WheelMo's shared shapes and the geometry that lands the pointer on the winner the server already chose. */
+/* WheelMo's shared shapes and the reel geometry that frames the winner the server already chose. */
 export type WheelMode = 'watchlist' | 'playlist' | 'surprise';
 export interface WheelFilm { tmdb_id: number; title: string; year: number | null; poster_path: string | null }
 export interface Spin {
@@ -7,21 +7,16 @@ export interface Spin {
 }
 export const MIN_POOL = 2, MAX_POOL = 12;
 
-/* Wedge i covers [i·seg, (i+1)·seg) degrees clockwise from 12 o'clock on the wheel. With the wheel turned R degrees
-   clockwise, the wedge under the fixed top pointer is the one at angle (−R mod 360). */
-export const wedgeAt = (rotation: number, n: number) => {
-  const a = (((-rotation) % 360) + 360) % 360;
-  return Math.min(n - 1, Math.floor(a / (360 / n)));
-};
-
-/* The rotation that brings wedge `index` under the pointer after `turns` full turns. `nudge` (−0.5…0.5) only moves
-   where inside the winning wedge the pointer stops, for a natural look; it can never change the winner. */
-export function landingRotation(from: number, index: number, n: number, turns: number, nudge = 0): number {
-  const seg = 360 / n;
-  const inside = (index + 0.5 + Math.max(-0.38, Math.min(0.38, nudge))) * seg;
-  const want = (((-inside) % 360) + 360) % 360;
-  const now = ((from % 360) + 360) % 360;
-  let delta = want - now;
-  if (delta <= 0) delta += 360;
-  return from + turns * 360 + delta;
+/* ---- The reel (WheelMo's carousel) ----
+   The reel's position is measured in posters: at position p, poster (p mod n) sits in the window. It only ever
+   stops on a whole number, so exactly one poster is framed: the server's winner. */
+export const mod = (a: number, n: number) => ((a % n) + n) % n;
+/* How many times the reel runs through the pool before stopping: at least ~28 posters pass the window. */
+export const reelTurns = (n: number) => Math.max(3, Math.ceil(28 / Math.max(1, n)));
+/* Where to stop: the first position, after `turns` full runs from `from`, that frames poster `index`. */
+export function reelLanding(from: number, index: number, n: number, turns = reelTurns(n)): number {
+  const base = Math.floor(from + 0.5) + turns * n;
+  return base + mod(index - base, n);
 }
+/* The poster in the window at a position. */
+export const reelAt = (pos: number, n: number) => mod(Math.round(pos), n);
