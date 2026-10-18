@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Avatar, Poster, ProviderBadge, Rating } from '@/ds/client';
 import BackButton from '@/components/BackButton';
+import { MoPage } from '@/components/mo/MoProvider';
 import FilmActions from '@/components/FilmActions';
 import AddToCollection from '@/components/community/AddToCollection';
 import FilmReviews from '@/components/community/FilmReviews';
@@ -55,6 +56,7 @@ export default async function FilmPage({ params }: Props) {
   return (
     <article className="film" data-film={f.id} aria-labelledby="film-title">
       {accent ? <style dangerouslySetInnerHTML={{ __html: accent.css }} /> : null}
+      <MoPage film={{ id: f.id, title: f.title, year: year ?? null }} />
       <div className="screen-bar"><BackButton /></div>
       {backdrop ? (
         <div className="film-backdrop"><img src={backdrop} srcSet={`${img(f.backdrop_path, 'w780')} 780w, ${backdrop} 1280w`} sizes="(min-width: 1024px) 960px, 100vw" alt="" /></div>

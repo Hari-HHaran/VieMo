@@ -10,6 +10,7 @@ import WheelStage from '../wheelmo/WheelStage';
 import DemoBadge from '../community/DemoBadge';
 import AddFilms from './AddFilms';
 import { useRoomLive } from './useRoomLive';
+import { useMoPage } from '../mo/MoProvider';
 
 const IMG = 'https://image.tmdb.org/t/p';
 const STEPS = [['lobby', 'Add films'], ['voting', 'Vote'], ['results', 'Results'], ['closed', 'Tonight’s film']] as const;
@@ -30,6 +31,7 @@ export default function NightRoom({ initial, realtime }: { initial: NightState; 
   const uid = useId();
   const toast = useToast();
   const { state: s, refresh, mode, online, gone } = useRoomLive(initial, realtime);
+  useMoPage({ room: { code: s.code, title: s.title, status: s.status } });
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [wheel, setWheel] = useState<'group' | 'decider' | null>(null);   // the host's wheel, before it spins

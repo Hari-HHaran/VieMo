@@ -42,7 +42,7 @@ export default async function Match({ searchParams }: { searchParams: Promise<Re
           </ul>
         </div>
       </nav>
-      {wheel ? <WheelMo initialShare={share} services={services} /> : (
+      {wheel ? <WheelMo initialShare={share} services={services} auto={q.auto === 'watchlist' || q.auto === 'surprise' ? q.auto : null} /> : (
         <QuickPick services={services} place={regionName(region)} availabilityNote={asOf(`Availability is from JustWatch via TMDB for ${regionName(region)}`)} />
       )}
     </div>

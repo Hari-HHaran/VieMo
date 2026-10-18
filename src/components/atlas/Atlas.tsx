@@ -5,7 +5,7 @@ import { Icon, Poster } from '@/ds/client';
 import { usePrefs } from '@/lib/device-store';
 import { LAYOUT, prefersLessMotion } from '@/lib/motion';
 import { SAMPLE_LOCATIONS, type AtlasFilm, type AtlasLocation } from '@/lib/atlas/types';
-import Mo from '../mo/Mo';
+import { useMoControl, useMoPage } from '../mo/MoProvider';
 import AtlasSearch from './AtlasSearch';
 import BehindTheFrame from './BehindTheFrame';
 import FlatMap from './FlatMap';
@@ -30,7 +30,7 @@ export default function Atlas() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [listOpen, setListOpen] = useState(true);
-  const [ask, setAsk] = useState<{ text: string; n: number } | null>(null);
+  const { askMo } = useMoControl();
   const globe = useRef<GlobeHandle>(null);
   const root = useRef<HTMLDivElement>(null);
   /* The globe code (three.js) loads only on this page. It is loaded by hand rather than through a Suspense
@@ -56,6 +56,7 @@ export default function Atlas() {
   /* Phase 1: a chosen film has no researched locations yet, so it shows none. Samples only appear with no film. */
   const locations = useMemo<AtlasLocation[]>(() => (film ? [] : SAMPLE_LOCATIONS), [film]);
   const selected = locations.find((l) => l.id === selectedId) ?? null;
+  useMoPage({ film: film ? { id: film.id, title: film.title, year: film.year ?? null } : null, location: selected ? { name: selected.name, country: selected.country ?? null, sample: !!selected.sample } : null });
   const showGlobe = view === 'globe' && webgl === true;
 
   const select = (l: AtlasLocation) => { setSelectedId(l.id); if (showGlobe) globe.current?.flyTo(l); };
@@ -128,12 +129,11 @@ export default function Atlas() {
         {selected ? (
           <div className="atlas-detail" key={selected.id}>
             <BehindTheFrame location={selected} film={film} onClose={() => setSelectedId(null)} onShowOnMap={() => setView('map')}
-              onAskMo={(l) => setAsk({ text: l.sample ? 'How do you check filming locations?' : `What was filmed at ${l.name}?`, n: Date.now() })} />
+              onAskMo={(l) => askMo(l.sample ? 'How do you check filming locations?' : `What was filmed at ${l.name}?`)} />
           </div>
         ) : null}
       </AnimatePresence>
 
-      <Mo context={{ film, location: selected }} ask={ask} />
     </div>
   );
 }

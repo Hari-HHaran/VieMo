@@ -80,3 +80,76 @@ function parseJsonReply<T>(text: string): T | null {
   if (a >= 0 && b > a) { try { return JSON.parse(t.slice(a, b + 1)) as T; } catch {} }
   return null;
 }
+
+/* ---- Chat with tools, streamed (Mo) ---- */
+export type ChatMessage =
+  | { role: 'system' | 'user'; content: string }
+  | { role: 'assistant'; content: string | null; tool_calls?: { id: string; type: 'function'; function: { name: string; arguments: string } }[] }
+  | { role: 'tool'; tool_call_id: string; content: string };
+export interface ToolSpec { type: 'function'; function: { name: string; description: string; parameters: object } }
+export interface ToolCall { id: string; name: string; args: string }
+
+/* One model turn. Text is passed to `onText` as it streams; tool calls are collected and returned whole.
+   Providers that refuse streaming get the same request without it. */
+export async function chatTurn(messages: ChatMessage[], tools: ToolSpec[], onText: (d: string) => void, signal?: AbortSignal):
+  Promise<{ content: string; calls: ToolCall[]; tokens: number }> {
+  if (!aiConfigured()) throw new AiError('config', 'No AI key on this server');
+  const reasoning = /^(gpt-5|o\d)/.test(AI_MODEL);
+  const base = { model: AI_MODEL, messages, tools, tool_choice: 'auto', max_completion_tokens: 1800, ...(reasoning ? { reasoning_effort: 'low' } : { temperature: 0.4 }) };
+  for (const stream of [true, false]) {
+    let res: Response;
+    try {
+      res = await fetch(`${BASE()}/chat/completions`, {
+        method: 'POST', headers: { Authorization: `Bearer ${KEY()}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(stream ? { ...base, stream: true, stream_options: { include_usage: true } } : base),
+        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(60_000)]) : AbortSignal.timeout(60_000), cache: 'no-store',
+      });
+    } catch (e) {
+      if (signal?.aborted) throw e;
+      throw new AiError('upstream', 'The AI service did not answer in time');
+    }
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({})) as { error?: { code?: string | number; type?: string } };
+      const code = String(err.error?.code || err.error?.type || `http_${res.status}`).replace(/[^\w.-]/g, '').slice(0, 60);
+      if (res.status === 401 || res.status === 403) throw new AiError('key', 'The AI service rejected the key', code);
+      if (res.status === 429) throw new AiError(err.error?.code === 'insufficient_quota' ? 'quota' : 'rate_limited', 'AI limit reached', code);
+      if (stream && (res.status === 400 || res.status === 422)) continue;
+      throw new AiError('upstream', `AI service ${res.status}`, code);
+    }
+    if (!stream) {
+      const data = await res.json().catch(() => null) as { choices?: { message?: { content?: string | null; tool_calls?: { id: string; function: { name: string; arguments: string } }[] } }[]; usage?: { total_tokens?: number } } | null;
+      const msg = data?.choices?.[0]?.message;
+      if (msg?.content) onText(msg.content);
+      return { content: msg?.content ?? '', calls: (msg?.tool_calls ?? []).map((c) => ({ id: c.id, name: c.function.name, args: c.function.arguments })), tokens: data?.usage?.total_tokens ?? 0 };
+    }
+    let content = '', tokens = 0, buf = '';
+    const calls: { id: string; name: string; args: string }[] = [];
+    const reader = res.body!.getReader();
+    const dec = new TextDecoder();
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let nl: number;
+      while ((nl = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1);
+        if (!line.startsWith('data:')) continue;
+        const payload = line.slice(5).trim();
+        if (payload === '[DONE]') continue;
+        let chunk: { choices?: { delta?: { content?: string | null; tool_calls?: { index: number; id?: string; function?: { name?: string; arguments?: string } }[] } }[]; usage?: { total_tokens?: number } };
+        try { chunk = JSON.parse(payload); } catch { continue; }
+        if (chunk.usage?.total_tokens) tokens = chunk.usage.total_tokens;
+        const delta = chunk.choices?.[0]?.delta;
+        if (delta?.content) { content += delta.content; onText(delta.content); }
+        for (const tc of delta?.tool_calls ?? []) {
+          const c = (calls[tc.index] ??= { id: '', name: '', args: '' });
+          if (tc.id) c.id = tc.id;
+          if (tc.function?.name) c.name += tc.function.name;
+          if (tc.function?.arguments) c.args += tc.function.arguments;
+        }
+      }
+    }
+    return { content, calls: calls.filter(Boolean).map((c, i) => ({ id: c.id || `call_${i}`, name: c.name, args: c.args })), tokens };
+  }
+  throw new AiError('upstream', 'No usable reply');
+}

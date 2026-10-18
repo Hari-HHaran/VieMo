@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Avatar, Icon, Poster } from '@/ds/client';
 import CollectionActions from '@/components/community/CollectionActions';
 import DemoBadge from '@/components/community/DemoBadge';
+import { MoPage } from '@/components/mo/MoProvider';
 import { collectionPage } from '@/lib/community';
 import { runtimeLabel } from '@/lib/format';
 import { currentUser } from '@/lib/supabase/server';
@@ -43,6 +44,7 @@ export default async function Collection({ params }: Params) {
         <div className="cv-info">
           <p className="type-eyebrow cv-eyebrow">Collection{c.visibility !== 'public' ? ` · ${c.visibility === 'unlisted' ? 'Unlisted' : 'Private'}` : ''}</p>
           <h1 className="cv-title">{c.title}</h1>
+          <MoPage collection={{ share: c.share_id, title: c.title }} />
           {c.description ? <p className="type-body-lg cv-desc">{c.description}</p> : null}
           <p className="cv-by type-body">
             <a href={`/u/${c.owner.username}`} className="cv-owner"><Avatar name={name} src={c.owner.avatar_url ?? undefined} size="sm" /><span>{name}</span></a>

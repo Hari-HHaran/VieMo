@@ -22,11 +22,11 @@ function sample<T>(list: T[], k: number): T[] {
 }
 const newId = () => (crypto.randomUUID ? crypto.randomUUID() : '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) => (Number(c) ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (Number(c) / 4)))).toString(16)));
 
-export default function WheelMo({ initialShare, services }: { initialShare?: string | null; services: { id: number; name: string }[] }) {
+export default function WheelMo({ initialShare, services, auto }: { initialShare?: string | null; services: { id: number; name: string }[]; auto?: 'watchlist' | 'surprise' | null }) {
   const uid = useId();
   const me = useAccount();
   const { list: device } = useWatchlist();
-  const [mode, setMode] = useState<WheelMode>(initialShare ? 'playlist' : 'watchlist');
+  const [mode, setMode] = useState<WheelMode>(auto ?? (initialShare ? 'playlist' : 'watchlist'));
   const [sources, setSources] = useState<Sources | null>(null);
   const [share, setShare] = useState<string | null>(initialShare ?? null);
   const [collection, setCollection] = useState<{ title: string; owner: string; is_demo: boolean; films: WheelFilm[] } | null | 'missing'>(null);
@@ -115,6 +115,22 @@ export default function WheelMo({ initialShare, services }: { initialShare?: str
     } catch { setError('Couldn’t deal films right now. Try again in a moment.'); }
     finally { setDealing(false); }
   };
+
+  /* Opened from a confirmed Mo card (?auto=…): spin once, as soon as the films are on the wheel. The address is
+     tidied first, so a reload never spins again. */
+  const autoRun = useRef(auto ?? null);
+  useEffect(() => {
+    if (!autoRun.current) return;
+    try { const u = new URL(location.href); u.searchParams.delete('auto'); history.replaceState(history.state, '', u); } catch {}
+    if (autoRun.current === 'surprise') void deal();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!autoRun.current || busy || dealing || spin) return;
+    if (autoRun.current === 'watchlist' && !sources) return;
+    if (autoRun.current === 'surprise' && !surprise) return;
+    autoRun.current = null;
+    if (pool.length >= MIN_POOL && pool.length <= MAX_POOL) void doSpin(false);
+  }, [sources, surprise, pool, busy, dealing, spin, doSpin]);
 
   const winner = revealed ? revealed.pool[revealed.winner_index] : null;
   const can = pool.length >= MIN_POOL && pool.length <= MAX_POOL;

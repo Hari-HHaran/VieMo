@@ -8,28 +8,14 @@ import Problem from '@/components/Problem';
 import QueryChips from '@/components/QueryChips';
 import SearchField from '@/components/SearchField';
 import { dateLabel } from '@/lib/format';
-import { genreCombos, MAX_MOODS, MOODS, parseMoods, sortByFit, type Mood } from '@/lib/moods';
+import { MAX_MOODS, MOODS, parseMoods, type Mood } from '@/lib/moods';
+import { moodFilms } from '@/lib/mood-films';
 import { regionName, viewerRegion } from '@/lib/region';
 import { settle } from '@/lib/settle';
-import { asOf, discover, HIDDEN_GEMS_RULE, hiddenGems, nowPlaying, regionProviders, trending, upcoming, type MovieSummary } from '@/lib/tmdb';
+import { asOf, discover, HIDDEN_GEMS_RULE, hiddenGems, nowPlaying, regionProviders, trending, upcoming } from '@/lib/tmdb';
 
 export const metadata: Metadata = { title: 'Discover' };
 
-/* Films for one or more moods. One mood: TMDB's popular films in any of its genres. Several: a TMDB search for each
-   genre combination that covers every mood, plus the popular films in any of their genres for close matches; each
-   film is then sorted by how many of the moods its TMDB genres fit. */
-async function moodFilms(moods: Mood[], region: string) {
-  const union = [...new Set(moods.flatMap((m) => m.genres))];
-  if (moods.length === 1) return { all: (await discover({ genresAny: union, region })).results, some: [] as { film: MovieSummary; fits: Mood[] }[] };
-  const pages = await Promise.allSettled([
-    ...genreCombos(moods).map((g) => discover({ genresAll: g, region }).then((r) => r.results)),
-    discover({ genresAny: union, region }).then((r) => r.results),
-    discover({ genresAny: union, region, page: 2 }).then((r) => r.results),
-  ]);
-  if (pages.every((p) => p.status === 'rejected')) throw (pages[0] as PromiseRejectedResult).reason;
-  const sorted = sortByFit(pages.flatMap((p) => (p.status === 'fulfilled' ? p.value : [])), moods);
-  return { all: sorted.all.map((x) => x.film), some: sorted.some };
-}
 const joinMoods = (moods: Mood[]) => moods.map((m) => m.label).join(' + ');
 
 export default async function Discover({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {

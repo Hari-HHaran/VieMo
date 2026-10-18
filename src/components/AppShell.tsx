@@ -1,5 +1,5 @@
 'use client';
-import { addTransitionType, createContext, useCallback, useContext, useEffect, useRef, useState, useTransition, ViewTransition } from 'react';
+import { addTransitionType, createContext, Suspense, useCallback, useContext, useEffect, useRef, useState, useTransition, ViewTransition } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Toast } from '@/ds/client';
@@ -9,6 +9,8 @@ import { WORLD_NAMES, worldFor, type WorldId } from '@/lib/worlds';
 import MotionProvider from './MotionProvider';
 import Backdrop from './fx/Backdrop';
 import CinemaCursor from './fx/CinemaCursor';
+import Mo from './mo/Mo';
+import { MoProvider } from './mo/MoProvider';
 import SiteNav from './nav/SiteNav';
 import { AccountProvider } from './account/useAccount';
 
@@ -113,6 +115,7 @@ export default function AppShell({ children, dataNote }: { children: React.React
   return (
     <ToastContext.Provider value={show}>
       <AccountProvider>
+      <MoProvider>
       <a className="skip-link" href="#main">Skip to content</a>
       <MotionProvider>
       <div className={`nav-progress${pending ? ' is-on' : ''}`} role="progressbar" aria-label="Loading page" aria-hidden={!pending} />
@@ -137,6 +140,7 @@ export default function AppShell({ children, dataNote }: { children: React.React
           </motion.div>
         ) : null}
       </AnimatePresence>
+      <Suspense fallback={null}><Mo /></Suspense>
       </MotionProvider>
       <Backdrop />
       <CinemaCursor world={world} />
@@ -145,6 +149,7 @@ export default function AppShell({ children, dataNote }: { children: React.React
           action={toast.action ? { label: toast.action.label, onClick: () => { toast.action!.onClick(); setToast(null); } } : undefined}
           onDismiss={() => setToast(null)} duration={toast.action ? 6000 : 3500} />
       ) : null}
+      </MoProvider>
       </AccountProvider>
     </ToastContext.Provider>
   );
