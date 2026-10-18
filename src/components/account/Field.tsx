@@ -35,7 +35,7 @@ export function PasswordField({ label, hint, error, ...input }: Props) {
         <input id={id} type={shown ? 'text' : 'password'} className="acct-input type-body" aria-invalid={error ? true : undefined} aria-describedby={described}
           autoCapitalize="none" autoCorrect="off" spellCheck={false} {...input} />
         <button type="button" className="acct-show type-label" aria-pressed={shown} aria-controls={id} onClick={() => setShown((s) => !s)}>
-          {shown ? 'Hide' : 'Show'}<span className="vm-sr"> password</span>
+          {shown ? 'Hide' : 'Show'}<span className="vm-sr"> {label.toLowerCase()}</span>
         </button>
       </div>
       {error ? <p id={`${id}-err`} className="acct-error type-caption"><Icon name="triangle-alert" size={14} />{error}</p> : null}

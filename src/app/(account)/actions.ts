@@ -5,14 +5,17 @@ import { revalidatePath } from 'next/cache';
 import { safeNext } from '@/lib/auth/next';
 import { siteOrigin } from '@/lib/auth/origin';
 import { clientIp, limitedKey } from '@/lib/rate-limit';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { currentUser, supabaseServer } from '@/lib/supabase/server';
 
 export type FormState = {
   error?: string;
-  field?: 'email' | 'password' | 'username' | 'display_name' | 'bio';
+  field?: 'email' | 'password' | 'confirm_password' | 'username' | 'display_name' | 'bio';
   sent?: boolean;
   email?: string;
+  name?: string;
   unconfirmed?: boolean;
+  exists?: boolean;
   saved?: boolean;
 };
 
@@ -60,27 +63,55 @@ export async function signIn(_: FormState, form: FormData): Promise<FormState> {
   redirect(next);
 }
 
+/* Some auth servers drop the name given to an account the admin creates, so it's set on the new profile here,
+   with a starting username made from it (never from the email). The person can change both in Account. */
+async function nameProfile(sb: NonNullable<Awaited<ReturnType<typeof supabaseServer>>>, id: string, displayName: string) {
+  const { data } = await sb.from('profiles').select('display_name').eq('id', id).maybeSingle();
+  if (data?.display_name) return;
+  const base = displayName.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 16);
+  for (let i = 0; i < 3; i++) {
+    const tail = crypto.getRandomValues(new Uint8Array(2)).reduce((t, x) => t + x.toString(16).padStart(2, '0'), '');
+    const { error } = await sb.from('profiles').update(base.length >= 3 ? { display_name: displayName, username: `${base}_${tail}` } : { display_name: displayName }).eq('id', id);
+    if (!error || error.code !== '23505') return;
+  }
+}
+
+/* Sign-up with a password, and you're in: no email link to click. With the server's Supabase admin key, the
+   account is created already confirmed and signed in at once (Supabase sends no email). Without it, Supabase's
+   own sign-up is used, which signs straight in when the project has "Confirm email" switched off. */
 export async function signUp(_: FormState, form: FormData): Promise<FormState> {
   const email = text(form, 'email').toLowerCase(), password = String(form.get('password') ?? '');
+  const confirm = String(form.get('confirm_password') ?? '');
   const displayName = text(form, 'display_name', 60);
   const next = safeNext(form.get('next'), '/');
-  if (!EMAIL.test(email)) return { error: 'Enter an email address you can open: we send a link to confirm it.', field: 'email', email };
-  if (password.length < MIN_PASSWORD) return { error: `Use at least ${MIN_PASSWORD} characters for your password.`, field: 'password', email };
-  if (password.length > 72) return { error: 'Use 72 characters or fewer for your password.', field: 'password', email };
-  if (await tooMany('sign-up', 5)) return { error: 'Too many attempts. Wait a minute, then try again.', email };
+  if (!EMAIL.test(email)) return { error: 'Enter an email address, like name@example.com.', field: 'email', email, name: displayName };
+  if (password.length < MIN_PASSWORD) return { error: `Use at least ${MIN_PASSWORD} characters for your password.`, field: 'password', email, name: displayName };
+  if (password.length > 72) return { error: 'Use 72 characters or fewer for your password.', field: 'password', email, name: displayName };
+  if (password !== confirm) return { error: 'The two passwords don’t match. Type the same password in both boxes.', field: 'confirm_password', email, name: displayName };
+  if (await tooMany('sign-up', 5)) return { error: 'Too many attempts. Wait a minute, then try again.', email, name: displayName };
   const sb = await supabaseServer();
-  if (!sb) return { error: OFFLINE, email };
-  const welcome = `/account?welcome=1${next !== '/' ? `&next=${encodeURIComponent(next)}` : ''}`;
+  if (!sb) return { error: OFFLINE, email, name: displayName };
+  const exists: FormState = { error: 'There’s already a VieMo account with this email. Sign in with its password instead.', field: 'email', email, name: displayName, exists: true };
+  const isTaken = (e: { code?: string; message?: string }) => e.code === 'email_exists' || e.code === 'user_already_exists' || /already (been )?registered|already exists/i.test(e.message ?? '');
+  const admin = supabaseAdmin();
+  if (admin) {
+    const { data: created, error: made } = await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: displayName ? { display_name: displayName } : {} });
+    if (made) return isTaken(made) ? exists : { error: explain(made), field: made.code === 'weak_password' ? 'password' : undefined, email, name: displayName };
+    const { error: signed } = await sb.auth.signInWithPassword({ email, password });
+    if (signed) return { error: explain(signed), email, name: displayName };
+    if (displayName && created.user) await nameProfile(sb, created.user.id, displayName);
+    revalidatePath('/', 'layout');
+    redirect(next);
+  }
   const { data, error } = await sb.auth.signUp({
     email, password,
-    options: { data: displayName ? { display_name: displayName } : undefined, emailRedirectTo: `${await siteOrigin()}/auth/callback?next=${encodeURIComponent(welcome)}` },
+    options: { data: displayName ? { display_name: displayName } : undefined, emailRedirectTo: `${await siteOrigin()}/auth/callback?next=${encodeURIComponent(next)}` },
   });
-  if (error && error.code !== 'user_already_exists') return { error: explain(error), field: error.code === 'weak_password' ? 'password' : undefined, email };
-  /* With email confirmation on (the default), there's no session yet: the link in the email finishes it.
-     Supabase answers the same way for an address that already has an account, so nobody can probe for one. */
-  if (!data?.session) return { sent: true, email };
+  if (error) return isTaken(error) ? exists : { error: explain(error), field: error.code === 'weak_password' ? 'password' : undefined, email, name: displayName };
+  /* The project still asks for email confirmation (and this server has no admin key to skip it). */
+  if (!data?.session) return { sent: true, email, name: displayName };
   revalidatePath('/', 'layout');
-  redirect(welcome);
+  redirect(next);
 }
 
 export async function resendConfirmation(_: FormState, form: FormData): Promise<FormState> {
@@ -89,7 +120,7 @@ export async function resendConfirmation(_: FormState, form: FormData): Promise<
   if (await tooMany('resend', 3)) return { error: 'Too many attempts. Wait a minute, then try again.', email };
   const sb = await supabaseServer();
   if (!sb) return { error: OFFLINE, email };
-  const { error } = await sb.auth.resend({ type: 'signup', email, options: { emailRedirectTo: `${await siteOrigin()}/auth/callback?next=${encodeURIComponent('/account?welcome=1')}` } });
+  const { error } = await sb.auth.resend({ type: 'signup', email, options: { emailRedirectTo: `${await siteOrigin()}/auth/callback?next=/` } });
   if (error) return { error: explain(error), email };
   return { sent: true, email };
 }

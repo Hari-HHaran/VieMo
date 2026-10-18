@@ -15,6 +15,7 @@ In Supabase, open **SQL Editor**. Paste each file below into a new query and run
 5. `supabase/migrations/20261020000005_community.sql` (demo labels, review visibility, Explore, and the demo importer's functions)
 6. `supabase/migrations/20261021000006_wheelmo.sql` (WheelMo spins: the winner is chosen in the database)
 7. `supabase/migrations/20261022000007_movie_nights.sql` (Movie Night rooms, private votes, and live updates)
+8. `supabase/migrations/20261023000008_private_usernames.sql` (a new account's starting username comes from its name, never its email)
 
 Each one should end with "Success. No rows returned". Run each file once only. If one fails, stop and send the error text, not the keys.
 
@@ -49,14 +50,18 @@ In Supabase, open **Authentication → URL Configuration**:
 
 Supabase only sends email links to addresses on this list. That stops anyone from using a forged address to send someone elsewhere.
 
-## 4. Email sign-in settings
+## 4. Sign-up with a password, no email link
 
-In **Authentication → Sign In / Providers → Email**:
+People sign up with an email, a password and the same password again, and go straight into VieMo; after that they sign in with their password. There's no confirmation email to click. Two ways to set this up:
 
-- Keep **Confirm email** on.
-- Set the **minimum password length** to 8, to match the form.
+- **With `SUPABASE_SERVICE_ROLE_KEY` set in Vercel** (you need it for the demo community anyway): VieMo creates each new account already confirmed and signs it in. Supabase sends no email, so its email limits don't matter for sign-ups.
+- **Without that key:** in **Authentication → Sign In / Providers → Email**, switch **Confirm email** off. Otherwise new accounts still get a confirmation link.
 
-Supabase's built-in email sender is for testing. It sends only a few emails an hour. Before inviting people, set up your own sender under **Authentication → Emails → SMTP Settings**. Resend, Postmark and Amazon SES all work.
+Either way, set the **minimum password length** to 8 there, to match the form.
+
+Because nobody confirms their address, someone could sign up with an email that isn't theirs. Password reset still goes by email, so only the real owner of an address can reset its password. Accounts made earlier that never clicked their link: confirm them in **Authentication → Users** (or switch Confirm email off).
+
+Password-reset emails still come from Supabase. Its built-in email sender is for testing and sends only a few emails an hour; before inviting many people, set up your own sender under **Authentication → Emails → SMTP Settings**. Resend, Postmark and Amazon SES all work.
 
 ### Optional: email links that work in any browser
 
@@ -65,7 +70,7 @@ By default, the link in a confirmation email only signs you in on the browser yo
 Confirm signup:
 
 ```html
-<a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email&next=%2Faccount%3Fwelcome%3D1">Confirm your email</a>
+<a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email&next=%2F">Confirm your email</a>
 ```
 
 Reset password:
@@ -78,7 +83,7 @@ Reset password:
 
 Use three email addresses you can open (A, B and C), and a private window for each.
 
-1. **Sign-up.** Create A. You see "Check your inbox". Open the link and you land on "Set up your profile". The watchlist choice starts on "Only me". Save.
+1. **Sign-up.** Create A with a password typed twice (try two different passwords first: it says they don't match). You land on Home, signed in, with no email to open. Open **Account**: you see "Set up your profile", the watchlist choice starts on "Only me", and the suggested username comes from your name, not your email. Save.
 2. **Wrong password.** Sign out, then sign in with a wrong password. The message is under the password field. Sign in properly from `/wall`; you come back to `/wall`.
 3. **Password reset.** "Forgot your password?" gives the same message for an unknown address as for A. A's email link opens "Choose a new password", and the new password works.
 4. **Profiles.** Create B and C. B tries to take A's username and is told it's taken. Each person can edit only their own profile.

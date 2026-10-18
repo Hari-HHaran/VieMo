@@ -21,9 +21,9 @@ export default function Reel({ films, pos, landed, spinning, still }: {
   const [pitch, setPitch] = useState(0);
   /* One poster plus its gap, measured, so the strip lines up at any screen size. */
   useEffect(() => {
-    const el = strip.current?.children[0] as HTMLElement | undefined;
-    if (!el) return;
-    const measure = () => setPitch(el.offsetWidth + parseFloat(getComputedStyle(strip.current!).columnGap || '0'));
+    const st = strip.current, el = st?.children[0] as HTMLElement | undefined;
+    if (!st || !el) return;
+    const measure = () => { if (st.isConnected) setPitch(el.offsetWidth + parseFloat(getComputedStyle(st).columnGap || '0')); };
     measure();
     const ro = new ResizeObserver(measure); ro.observe(el);
     return () => ro.disconnect();

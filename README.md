@@ -209,8 +209,8 @@ Your month as a cinema seating chart: one seat per day, lit up by how much you d
 
 ### Accounts
 
-- **Signing up:** email and password with an email confirmation, sign-in and sign-out, forgotten password and reset.
-- **Profile setup:** username, name and bio, and whether your watchlist is public (private by default).
+- **Signing up:** email, password and the same password again, then straight into VieMo: no email link to click. After that, sign in with your email and password. Forgotten passwords are reset by email.
+- **Profile setup** (optional, in Account): username, name and bio, and whether your watchlist is public (private by default). A new account's starting username comes from the name you gave, or `member`, plus a random ending; never from your email.
 - **Returning:** after signing in you come back to the page you were on.
 - **Signed-out visitors** can still use most of the app. Their watchlist, diary and settings are kept in their browser, and the app says so.
 - **Not yet built:** moving your diary into your account.
@@ -396,7 +396,7 @@ Set these in Vercel under **Project → Settings → Environment Variables**, th
 | `TMDB_DEFAULT_REGION` | optional | default viewing region, e.g. `SG` |
 | `NEXT_PUBLIC_SUPABASE_URL` | accounts | your Supabase project address |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | accounts | the publishable (or anon) key: public by design |
-| `SUPABASE_SERVICE_ROLE_KEY` | demo import, signed-out WheelMo spins, film caching, Mo's daily cap | secret; server only |
+| `SUPABASE_SERVICE_ROLE_KEY` | instant sign-up with no email link, demo import, signed-out WheelMo spins, film caching, Mo's daily cap | secret; server only |
 | `NEXT_PUBLIC_SITE_URL` | accounts | your site's address, used in email links |
 | `OPENAI_API_KEY` | Reel Director and Mo | secret; server only |
 | `OPENAI_BASE_URL` | optional | only for OpenAI-compatible providers |
@@ -416,7 +416,7 @@ The app is forgiving about slightly different spellings of the Supabase and Open
 
 Follow `docs/supabase-setup.md`. In short:
 
-1. Run the seven files in `supabase/migrations/`, in order, in Supabase's SQL Editor.
+1. Run the eight files in `supabase/migrations/`, in order, in Supabase's SQL Editor.
 2. Add the keys above in Vercel.
 3. Set your site address and redirect links in Supabase Auth.
 4. Check `/status` and the three-account checklist in that guide.
@@ -461,7 +461,7 @@ Import the repository in Vercel, add the variables above, and deploy. Accounts, 
 | `src/lib/demo/`, `data/demo/` | The demo community importer and its fixture |
 | `src/styles/`, `src/app/app.css` | Styles by feature |
 | `design-system/` | Tokens, fonts, components and the brand book. Edit `design-system/src/`, then run `npm run ds:build` |
-| `supabase/migrations/` | The database: tables, row level security and functions (migrations 0001–0007) |
+| `supabase/migrations/` | The database: tables, row level security and functions (migrations 0001–0008) |
 | `supabase/tests/local/` | Database checks |
 | `docs/` | `supabase-setup.md` (connect Supabase), `plan.md` (product plan and feature status), `proposal-community-wheelmo.md` |
 

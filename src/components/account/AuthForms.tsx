@@ -55,7 +55,7 @@ export function SignUpForm({ next }: { next: string }) {
     return (
       <div className="acct-sent">
         <h2 ref={done} tabIndex={-1} className="type-display-md">Check your inbox</h2>
-        <p className="type-body">We sent a confirmation link to <strong>{state.email}</strong>. Open it on this device to finish setting up your account.</p>
+        <p className="type-body">This VieMo server still asks new accounts to confirm their email, so we sent a link to <strong>{state.email}</strong>. Open it on this device to finish.</p>
         <p className="type-caption vm-muted">Nothing there after a few minutes? Check spam, or sign in to send it again.</p>
       </div>
     );
@@ -64,9 +64,11 @@ export function SignUpForm({ next }: { next: string }) {
     <form ref={form} action={action} className="acct-form" noValidate>
       <input type="hidden" name="next" value={next} />
       <FormProblem message={topError(state)} />
-      <Field label="Your name" hint="Optional. Shown on your profile and collections." name="display_name" autoComplete="name" maxLength={60} />
+      <Field label="Your name" hint="Optional. Shown on your profile and collections." name="display_name" autoComplete="name" maxLength={60} defaultValue={state.name} />
       <Field label="Email" name="email" type="email" autoComplete="email" inputMode="email" required defaultValue={state.email} error={fieldError(state, 'email')} />
       <PasswordField label="Password" hint="At least 8 characters." name="password" autoComplete="new-password" required minLength={8} maxLength={72} error={fieldError(state, 'password')} />
+      <PasswordField label="Confirm password" hint="Type the same password again." name="confirm_password" autoComplete="new-password" required minLength={8} maxLength={72} error={fieldError(state, 'confirm_password')} />
+      {state.exists ? <p className="type-body"><a href={`/sign-in${next !== '/' ? `?next=${encodeURIComponent(next)}` : ''}`}>Sign in instead</a></p> : null}
       <Button type="submit" variant="primary" size="lg" busy={pending} className="acct-submit">{pending ? 'Creating your account' : 'Create account'}</Button>
     </form>
   );

@@ -8,14 +8,16 @@ create table test.vars (k text primary key, v text);
 grant select, insert on test.vars to anon, authenticated, service_role;
 
 -- Seed: three sign-ups (the trigger makes their profiles) and some films (as the server would).
-insert into auth.users (id, email) values (:'A', 'alice@example.com'), (:'B', 'Bob.Smith+films@example.com'), (:'C', 'c@x.io');
+insert into auth.users (id, email, raw_user_meta_data) values (:'A', 'alice@example.com', '{}'), (:'B', 'Bob.Smith+films@example.com', '{"display_name": "Bob Smith"}'), (:'C', 'c@x.io', '{}');
 set role service_role;
 insert into public.films (tmdb_id, title, year, genres) values (101, 'Film One', 1994, '{Drama}'), (102, 'Film Two', 2001, '{Comedy}'),
   (103, 'Film Three', 2015, '{Horror}'), (104, 'Film Four', 1977, '{Drama,Romance}'), (105, 'Film Five', 2023, '{Thriller}');
 reset role;
 
 select test.ok((select count(*) from public.profiles) = 3, 'sign-up creates a profile for each of the three accounts');
-select test.ok((select username::text from public.profiles where id = :'B') ~ '^bobsmithfilms_[0-9a-f]{4}$', 'usernames are made from the email, lowercased and made unique');
+select test.ok((select username::text from public.profiles where id = :'B') ~ '^bobsmith_[0-9a-f]{4}$', 'a starting username comes from the name given at sign-up, lowercased and made unique');
+select test.ok((select username::text from public.profiles where id = :'A') ~ '^member_[0-9a-f]{4}$', 'without a name it is member_ plus a random ending');
+select test.ok(not exists (select 1 from public.profiles p join auth.users u on u.id = p.id where p.username::text like split_part(lower(u.email), '@', 1) || '%' and char_length(split_part(u.email, '@', 1)) >= 3), 'no starting username contains any part of an email address');
 select test.ok((select watchlist_visibility from public.profiles where id = :'A') = 'private', 'watchlists start private');
 
 -- ===== Profiles =====
