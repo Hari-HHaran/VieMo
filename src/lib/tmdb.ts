@@ -136,6 +136,7 @@ export const hiddenGems = () => useSnapshot() ? fromSnapshot(snap.hiddenGems) :
 
 export interface DiscoverQuery {
   genresAny?: number[];
+  genresAll?: number[];    // every one of these genres (used instead of genresAny when both are set)
   withoutGenres?: number[];
   runtimeGte?: number;
   runtimeLte?: number;
@@ -148,7 +149,7 @@ export const discover = (q: DiscoverQuery) => useSnapshot() ? fromSnapshot(() =>
     sort_by: 'popularity.desc',
     include_adult: false,
     'vote_count.gte': 150,
-    with_genres: q.genresAny?.length ? q.genresAny.join('|') : undefined,
+    with_genres: q.genresAll?.length ? q.genresAll.join(',') : q.genresAny?.length ? q.genresAny.join('|') : undefined,
     without_genres: q.withoutGenres?.length ? q.withoutGenres.join(',') : undefined,
     'with_runtime.gte': q.runtimeGte ?? 40,
     'with_runtime.lte': q.runtimeLte,

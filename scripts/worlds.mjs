@@ -39,8 +39,8 @@ for (const [name, w] of Object.entries(WORLDS)) {
   out.push(`:is(.shell, .curtain)[data-world="${name}"] { ${keys.map((k) => `--${k}: ${g[k]};`).join(' ')} --world-seed: ${w.seed}; ${roles(a.dark)} }`);
   out.push(`[data-theme="light"] :is(.shell, .curtain)[data-world="${name}"] { ${keys.map((k) => `--${k}: inherit;`).join(' ')} ${roles(a.light)} }`);
 }
-/* The Cinema Passport is the one place a person's own accent (from their favourite film) shows. */
-out.push('html[data-vm-accent] .shell[data-world="passport"] { --reel: inherit; --on-reel: inherit; --reel-ink: inherit; --reel-soft: inherit; }');
+/* The Green Room (Profile) is the one place a person's own accent (from their favourite film) shows. */
+out.push('html[data-vm-accent] .shell[data-world="greenroom"] { --reel: inherit; --on-reel: inherit; --reel-ink: inherit; --reel-soft: inherit; }');
 
 if (fails.length) { console.error('Contrast failures:\n' + fails.join('\n')); process.exit(1); }
 writeFileSync(new URL('../src/app/worlds.css', import.meta.url), out.join('\n') + '\n');

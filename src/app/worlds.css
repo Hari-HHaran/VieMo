@@ -17,9 +17,9 @@
 /* Collections: the Record Store. Forest green and brass. */
 :is(.shell, .curtain)[data-world="records"] { --bg: #0b1510; --surface: #101c15; --surface-raised: #16251b; --surface-overlay: #1d2f23; --line: #2b4233; --line-strong: #6e8a76; --skeleton: #1a2a1f; --world-seed: #c39548; --reel: #c39548; --on-reel: #0b1510; --reel-ink: #d1a255; --reel-soft: #362200; }
 [data-theme="light"] :is(.shell, .curtain)[data-world="records"] { --bg: inherit; --surface: inherit; --surface-raised: inherit; --surface-overlay: inherit; --line: inherit; --line-strong: inherit; --skeleton: inherit; --reel: #8b6000; --on-reel: #f3ece2; --reel-ink: #8b6000; --reel-soft: #f8e9d2; }
-/* Profile: the Cinema Passport. Midnight blue and silver; a personal accent replaces silver. */
-:is(.shell, .curtain)[data-world="passport"] { --bg: #0a0f1f; --surface: #0f1528; --surface-raised: #151c33; --surface-overlay: #1c2440; --line: #2a3352; --line-strong: #6d7896; --skeleton: #1a2138; --world-seed: #c3c9d6; --reel: #e2ddd9; --on-reel: #0a0f1f; --reel-ink: #d5d0cc; --reel-soft: #312d2a; }
-[data-theme="light"] :is(.shell, .curtain)[data-world="passport"] { --bg: inherit; --surface: inherit; --surface-raised: inherit; --surface-overlay: inherit; --line: inherit; --line-strong: inherit; --skeleton: inherit; --reel: #312d2a; --on-reel: #f3ece2; --reel-ink: #312d2a; --reel-soft: #e9e3df; }
+/* Profile: the Green Room. Midnight blue and silver; a personal accent replaces silver. */
+:is(.shell, .curtain)[data-world="greenroom"] { --bg: #0a0f1f; --surface: #0f1528; --surface-raised: #151c33; --surface-overlay: #1c2440; --line: #2a3352; --line-strong: #6d7896; --skeleton: #1a2138; --world-seed: #c3c9d6; --reel: #e2ddd9; --on-reel: #0a0f1f; --reel-ink: #d5d0cc; --reel-soft: #312d2a; }
+[data-theme="light"] :is(.shell, .curtain)[data-world="greenroom"] { --bg: inherit; --surface: inherit; --surface-raised: inherit; --surface-overlay: inherit; --line: inherit; --line-strong: inherit; --skeleton: inherit; --reel: #312d2a; --on-reel: #f3ece2; --reel-ink: #312d2a; --reel-soft: #e9e3df; }
 /* Film details: the Premiere. The accent is re-derived from each poster at runtime. */
 :is(.shell, .curtain)[data-world="premiere"] { --bg: #120d0a; --surface: #18120e; --surface-raised: #211813; --surface-overlay: #2a1f18; --line: #3b2d23; --line-strong: #7f6c5e; --skeleton: #261c15; --world-seed: #e08a4a; --reel: #e08a4a; --on-reel: #120d0a; --reel-ink: #ea9353; --reel-soft: #3c1d05; }
 [data-theme="light"] :is(.shell, .curtain)[data-world="premiere"] { --bg: inherit; --surface: inherit; --surface-raised: inherit; --surface-overlay: inherit; --line: inherit; --line-strong: inherit; --skeleton: inherit; --reel: #9f5100; --on-reel: #f3ece2; --reel-ink: #9f5100; --reel-soft: #ffe6d5; }
@@ -32,4 +32,4 @@
 /* SceneAtlas: the cinematic planetarium. Graphite night, electric blue and muted violet light. */
 :is(.shell, .curtain)[data-world="planetarium"] { --bg: #07080c; --surface: #0e1017; --surface-raised: #141720; --surface-overlay: #1b1f2a; --line: #272c39; --line-strong: #6f7891; --skeleton: #161a22; --world-seed: #5b8cff; --reel: #5b8cff; --on-reel: #07080c; --reel-ink: #81a8ff; --reel-soft: #182544; }
 [data-theme="light"] :is(.shell, .curtain)[data-world="planetarium"] { --bg: inherit; --surface: inherit; --surface-raised: inherit; --surface-overlay: inherit; --line: inherit; --line-strong: inherit; --skeleton: inherit; --reel: #335fce; --on-reel: #f3ece2; --reel-ink: #3962c4; --reel-soft: #e2ebff; }
-html[data-vm-accent] .shell[data-world="passport"] { --reel: inherit; --on-reel: inherit; --reel-ink: inherit; --reel-soft: inherit; }
+html[data-vm-accent] .shell[data-world="greenroom"] { --reel: inherit; --on-reel: inherit; --reel-ink: inherit; --reel-soft: inherit; }

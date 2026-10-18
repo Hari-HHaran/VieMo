@@ -79,7 +79,8 @@ export const snap = {
       if (f.vote_count < 150) return false;
       if (!f.runtime || f.runtime < gte || (q.runtimeLte != null && f.runtime > q.runtimeLte)) return false;
       const ids = f.genres.map((g) => g.id);
-      if (q.genresAny?.length && !q.genresAny.some((g) => ids.includes(g))) return false;
+      if (q.genresAll?.length) { if (!q.genresAll.every((g) => ids.includes(g))) return false; }
+      else if (q.genresAny?.length && !q.genresAny.some((g) => ids.includes(g))) return false;
       if (q.withoutGenres?.length && q.withoutGenres.some((g) => ids.includes(g))) return false;
       if (q.providers?.length) {
         const wp = f['watch/providers']?.results?.[rg];

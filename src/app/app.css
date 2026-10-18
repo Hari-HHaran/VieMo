@@ -227,28 +227,47 @@ html[data-motion="reduce"] .ticker-track { animation: none; }
 html[data-motion="reduce"] .ticker-row[aria-hidden] { display: none; }
 
 
-/* Discover: the Mood Observatory */
-.sky { position: relative; aspect-ratio: 1 / 0.95; max-width: 560px; width: 100%; margin-inline: auto; border-radius: var(--radius-xl);
-  background: radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--reel) 14%, var(--surface)) 0%, var(--bg) 70%); border: 1px solid var(--line); overflow: hidden; transition: opacity var(--duration-base) var(--ease-out); }
-.sky.is-pending { opacity: 0.7; }
-.sky-lines { position: absolute; inset: 6% 10%; width: 80%; height: 88%; overflow: visible; }
-.sky-lines line { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 2 4; transition: stroke var(--duration-base) var(--ease-out); }
-.sky-lines line.is-lit { stroke: var(--reel-ink); stroke-dasharray: none; }
-.sky-star { fill: var(--ink-faint); opacity: 0.55; }
-.sky-nodes { position: absolute; inset: 6% 10%; }
-.sky-node { position: absolute; translate: -50% -50%; display: inline-grid; justify-items: center; gap: 4px; min-width: var(--tap-min); min-height: var(--tap-min); padding: 6px 10px;
-  border: 1px solid transparent; border-radius: var(--radius-full); background: color-mix(in srgb, var(--bg) 70%, transparent); color: var(--ink); cursor: pointer;
-  font: 600 13px/16px var(--font-sans); white-space: nowrap; }
-.sky-node:hover { border-color: var(--line-strong); }
-.sky-node:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
-.sky-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ink-muted); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ink-muted) 18%, transparent); transition: background var(--duration-base), box-shadow var(--duration-base); }
-.sky-node.is-on { background: var(--reel); color: var(--on-reel); border-color: var(--reel); }
-.sky-node.is-on .sky-dot { background: var(--on-reel); box-shadow: 0 0 0 6px color-mix(in srgb, var(--reel) 35%, transparent), 0 0 18px 4px color-mix(in srgb, var(--reel) 60%, transparent); }
+/* Discover: the mood mixer. A desk of channels; a pushed-up channel lights its lamp and raises its fader. */
+.mixer { display: grid; gap: var(--space-3); }
+.mixer.is-pending .mixer-desk { opacity: 0.8; }
+.mixer-desk { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); padding: var(--space-2); border-radius: var(--radius-xl);
+  background: linear-gradient(180deg, var(--surface-raised), var(--surface)); border: 1px solid var(--line); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 6%, transparent); }
+.mixer-ch { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: 'lamp label' 'track genres'; align-items: center; column-gap: var(--space-3); row-gap: 6px;
+  min-width: 0; min-height: 72px; padding: var(--space-2) var(--space-3); border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  cursor: pointer; text-align: left; transition: border-color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out); }
+.mixer-ch:hover:not([aria-disabled]) { border-color: var(--line-strong); }
+.mixer-ch:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.mixer-ch[aria-disabled] { cursor: not-allowed; color: var(--ink-muted); }
+.mixer-ch.is-on { border-color: var(--reel-ink); background: color-mix(in srgb, var(--reel) 14%, var(--surface)); }
+.mixer-lamp { grid-area: lamp; justify-self: center; width: 10px; height: 10px; border-radius: 50%; background: var(--surface-raised); border: 1px solid var(--line-strong); transition: background var(--duration-base), box-shadow var(--duration-base); }
+.mixer-ch.is-on .mixer-lamp { background: var(--reel); border-color: var(--reel); box-shadow: 0 0 0 4px color-mix(in srgb, var(--reel) 25%, transparent), 0 0 14px 2px color-mix(in srgb, var(--reel) 55%, transparent); }
+/* The fader: sideways on phones, upright on wider screens. Pushed up (or across) when the mood is on. */
+.mixer-track { grid-area: track; position: relative; display: block; width: 44px; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 14%, transparent); }
+.mixer-knob { position: absolute; left: 0; top: 50%; width: 14px; height: 24px; margin-top: -12px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--ink-muted), color-mix(in srgb, var(--ink-muted) 60%, var(--surface))); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  transition: translate var(--duration-base) var(--ease-out), background var(--duration-base); }
+.mixer-knob::after { content: ''; position: absolute; top: 4px; bottom: 4px; left: 6px; width: 2px; background: var(--surface); opacity: 0.7; }
+.mixer-ch.is-on .mixer-knob { translate: 30px 0; background: linear-gradient(90deg, var(--reel), color-mix(in srgb, var(--reel) 70%, var(--surface))); }
+.mixer-label { grid-area: label; min-width: 0; }
+.mixer-genres { grid-area: genres; min-width: 0; color: var(--ink-muted); }
+@media (min-width: 640px) {
+  .mixer-desk { grid-template-columns: repeat(4, minmax(0, 1fr)); padding: var(--space-3); }
+  .mixer-ch { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'lamp' 'track' 'label' 'genres'; justify-items: center; align-content: start; row-gap: var(--space-2); min-height: 168px; padding: var(--space-3) var(--space-1); text-align: center; }
+  .mixer-track { width: 6px; height: 64px; }
+  .mixer-knob { left: 50%; top: auto; bottom: 0; width: 28px; height: 14px; margin: 0 0 0 -14px; background: linear-gradient(180deg, var(--ink-muted), color-mix(in srgb, var(--ink-muted) 60%, var(--surface))); }
+  .mixer-knob::after { top: 6px; bottom: auto; left: 4px; right: 4px; width: auto; height: 2px; }
+  .mixer-ch.is-on .mixer-knob { translate: 0 -50px; background: linear-gradient(180deg, var(--reel), color-mix(in srgb, var(--reel) 70%, var(--surface))); }
+}
+@media (min-width: 1100px) { .mixer-desk { grid-template-columns: repeat(8, minmax(0, 1fr)); padding: var(--space-4); } }
+.mixer-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-2); min-height: 44px; }
+.mixer-clear { min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius-full); border: 1px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; }
+.mixer-clear:hover { border-color: var(--ink); }
+.mixer-clear:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+@media (prefers-reduced-motion: reduce) { .mixer-ch, .mixer-lamp, .mixer-knob { transition: none; } }
+html[data-motion="reduce"] :is(.mixer-ch, .mixer-lamp, .mixer-knob) { transition: none; }
 .mood-results { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
 .mood-results-head { display: grid; gap: 2px; }
 .reflow > li { min-width: 0; }
-@media (min-width: 768px) { .sky-node { font-size: 14px; } }
-@media (prefers-reduced-motion: reduce) { .sky, .sky-lines line, .sky-dot { transition: none; } }
 
 /* Match: the motion card deck */
 .deck-stack { display: grid; }
@@ -262,28 +281,6 @@ html[data-motion="reduce"] .ticker-row[aria-hidden] { display: none; }
 .clips-reel { position: sticky; top: 0; z-index: 2; height: 3px; margin-bottom: -3px; background: color-mix(in srgb, var(--ink) 12%, transparent); }
 .clips-reel span { display: block; height: 100%; background: var(--reel); transform-origin: left; transition: transform var(--duration-slow) var(--ease-out); }
 @media (prefers-reduced-motion: reduce) { .clips-reel span { transition: none; } }
-
-/* Profile: the Cinema Passport */
-.passport { position: relative; display: grid; gap: var(--space-4); max-width: 560px; padding: var(--space-5); border-radius: var(--radius-lg); overflow: hidden; color: var(--ink);
-  background: linear-gradient(155deg, color-mix(in srgb, var(--reel) 16%, var(--surface-raised)) 0%, var(--surface) 55%, var(--surface-raised) 100%);
-  border: 1px solid var(--line-strong); box-shadow: var(--shadow-float); }
-.passport::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
-  background: repeating-linear-gradient(115deg, transparent 0 14px, color-mix(in srgb, var(--ink) 4%, transparent) 14px 15px); }
-.passport > * { position: relative; }
-.passport-top { display: flex; justify-content: space-between; align-items: center; color: var(--reel-ink); }
-.passport-seal { font-size: 22px; line-height: 1; }
-.passport-body { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-4); align-items: start; }
-.passport-photo { width: var(--poster-sm); }
-.passport-photo .vm-poster { width: 100%; filter: saturate(0.92); }
-.passport-blank { display: grid; place-items: center; aspect-ratio: 2 / 3; padding: var(--space-2); text-align: center; border: 1px dashed var(--line-strong); border-radius: var(--radius-sm); color: var(--ink-muted); }
-.passport-fields { display: grid; gap: var(--space-2); margin: 0; }
-.passport-fields div { display: grid; gap: 1px; min-width: 0; }
-.passport-fields dt { color: var(--ink-muted); }
-.passport-fields dd { margin: 0; overflow-wrap: anywhere; }
-.passport-stamps { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); align-items: center; padding-top: var(--space-3); border-top: 1px dashed var(--line-strong); }
-.passport-slots { display: flex; }
-.passport-slots span { width: 30px; height: 30px; margin-right: -8px; border-radius: 50%; border: 1.5px dashed var(--line-strong); background: var(--surface); }
-.passport-mrz { margin: 0; font: 500 12px/1.4 var(--font-mono); letter-spacing: 0.18em; color: var(--ink-faint); white-space: nowrap; overflow: hidden; }
 
 /* Reel Director: the Director's Studio */
 .studio-head { gap: var(--space-2); }
