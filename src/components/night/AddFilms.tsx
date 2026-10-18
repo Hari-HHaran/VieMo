@@ -107,7 +107,7 @@ export default function AddFilms({ night, inPool, onAdded }: { night: string; in
       {room <= 0 ? null : tab === 'watchlist' ? (
         sources === null ? <p className="type-caption vm-muted" role="status">Loading your watchlist…</p>
           : sources.watchlist.length ? checklist(sources.watchlist, 'watchlist')
-          : <p className="type-body vm-muted">Your account watchlist is empty. <a href="/library">Bring films over from this device</a> or use Search.</p>
+          : <p className="type-body vm-muted">Your account watchlist is empty. <a href="/profile?tab=library">Bring films over from this device</a> or use Search.</p>
       ) : tab === 'collection' ? (
         <div className="nr-stack">
           <label className="nr-field"><span className="type-label">Collection</span>

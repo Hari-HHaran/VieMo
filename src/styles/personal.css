@@ -1,0 +1,83 @@
+/* Personal touches: the cinema cursor and the favourite-poster backdrop. Both are optional (Settings). */
+
+/* The cursor. The native one is hidden only while ours is running; text fields keep the normal text cursor. */
+html[data-cursor="cinema"], html[data-cursor="cinema"] * { cursor: none !important; }
+html[data-cursor="cinema"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]), textarea, [contenteditable="true"]) { cursor: text !important; }
+html[data-cursor="cinema"] iframe { cursor: auto !important; }
+.cc-dot, .cc-ring { position: fixed; left: 0; top: 0; z-index: 2147483000; pointer-events: none; will-change: transform; }
+html:not([data-cursor="cinema"]) :is(.cc-dot, .cc-ring) { display: none; }
+.cc-dot { width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--cc-ink, #e8c27a);
+  box-shadow: 0 0 0 1.5px var(--cc-edge, #000), 0 0 10px color-mix(in srgb, var(--cc-ink, #e8c27a) 60%, transparent); transition: opacity 120ms, width 160ms, height 160ms, margin 160ms; }
+.cc-ring { width: 48px; height: 48px; margin: -24px 0 0 -24px; transition: opacity 160ms; }
+.cc-reel, .cc-finder { position: absolute; inset: 0; transition: transform 260ms cubic-bezier(.2,.8,.2,1), opacity 200ms; }
+.cc-reel { width: 100%; height: 100%; overflow: visible; transform: scale(0.62); }
+.cc-reel > circle { fill: none; stroke: var(--cc-ink, #e8c27a); stroke-width: 2.2; filter: drop-shadow(0 0 1.5px var(--cc-edge, #000)); }
+.cc-reel g circle { fill: var(--cc-ink, #e8c27a); opacity: 0; transition: opacity 200ms; }
+.cc-reel g { transform-origin: 24px 24px; }
+.cc-finder { opacity: 0; transform: scale(0.7); }
+.cc-finder i { position: absolute; width: 12px; height: 12px; border: 0 solid var(--cc-ink, #e8c27a); filter: drop-shadow(0 0 1px var(--cc-edge, #000)); }
+.cc-finder i:nth-child(1) { left: -6px; top: -10px; border-left-width: 2.5px; border-top-width: 2.5px; }
+.cc-finder i:nth-child(2) { right: -6px; top: -10px; border-right-width: 2.5px; border-top-width: 2.5px; }
+.cc-finder i:nth-child(3) { left: -6px; bottom: -10px; border-left-width: 2.5px; border-bottom-width: 2.5px; }
+.cc-finder i:nth-child(4) { right: -6px; bottom: -10px; border-right-width: 2.5px; border-bottom-width: 2.5px; }
+[data-mode="hidden"] { opacity: 0; }
+.cc-ring[data-mode="text"], .cc-dot[data-mode="text"] { opacity: 0; }
+/* Links and buttons: the ring opens into a reel and its sprocket holes turn. */
+.cc-ring[data-mode="link"] .cc-reel { transform: scale(1); }
+.cc-ring[data-mode="link"] .cc-reel g circle { opacity: 0.9; }
+.cc-ring[data-mode="link"] .cc-reel g { animation: cc-turn 2.4s linear infinite; }
+.cc-dot[data-mode="link"] { width: 6px; height: 6px; margin: -3px 0 0 -3px; }
+/* Posters: a camera viewfinder. */
+.cc-ring[data-mode="media"] .cc-reel { opacity: 0; transform: scale(1.2); }
+.cc-ring[data-mode="media"] .cc-finder { opacity: 1; transform: scale(1); }
+/* Things you drag (the globe, WheelMo's lever): a wider, dashed ring. */
+.cc-ring[data-mode="drag"] .cc-reel { transform: scale(1.15); }
+.cc-ring[data-mode="drag"] .cc-reel > circle { stroke-dasharray: 5 5; }
+@keyframes cc-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .cc-ring[data-mode="link"] .cc-reel g { animation: none; } .cc-reel, .cc-finder, .cc-dot { transition: none; } }
+html[data-motion="reduce"] .cc-ring[data-mode="link"] .cc-reel g { animation: none; }
+html[data-motion="reduce"] :is(.cc-reel, .cc-finder, .cc-dot) { transition: none; }
+@media (forced-colors: active) { .cc-dot, .cc-ring { display: none; } }
+
+/* The backdrop: one fixed layer painted under everything in the shell (the shell is its own stacking context, so
+   z-index -1 sits above the page colour and below the content). Faded to at most 14%, slightly desaturated. */
+.shell { isolation: isolate; }
+html[data-vm-backdrop="all"] .shell::before,
+html[data-vm-backdrop="home"] .shell[data-home]::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: var(--vm-backdrop-img) center 22% / cover no-repeat;
+  opacity: var(--vm-backdrop-opacity, 0.08); filter: saturate(0.85);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, rgba(0, 0, 0, 0.35) 100%); mask-image: linear-gradient(180deg, #000 0%, #000 55%, rgba(0, 0, 0, 0.35) 100%);
+}
+/* Faint text is only just above 4.5:1 on a plain page; with a poster behind it, it uses the muted ink instead. */
+html[data-vm-backdrop="all"] .shell, html[data-vm-backdrop="home"] .shell[data-home] { --ink-faint: var(--ink-muted); }
+html[data-vm-backdrop-blur] .shell::before { filter: saturate(0.85) blur(14px); inset: -30px; }
+@media print { .shell::before { display: none; } }
+
+/* Settings */
+.settings-crumb { color: var(--reel-ink); text-transform: uppercase; letter-spacing: 0.12em; }
+.settings-crumb a { color: inherit; }
+.settings-toc { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.settings-toc a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 var(--space-4); border-radius: var(--radius-full); border: 1px solid var(--line-strong); color: var(--ink); text-decoration: none; }
+.settings-toc a:hover { border-color: var(--ink); }
+.settings-toc a:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.settings-page .section { scroll-margin-top: 96px; }
+.bd-settings { display: grid; gap: var(--space-4); max-width: 640px; }
+.bd-settings > .vm-btn { justify-self: start; }
+.bd-current { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: var(--space-4); align-items: center; padding: var(--space-3); border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--surface); }
+.bd-current-text { display: grid; gap: 4px; justify-items: start; }
+.bd-thumb { display: block; width: 72px; aspect-ratio: 2 / 3; border-radius: var(--radius-sm); overflow: hidden; }
+.bd-none { display: grid; place-items: center; height: 100%; border: 1px dashed var(--line-strong); border-radius: var(--radius-sm); color: var(--ink-muted); }
+.bd-search { display: grid; gap: var(--space-2); }
+.bd-search .search-input { padding-left: var(--space-3); }
+.bd-range { display: grid; grid-template-columns: auto minmax(0, 1fr) 4ch; gap: var(--space-3); align-items: center; max-width: 420px; }
+.bd-range input { accent-color: var(--reel); min-height: 44px; }
+.settings-group:disabled { opacity: 0.6; }
+
+/* Profile */
+.profile-head-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.profile-settings { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius-full); border: 1px solid var(--line-strong); color: var(--ink); text-decoration: none; }
+.profile-settings:hover { border-color: var(--ink); }
+.profile-settings:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+.lib-signin { display: grid; gap: var(--space-3); padding: var(--space-5); border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--surface); max-width: 640px; }
+.library { display: grid; min-width: 0; }

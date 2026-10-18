@@ -9,7 +9,7 @@ export function worldFor(path: string): WorldId {
   if (path.startsWith('/match')) return 'casting';
   if (path.startsWith('/director')) return 'studio';
   if (path.startsWith('/clips')) return 'screening';
-  if (path.startsWith('/profile')) return 'greenroom';
+  if (path.startsWith('/profile') || path.startsWith('/settings')) return 'greenroom';
   if (path.startsWith('/wall')) return 'gallery';
   if (path.startsWith('/atlas')) return 'planetarium';
   if (path.startsWith('/film')) return 'premiere';

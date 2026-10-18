@@ -20,6 +20,7 @@ export default function AppearanceSettings() {
         <legend className="type-label">Motion and media</legend>
         <label className="option"><input type="checkbox" checked={prefs.reduceMotion} onChange={(e) => update({ reduceMotion: e.target.checked })} /><span className="type-body">Reduce motion</span></label>
         <label className="option"><input type="checkbox" checked={prefs.autoplay} onChange={(e) => update({ autoplay: e.target.checked })} /><span className="type-body">Autoplay trailers in Clips (muted)</span></label>
+        <label className="option"><input type="checkbox" checked={prefs.cursor} onChange={(e) => update({ cursor: e.target.checked })} /><span className="type-body">Cinema cursor (mouse and trackpad; it takes each page’s colour)</span></label>
         <label className="option"><input type="checkbox" checked={prefs.captions} onChange={(e) => update({ captions: e.target.checked })} /><span className="type-body">Turn on captions when a trailer has them</span></label>
       </fieldset>
     </div>

@@ -13,13 +13,21 @@ export interface NavItem { id: string; label: string; icon: string; href: string
 interface Props { items: readonly NavItem[]; current: string; loadingHref: string | null; pathname: string }
 
 const MORE = [
-  { href: '/explore', icon: 'list-plus', label: 'Explore collections', note: 'Shelves of films from the community' },
-  { href: '/search', icon: 'search', label: 'Search', note: 'Any film on TMDB' },
-  { href: '/atlas', icon: 'compass', label: 'SceneAtlas', note: 'Where films were made, on a globe' },
-  { href: '/viewmo', icon: 'globe', label: 'ViewMo', note: 'Spin a sphere of this week’s posters' },
-  { href: '/director', icon: 'clapperboard', label: 'Reel Director', note: 'Describe your night, get three picks' },
-  { href: '/wall', icon: 'star', label: 'Wall of Fame', note: 'Every film you’ve watched, framed' },
-  { href: '/library', icon: 'bookmark', label: 'Your library', note: 'Collections, saves and watchlist in your account' },
+  { group: 'Discover', items: [
+    { href: '/search', icon: 'search', label: 'Search', note: 'Any film on TMDB' },
+    { href: '/explore', icon: 'list-plus', label: 'Explore collections', note: 'Shelves of films from the community' },
+    { href: '/viewmo', icon: 'globe', label: 'ViewMo', note: 'Spin a sphere of this week’s posters' },
+    { href: '/atlas', icon: 'compass', label: 'SceneAtlas (preview)', note: 'Where films were made, on a globe' },
+  ] },
+  { group: 'Decide', items: [
+    { href: '/match/night', icon: 'users', label: 'Movie Night', note: 'Vote with friends, then let WheelMo decide' },
+    { href: '/director', icon: 'clapperboard', label: 'Reel Director', note: 'Describe your night, get three picks' },
+  ] },
+  { group: 'You', items: [
+    { href: '/wall', icon: 'star', label: 'Wall of Fame', note: 'Every film you’ve watched, framed' },
+    { href: '/profile?tab=library', icon: 'bookmark', label: 'Your library', note: 'Collections, saves and watchlist in your account' },
+    { href: '/settings', icon: 'settings', label: 'Settings', note: 'Colour, background, cursor, theme, region' },
+  ] },
 ] as const;
 
 /* Links are plain <a href>; AppShell turns same-site clicks into client-side transitions, so these keep working
@@ -79,16 +87,21 @@ function FloatingNav({ items, current, loadingHref, pathname }: Props) {
             initial={{ clipPath: 'inset(0 0 100% 0 round 20px)', opacity: 0.6 }} animate={{ clipPath: 'inset(0 0 0% 0 round 20px)', opacity: 1 }}
             exit={{ clipPath: 'inset(0 0 100% 0 round 20px)', opacity: 0, transition: { duration: DURATION.standard, ease: EASE.inOut } }}
             transition={{ duration: DURATION.reveal, ease: EASE.out }}>
-            <ul role="list">
-              {MORE.map((m, i) => (
-                <motion.li key={m.href} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING.reveal, delay: 0.06 + stagger(i) }}>
-                  <a href={m.href} className="fnav-panel-link">
-                    <span className="fnav-panel-icon" aria-hidden="true"><Icon name={m.icon as never} size={20} /></span>
-                    <span><span className="fnav-panel-title">{m.label}</span><span className="fnav-panel-note">{m.note}</span></span>
-                  </a>
-                </motion.li>
-              ))}
-            </ul>
+            {MORE.map((g, gi) => (
+              <div key={g.group} className="fnav-panel-group">
+                <p className="fnav-panel-head" id={`menu-${g.group}`}>{g.group}</p>
+                <ul role="list" aria-labelledby={`menu-${g.group}`}>
+                  {g.items.map((m, i) => (
+                    <motion.li key={m.href} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING.reveal, delay: 0.06 + stagger(gi * 3 + i) }}>
+                      <a href={m.href} className="fnav-panel-link">
+                        <span className="fnav-panel-icon" aria-hidden="true"><Icon name={m.icon as never} size={20} /></span>
+                        <span><span className="fnav-panel-title">{m.label}</span><span className="fnav-panel-note">{m.note}</span></span>
+                      </a>
+                    </motion.li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </motion.div>
         ) : null}
       </AnimatePresence>

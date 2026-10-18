@@ -7,6 +7,8 @@ import { applyPrefsToDocument, usePrefs } from '@/lib/device-store';
 import { DURATION, EASE } from '@/lib/motion';
 import { WORLD_NAMES, worldFor, type WorldId } from '@/lib/worlds';
 import MotionProvider from './MotionProvider';
+import Backdrop from './fx/Backdrop';
+import CinemaCursor from './fx/CinemaCursor';
 import SiteNav from './nav/SiteNav';
 import { AccountProvider } from './account/useAccount';
 
@@ -27,7 +29,7 @@ function tabFor(path: string): string | null {
   if (path.startsWith('/discover') || path.startsWith('/search') || path.startsWith('/viewmo') || path.startsWith('/atlas') || path.startsWith('/explore') || path.startsWith('/c/')) return 'discover';
   if (path.startsWith('/match')) return 'match';
   if (path.startsWith('/clips')) return 'clips';
-  if (path.startsWith('/profile') || path.startsWith('/wall') || path.startsWith('/account') || path.startsWith('/library')) return 'profile';
+  if (path.startsWith('/profile') || path.startsWith('/wall') || path.startsWith('/account') || path.startsWith('/library') || path.startsWith('/settings')) return 'profile';
   return null; // secondary screens keep the tab they were opened from
 }
 
@@ -114,7 +116,7 @@ export default function AppShell({ children, dataNote }: { children: React.React
       <a className="skip-link" href="#main">Skip to content</a>
       <MotionProvider>
       <div className={`nav-progress${pending ? ' is-on' : ''}`} role="progressbar" aria-label="Loading page" aria-hidden={!pending} />
-      <div className="shell" data-world={world}>
+      <div className="shell" data-world={world} data-home={pathname === '/' ? '' : undefined}>
         <SiteNav items={NAV} current={current} loadingHref={pending ? target : null} pathname={pathname} />
         <main id="main" className="shell-main" tabIndex={-1}>
           {dataNote ? <p className="data-note type-caption">{dataNote}</p> : null}
@@ -136,6 +138,8 @@ export default function AppShell({ children, dataNote }: { children: React.React
         ) : null}
       </AnimatePresence>
       </MotionProvider>
+      <Backdrop />
+      <CinemaCursor world={world} />
       {toast ? (
         <Toast key={toast.key} floating message={toast.message} tone={toast.tone} icon={toast.icon as never}
           action={toast.action ? { label: toast.action.label, onClick: () => { toast.action!.onClick(); setToast(null); } } : undefined}

@@ -12,7 +12,7 @@ export async function MemberCollections({ owner, name, isOwn }: { owner: string;
   if (!r.ok) return <EmptyState icon="triangle-alert" title="Collections didn’t load" body="Try again in a moment." />;
   if (!r.value.length) return <EmptyState icon="list-plus" title={isOwn ? 'You have no public collections' : `${name} has no public collections`}
     body={isOwn ? 'Your collections start private. Make one public in your library to show it here.' : 'Only public collections appear on profiles.'}
-    action={isOwn ? { label: 'Open your library', icon: 'bookmark', href: '/library' } : undefined} />;
+    action={isOwn ? { label: 'Open your library', icon: 'bookmark', href: '/profile?tab=library' } : undefined} />;
   return <ul role="list" className="pl-grid">{r.value.map((c) => <li key={c.id}><PlaylistCard c={c} /></li>)}</ul>;
 }
 
@@ -22,7 +22,7 @@ export async function MemberWatchlist({ owner, name, isOwn, visibility }: { owne
   const { data, error } = sb ? await sb.from('watchlist_items').select('tmdb_id, added_at, films(title, year, poster_path)').eq('user_id', owner).order('added_at', { ascending: false }).limit(100) : { data: null, error: true };
   if (error || !data) return <EmptyState icon="triangle-alert" title="The watchlist didn’t load" body="Try again in a moment." />;
   const rows = data as unknown as { tmdb_id: number; films: { title: string; year: number | null; poster_path: string | null } | null }[];
-  if (!rows.length) return <EmptyState icon="bookmark" title={isOwn ? 'Your account watchlist is empty' : `${name}’s watchlist is empty`} body={isOwn ? 'Films you save on this device can be moved into your account from your library.' : ''} action={isOwn ? { label: 'Open your library', icon: 'bookmark', href: '/library' } : undefined} />;
+  if (!rows.length) return <EmptyState icon="bookmark" title={isOwn ? 'Your account watchlist is empty' : `${name}’s watchlist is empty`} body={isOwn ? 'Films you save on this device can be moved into your account from your library.' : ''} action={isOwn ? { label: 'Open your library', icon: 'bookmark', href: '/profile?tab=library' } : undefined} />;
   return (
     <>
       {isOwn ? <p className="type-caption vm-muted">{visibility === 'public' ? 'Anyone can see your watchlist.' : 'Only you can see your watchlist.'} Change it on your account page.</p> : null}

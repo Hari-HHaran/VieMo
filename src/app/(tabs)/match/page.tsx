@@ -22,30 +22,28 @@ export default async function Match({ searchParams }: { searchParams: Promise<Re
         <h1 className="type-display-lg">Match</h1>
         <p className="type-body vm-muted">Decide what to watch without the back-and-forth.</p>
       </header>
-      <nav className="match-modes" aria-label="Ways to decide">
-        <a href="/match" className="match-mode" aria-current={!wheel ? 'page' : undefined}>
-          <Icon name="users" size={20} /><span><span className="type-label">Swipe Match</span><span className="type-caption vm-muted">Swipe through films until one fits</span></span>
-        </a>
-        <a href="/match?mode=wheel" className="match-mode is-wheel" aria-current={wheel ? 'page' : undefined}>
-          <Icon name="rotate-cw" size={20} /><span><span className="type-label">WheelMo</span><span className="type-caption vm-muted">Pull the lever. Let cinema decide.</span></span>
-        </a>
+      <nav className="decide" aria-label="Ways to decide">
+        <div className="decide-group">
+          <h2 className="type-label decide-head">Just me</h2>
+          <ul role="list" className="decide-list">
+            <li><a href="/match" className="match-mode" aria-current={!wheel ? 'page' : undefined}>
+              <Icon name="heart" size={20} /><span><span className="type-label">Swipe Match</span><span className="type-caption vm-muted">Swipe through films until one fits</span></span></a></li>
+            <li><a href="/match?mode=wheel" className="match-mode is-wheel" aria-current={wheel ? 'page' : undefined}>
+              <Icon name="rotate-cw" size={20} /><span><span className="type-label">WheelMo</span><span className="type-caption vm-muted">Pull the lever. Let cinema decide.</span></span></a></li>
+            <li><a href="/director" className="match-mode">
+              <Icon name="clapperboard" size={20} /><span><span className="type-label">Reel Director</span><span className="type-caption vm-muted">Describe your night, get three picks</span></span></a></li>
+          </ul>
+        </div>
+        <div className="decide-group">
+          <h2 className="type-label decide-head">With friends</h2>
+          <ul role="list" className="decide-list">
+            <li><a href="/match/night" className="match-mode">
+              <Icon name="users" size={20} /><span><span className="type-label">Movie Night</span><span className="type-caption vm-muted">Everyone votes in private; Match Decider settles it</span></span></a></li>
+          </ul>
+        </div>
       </nav>
       {wheel ? <WheelMo initialShare={share} services={services} /> : (
-        <>
-          <aside className="notice" aria-labelledby="mn-h">
-            <Icon name="users" size={20} />
-            <div>
-              <h2 id="mn-h" className="type-label">Movie Night with friends</h2>
-              <p className="type-caption vm-muted">Vote together in real time from any device. <a href="/match/night">Start or join a Movie Night</a>.</p>
-            </div>
-          </aside>
-          <a className="viewmo-promo director-promo" href="/director">
-            <span className="viewmo-promo-icon" aria-hidden="true"><Icon name="clapperboard" size={22} /></span>
-            <span><span className="type-heading-md">Ask Reel Director</span><span className="type-caption vm-muted">Rather describe it in words? Get three picks with reasons.</span></span>
-            <Icon name="chevron-right" size={20} />
-          </a>
-          <QuickPick services={services} place={regionName(region)} availabilityNote={asOf(`Availability is from JustWatch via TMDB for ${regionName(region)}`)} />
-        </>
+        <QuickPick services={services} place={regionName(region)} availabilityNote={asOf(`Availability is from JustWatch via TMDB for ${regionName(region)}`)} />
       )}
     </div>
   );

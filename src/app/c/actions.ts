@@ -28,7 +28,7 @@ export async function copyCollection(share: string): Promise<Done> {
   const { data, error } = await sb.rpc('copy_collection', { p_share: share });
   if (error || !data) return { ok: false, message: 'That didn’t copy. Try again.' };
   const { data: c } = await sb.from('movie_collections').select('share_id').eq('id', data as string).maybeSingle();
-  revalidatePath('/library');
+  revalidatePath('/profile');
   return { ok: true, share: c?.share_id };
 }
 
@@ -68,6 +68,6 @@ export async function createCollection(title: string, visibility: string, firstF
   const { data, error } = await sb.from('movie_collections').insert({ owner_id: user.id, title: t, visibility: v }).select('id, share_id').single();
   if (error || !data) return { ok: false, message: 'That didn’t save. Try again.' };
   if (firstFilm) await setInCollection(data.id, firstFilm, true);
-  revalidatePath('/library');
+  revalidatePath('/profile');
   return { ok: true, id: data.id, share: data.share_id };
 }

@@ -49,7 +49,7 @@ export default async function Collection({ params }: Params) {
             {c.owner.is_demo ? <DemoBadge /> : null}
             <span className="vm-muted">· {c.films.length} {c.films.length === 1 ? 'film' : 'films'}{runtime ? ` · ${runtimeLabel(runtime)}` : ''}{c.saves ? ` · ${c.saves} ${c.saves === 1 ? 'save' : 'saves'}` : ''}</span>
           </p>
-          {mine ? <p className="type-caption vm-muted cv-vis"><Icon name={c.visibility === 'public' ? 'globe' : c.visibility === 'unlisted' ? 'link' : 'lock'} size={14} /> {VIS[c.visibility]}. <a href="/library">Change it in your library</a></p> : null}
+          {mine ? <p className="type-caption vm-muted cv-vis"><Icon name={c.visibility === 'public' ? 'globe' : c.visibility === 'unlisted' ? 'link' : 'lock'} size={14} /> {VIS[c.visibility]}. <a href="/profile?tab=library">Change it in your library</a></p> : null}
           {c.owner.is_demo ? <p className="type-caption vm-muted">A demo collection: made by a fictional account for testing.</p> : null}
           <div className="cv-row">
             <CollectionActions id={c.id} share={c.share_id} title={c.title} canSave={!mine && c.visibility === 'public'} saved={c.saved_by_me} signedIn={!!user} />

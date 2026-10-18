@@ -13,6 +13,7 @@ import '../styles/screening.css';
 import '../styles/community.css';
 import '../styles/wheelmo.css';
 import '../styles/night.css';
+import '../styles/personal.css';
 import type { Metadata, Viewport } from 'next';
 import AppShell from '@/components/AppShell';
 import { dataSource } from '@/lib/tmdb';
@@ -34,7 +35,7 @@ export const viewport: Viewport = {
 };
 
 /* Runs before first paint: applies the saved theme, motion setting and personal accent so nothing flashes. */
-const boot = `(function(){try{var e=document.documentElement;var p=JSON.parse(localStorage.getItem('viemo:prefs')||'{}');var t=p.theme||'system';e.setAttribute('data-theme',t==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t);if(p.reduceMotion)e.setAttribute('data-motion','reduce');var a=JSON.parse(localStorage.getItem('viemo:accent')||'null');if(a&&a.css){var s=document.createElement('style');s.id='vm-accent';s.textContent=a.css;document.head.appendChild(s);e.setAttribute('data-vm-accent','')}}catch(x){}})();`;
+const boot = `(function(){try{var e=document.documentElement;var p=JSON.parse(localStorage.getItem('viemo:prefs')||'{}');var t=p.theme||'system';e.setAttribute('data-theme',t==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):t);if(p.reduceMotion)e.setAttribute('data-motion','reduce');var a=JSON.parse(localStorage.getItem('viemo:accent')||'null');if(a&&a.css){var s=document.createElement('style');s.id='vm-accent';s.textContent=a.css;document.head.appendChild(s);e.setAttribute('data-vm-accent','')}var b=JSON.parse(localStorage.getItem('viemo:backdrop')||'null');if(b&&b.film&&/^\\/[A-Za-z0-9._-]+$/.test(b.film.posterPath||'')){e.setAttribute('data-vm-backdrop',b.where==='home'?'home':'all');if(b.blur)e.setAttribute('data-vm-backdrop-blur','');e.style.setProperty('--vm-backdrop-img','url("https://image.tmdb.org/t/p/w780'+b.film.posterPath+'")');e.style.setProperty('--vm-backdrop-opacity',String(Math.min(0.14,Math.max(0.04,+b.opacity||0.08))))}}catch(x){}})();`;
 
 /* When the server runs on the saved snapshot, every screen says so (and how old it is). */
 function dataNote(): string | null {

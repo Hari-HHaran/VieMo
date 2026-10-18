@@ -58,7 +58,7 @@ export default async function Explore({ searchParams }: { searchParams: Promise<
         {cols.ok && !list.length ? (
           <EmptyState icon="list-plus" title={query ? 'No public collections match' : 'No public collections yet'}
             body={query ? 'Try another word, or clear the search.' : 'When members make a collection public, it shows here. Yours start private; you choose what to share.'}
-            action={{ label: 'Make a collection', icon: 'plus', href: '/library' }} />
+            action={{ label: 'Make a collection', icon: 'plus', href: '/profile?tab=library' }} />
         ) : (
           <ul role="list" className="pl-grid">{list.map((c, i) => <li key={c.id}><PlaylistCard c={c} priority={i < 6} /></li>)}</ul>
         )}

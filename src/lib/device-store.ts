@@ -51,8 +51,8 @@ export function useWatchlist() {
 }
 
 export type ThemePref = 'system' | 'dark' | 'light';
-export interface Prefs { theme: ThemePref; reduceMotion: boolean; autoplay: boolean; captions: boolean }
-export const DEFAULT_PREFS: Prefs = { theme: 'system', reduceMotion: false, autoplay: false, captions: true };
+export interface Prefs { theme: ThemePref; reduceMotion: boolean; autoplay: boolean; captions: boolean; cursor: boolean }
+export const DEFAULT_PREFS: Prefs = { theme: 'system', reduceMotion: false, autoplay: false, captions: true, cursor: true };
 const prefsStore = createStore<Prefs>('viemo:prefs', DEFAULT_PREFS);
 export function usePrefs(): [Prefs, (patch: Partial<Prefs>) => void] {
   const prefs = { ...DEFAULT_PREFS, ...prefsStore.useValue() };
@@ -64,6 +64,15 @@ export interface AccentPref { hex: string | null; css: string | null; film: { id
 const accentStore = createStore<AccentPref>('viemo:accent', { hex: null, css: null, film: null });
 export const useAccentPref = () => accentStore.useValue();
 export const setAccentPref = (v: AccentPref) => accentStore.set(v);
+
+/* A favourite poster behind the app, faded right down so it never competes with the content. */
+export const BACKDROP_MIN = 0.04, BACKDROP_MAX = 0.14, BACKDROP_DEFAULT = 0.08;
+export interface BackdropPref { film: { id: number; title: string; posterPath: string } | null; opacity: number; where: 'home' | 'all'; blur: boolean }
+export const DEFAULT_BACKDROP: BackdropPref = { film: null, opacity: BACKDROP_DEFAULT, where: 'all', blur: false };
+const backdropStore = createStore<BackdropPref>('viemo:backdrop', DEFAULT_BACKDROP);
+export const useBackdropPref = (): BackdropPref => ({ ...DEFAULT_BACKDROP, ...backdropStore.useValue() });
+export const setBackdropPref = (patch: Partial<BackdropPref>) => backdropStore.set({ ...DEFAULT_BACKDROP, ...backdropStore.get(), ...patch });
+export const clampBackdrop = (n: number) => Math.min(BACKDROP_MAX, Math.max(BACKDROP_MIN, Number.isFinite(n) ? n : BACKDROP_DEFAULT));
 
 /* Applies theme and motion preferences to <html>; the inline script in the layout does the same before first paint. */
 export function applyPrefsToDocument(p: Prefs) {

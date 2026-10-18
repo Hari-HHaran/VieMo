@@ -124,16 +124,26 @@ a.wm-mode { color: var(--wm-muted); }
 @keyframes wm-spark { 0% { opacity: 1; transform: rotate(var(--a)) translateX(0); } 100% { opacity: 0; transform: rotate(var(--a)) translateX(140px); } }
 
 /* Match: Swipe Match or WheelMo */
-.match-modes { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.decide { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: var(--space-4); }
+@media (max-width: 900px) { .decide { grid-template-columns: minmax(0, 1fr); } }
+.decide-group { display: grid; gap: var(--space-2); align-content: start; min-width: 0; }
+.decide-head { color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; margin: 0; }
+.decide-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.decide-list .match-mode { height: 100%; }
 .match-mode { display: flex; align-items: center; gap: var(--space-3); min-height: 64px; padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg);
   border: 1px solid var(--line-strong); color: var(--ink); text-decoration: none; background: var(--surface); }
 .match-mode > span { display: grid; }
 .match-mode[aria-current] { border-color: var(--reel-ink); box-shadow: inset 0 0 0 1px var(--reel-ink); background: color-mix(in srgb, var(--reel) 12%, var(--surface)); }
 .match-mode.is-wheel svg { color: var(--reel-ink); }
 .match-mode:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
-@media (max-width: 480px) { .match-mode .type-caption { display: none; } }
+
 
 @media (prefers-reduced-motion: reduce) { .wm-bulb, .is-spinning .wm-bulb, .has-winner .wm-bulb { animation: none; } .wm-sparkles { display: none; } }
 html[data-motion="reduce"] .wm-bulb { animation: none !important; }
 html[data-motion="reduce"] .wm-sparkles { display: none; }
 @media (forced-colors: active) { .wm-wedge-edge { stroke: CanvasText; } .wm-wedge.is-winner .wm-wedge-edge { stroke: Highlight; } }
+@media (max-width: 480px) {
+  .decide-list { grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+  .decide-list .match-mode { min-height: 56px; padding: var(--space-2) var(--space-3); gap: var(--space-2); }
+  .decide-list .match-mode .type-caption { display: none; }
+}
