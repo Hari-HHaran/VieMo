@@ -6,7 +6,9 @@ You need a Supabase project and access to the VieMo project in Vercel. Supabase'
 
 ## 1. Create the tables
 
-In Supabase, open **SQL Editor**. Paste each file below into a new query and run it, one at a time, in this order:
+**New, empty project? Do it in one go:** open **SQL Editor → New query**, paste the whole of `supabase/setup-all-migrations.sql`, and press **Run** (Supabase's "destructive operations" warning is expected). It contains all the files below, in order, as one transaction: if anything fails, nothing is changed. It ends by reloading Supabase's API, so the new tables and functions are available at once.
+
+**Or one file at a time** (use this if some have already run): in **SQL Editor**, paste each file below into a new query and run it, in this order:
 
 1. `supabase/migrations/20261018000001_foundation.sql` (films, profiles, follows)
 2. `supabase/migrations/20261018000002_library.sql` (watchlist, diary, collections)

@@ -416,7 +416,7 @@ The app is forgiving about slightly different spellings of the Supabase and Open
 
 Follow `docs/supabase-setup.md`. In short:
 
-1. Run the eight files in `supabase/migrations/`, in order, in Supabase's SQL Editor.
+1. In Supabase's SQL Editor, run `supabase/setup-all-migrations.sql` (all eight migrations in one go, for a new project), or the files in `supabase/migrations/` one at a time, in order. After adding a migration, `npm run db:bundle` rebuilds the combined file.
 2. Add the keys above in Vercel.
 3. Set your site address and redirect links in Supabase Auth.
 4. Check `/status` and the three-account checklist in that guide.

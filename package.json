@@ -9,7 +9,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "ds:build": "node design-system/scripts/build.mjs",
-    "snapshot": "node scripts/snapshot.mjs"
+    "snapshot": "node scripts/snapshot.mjs",
+    "db:bundle": "node scripts/bundle-migrations.mjs"
   },
   "engines": {
     "node": ">=20.9.0"
